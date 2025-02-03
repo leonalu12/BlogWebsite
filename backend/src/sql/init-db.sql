@@ -1,5 +1,6 @@
 -- Create user table
 CREATE TABLE IF NOT EXISTS users (
+
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
     fname  VARCHAR(50),
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Create comment table
 CREATE TABLE IF NOT EXISTS comments (
+
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     content TEXT,
     layer INTEGER,
