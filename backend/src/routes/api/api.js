@@ -3,6 +3,8 @@ import express from "express";
 const router = express.Router();
 
 // import child routes
+import articleRouter from "./api-article.js";
+router.use("/article", articleRouter);
 
 import userRouter from "./api-user.js";
 router.use("/users", userRouter);
@@ -15,3 +17,5 @@ router.use("/comments", commentRouter);
 
 
 export default router;
+
+
