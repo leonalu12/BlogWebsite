@@ -1,26 +1,43 @@
-/**
- * This file contains API routes for the temp data. You should
- * create your own API routes files for your project, and get rid of this one.
- */
-
 import express from "express";
-import { getMessages, addMessage } from "../../data/temp-dao.js";
+import { createUser,getUsersByUsername,deleteUser,updateUser,getUsers} from "../../data/user-dao.js";
+import {requiresAuthentication} from "../../middleware/auth-middleware.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const messages = await getMessages();
 
-  const callCountCookie = req.cookies.callCount;
-  const callCount = callCountCookie ? parseInt(callCountCookie) + 1 : 1;
-
-  return res.cookie("callCount", callCount.toString(), { httpOnly: true }).json(messages);
+router.get("/", requiresAuthentication, async (req, res) => {
+  const username = req.query.username;
+  if (!username) {
+    const users = await getUsers();
+    return res.json(users);
+  }
+  const user = await getUsersByUsername(username);
+  return res.json(user);
 });
 
-router.post("/", async (req, res) => {
-  const { message } = req.body;
-  const dbMessage = await addMessage(message);
-  return res.status(201).location(`/api/messages/${message.id}`).json(dbMessage);
-})
+router.post("/register", async (req, res) => {
+  try {
+    const user = req.body;
+    const newUser = await createUser(user);
+    return res.status(201).location(`/api/users/${newUser.id}`).json(newUser);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
+  }   
+});
+
+
+
+router.delete("/:id", requiresAuthentication, async (req, res) => {
+  const id = req.params.id;
+  await deleteUser(id);
+  return res.sendStatus(204);
+});
+
+router.patch("/:id", requiresAuthentication, async (req, res) => {
+  const id = req.params.id;
+  const user = req.body;
+  const updatedUser = await updateUser(user, id);
+  return res.json(updatedUser);
+});
 
 export default router;
