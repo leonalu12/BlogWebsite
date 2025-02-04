@@ -14,11 +14,12 @@ export async function getCommentsWithArticleId(articleId) {
 export async function addComment(content, layer, date_time, user_id, article_id, parent_cid) {
     const db = await getDatabase();
     const dbResult = await db.run(
-        "INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES(content, layer, date_time, user_id, article_id, parent_cid)");
+        "INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES(?, ?, ?, ?, ?, ?)",[content, layer, date_time, user_id, article_id, parent_cid]);
+        return dbResult;
 }
 
 /* delete comment */
 export async function deleteComment(id) {
     const db = await getDatabase();
-    return await db.run("DELETE FROM comments WHERE id = id");
+    return await db.run("DELETE FROM comments WHERE id = ?",[id]);
 }

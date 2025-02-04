@@ -3,6 +3,7 @@ import { getCommentsWithArticleId, addComment, deleteComment } from "../../data/
 
 const router = express.Router();
 
+//get comments by article id
 router.get("/:articleId", async (req, res) => {
     try {
         const comments = await getCommentsWithArticleId(req.params.articleId);
@@ -12,10 +13,17 @@ router.get("/:articleId", async (req, res) => {
     }
 });
 
+//create comment
 router.post("/", async (req, res) => {
-  const { message } = req.body;
-  const dbMessage = await addMessage(message);
-  return res.status(201).location(`/api/messages/${message.id}`).json(dbMessage);
+  try{
+    
+  const newComment = await addComment(req.body);
+  return res.status(201).json(newComment);}
+  catch(err){
+    res.status(500).json({ message: "Failed to add comment", error: err.message });
+  }
 })
+
+
 
 export default router;
