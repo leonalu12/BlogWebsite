@@ -1,5 +1,5 @@
 import express from "express";
-import { getCommentsWithArticleId, addComment, deleteComment } from "../../data/comment-dao.js";
+import { getCommentsWithArticleId, addComment, deleteComment, likeComment, unlikeComment, getCommentLikes } from "../../data/comment-dao.js";
 
 const router = express.Router();
 
@@ -36,8 +36,40 @@ router.delete("/:id", async(req, res) => {
     } catch (err) {
         res.status(500);
     }
-})
+});
 
+//like comment
+router.post("/:id/like", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const success = await likeComment(userId, req.params.id);
+      res.json({ liked: success });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+//unlike comment
+router.delete("/:id/like", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      await unlikeArticle(userId, req.params.id);
+      res.status(204).send();
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+});
+
+//get likes number
+router.get("/:commentId/likes", async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        const likes = await getCommentLikes(commentId);
+        res.json({ likes });
+    } catch (err) {
+        res.status(500).json({ message: "fail to get likes number." });
+    }
+});
 
 
 export default router;

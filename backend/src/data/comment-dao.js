@@ -24,3 +24,28 @@ export async function deleteComment(id) {
     const db = await getDatabase();
     return await db.run("DELETE FROM comments WHERE id = ?",[id]);
 }
+
+/* like */
+export async function likeComment(user_id, comment_id) {
+    const db = await getDatabase();
+    // check like
+    const existingLike = await db.get("SELECT * FROM like_c WHERE user_id = ? AND comment_id = ?", [user_id, comment_id]);
+    if (!existingLike) {
+      await db.run("INSERT INTO like_c (user_id, comment_id) VALUES (?, ?)", [user_id, comment_id]);
+      return true;
+    }
+    return false;
+}
+
+/* unlike */
+export async function unlikeComment(user_id, comment_id) {
+    const db = await getDatabase();
+    await db.run("DELETE FROM like_c WHERE user_id = ? AND comment_id = ?", [user_id, comment_id]);
+}
+
+/* get the number of likes from a comment */
+export async function getCommentLikes(comment_id) {
+    const db = await getDatabase();
+    const result = await db.get("SELECT COUNT(*) AS like_count FROM like_c WHERE comment_id = ?", [comment_id]);
+    return result ? result.like_count : 0;
+}
