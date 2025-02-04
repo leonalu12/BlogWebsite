@@ -10,4 +10,8 @@ router.use("/users", userRouter);
 import authRouter from "./api-auth.js";
 router.use("/auth", authRouter);
 
+import commentRouter from "./api-comment.js";
+router.use("/comments", commentRouter);
+
+
 export default router;
