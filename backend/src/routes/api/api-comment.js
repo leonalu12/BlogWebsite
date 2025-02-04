@@ -16,12 +16,26 @@ router.get("/:articleId", async (req, res) => {
 //create comment
 router.post("/", async (req, res) => {
   try{
-    
-  const newComment = await addComment(req.body);
+    const { content, layer, date_time, user_id, article_id, parent_cid } = req.body;
+    if (!content) {
+        return res.status(400);
+    }
+  const newComment = await addComment(content, layer, date_time, user_id, article_id, parent_cid);
   return res.status(201).json(newComment);}
   catch(err){
     res.status(500).json({ message: "Failed to add comment", error: err.message });
   }
+});
+
+//delete comment
+router.delete("/:id", async(req, res) => {
+    try {
+        const comment_id = req.params.id;
+        await deleteComment(comment_id);
+        return res.json({message:"comment and all replies deleted."});
+    } catch (err) {
+        res.status(500);
+    }
 })
 
 
