@@ -4,7 +4,7 @@ const router = express.Router();
 
 // import child routes
 import articleRouter from "./api-article.js";
-router.use("/article", articleRouter);
+router.use("/articles", articleRouter);
 
 
 import userRouter from "./api-user.js";
