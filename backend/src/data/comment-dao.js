@@ -31,7 +31,7 @@ export async function likeComment(user_id, comment_id) {
     // check like
     const existingLike = await db.get("SELECT * FROM like_c WHERE user_id = ? AND comment_id = ?", [user_id, comment_id]);
     if (!existingLike) {
-      await db.run("INSERT INTO like_a (user_id, comment_id) VALUES (?, ?)", [user_id, comment_id]);
+      await db.run("INSERT INTO like_c (user_id, comment_id) VALUES (?, ?)", [user_id, comment_id]);
       return true;
     }
     return false;
