@@ -20,10 +20,6 @@ CREATE TABLE IF NOT EXISTS comments (
     date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER,
     article_id INTEGER,
-    article_id INTEGER,
-    article_id INTEGER,
-    article_id INTEGER,
-
     parent_cid INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,

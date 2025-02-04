@@ -41,8 +41,8 @@ router.delete("/:id", async(req, res) => {
 //like comment
 router.post("/:id/like", async (req, res) => {
     try {
-      const { userId } = req.body;
-      const success = await likeComment(userId, req.params.id);
+      const { user_id } = req.body;
+      const success = await likeComment(user_id, req.params.id);
       res.json({ liked: success });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -52,8 +52,8 @@ router.post("/:id/like", async (req, res) => {
 //unlike comment
 router.delete("/:id/like", async (req, res) => {
     try {
-      const { userId } = req.body;
-      await unlikeArticle(userId, req.params.id);
+      const { user_id } = req.body;
+      await unlikeComment(user_id, req.params.id);
       res.status(204).send();
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -61,10 +61,10 @@ router.delete("/:id/like", async (req, res) => {
 });
 
 //get likes number
-router.get("/:commentId/likes", async (req, res) => {
+router.get("/:id/likes", async (req, res) => {
     try {
-        const commentId = req.params.commentId;
-        const likes = await getCommentLikes(commentId);
+        const comment_id = req.params.id;
+        const likes = await getCommentLikes(comment_id);
         res.json({ likes });
     } catch (err) {
         res.status(500).json({ message: "fail to get likes number." });

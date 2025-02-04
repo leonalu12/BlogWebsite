@@ -1,8 +1,5 @@
 import { getDatabase } from "./database.js";
 
-
-
-
 /* get all comments from given article id */
 export async function getCommentsWithArticleId(articleId) {
     const db = await getDatabase();
