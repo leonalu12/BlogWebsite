@@ -7,4 +7,14 @@ import articleRouter from "./api-article.js";
 router.use("/article", articleRouter);
 
 
+import userRouter from "./api-user.js";
+router.use("/users", userRouter);
+
+import authRouter from "./api-auth.js";
+router.use("/auth", authRouter);
+
+import commentRouter from "./api-comment.js";
+router.use("/comments", commentRouter);
+
+
 export default router;
