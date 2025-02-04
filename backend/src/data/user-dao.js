@@ -15,28 +15,32 @@ const userSchema = yup
 });
 
 export async function createUser(user) {
-    let newUser=userSchema.validateSync(user,{
-        abortEarly:false,
-        stripUnknown: true
-    })
+    try {
+        let newUser = userSchema.validateSync(user, {
+            abortEarly: false,
+            stripUnknown: true
+        });
 
-    const saltRounds = 10;
-    newUser.pwd = await bcrypt.hash(newUser.pwd, saltRounds);
+        const saltRounds = 10;
+        newUser.pwd = await bcrypt.hash(newUser.pwd, saltRounds);
 
-    const db = await getDatabase();
-    const response = await db.run(
-        'INSERT INTO users (username, fname, lname, description, dob, pwd, icon) VALUES(?, ?, ?, ?, ?, ?, ?)', 
-        newUser.username, 
-        newUser.fname,
-        newUser.lname, 
-        newUser.description,
-        newUser.dob, 
-        newUser.pwd,
-        newUser.icon
-    );
- 
-    newUser.id = response.lastID;
-    return newUser;
+        const db = await getDatabase();
+        const response = await db.run(
+            'INSERT INTO users (username, fname, lname, description, dob, pwd, icon) VALUES(?, ?, ?, ?, ?, ?, ?)', 
+            newUser.username, 
+            newUser.fname,
+            newUser.lname, 
+            newUser.description,
+            newUser.dob, 
+            newUser.pwd,
+            newUser.icon
+        );
+
+        newUser.id = response.lastID;
+        return newUser;
+    } catch (error) {
+        throw new Error(`Error creating user: ${error.message}`);
+    }
 }
 
 export async function authenticateUser(username, pwd) {
@@ -62,8 +66,8 @@ export async function getUsers() {
  
 export async function getUsersByUsername(username) {
     const db = await getDatabase();
-    const users = await db.all('SELECT * FROM users WHERE username = ?', username);
-    return users;
+    const user = await db.get('SELECT * FROM users WHERE username = ?', username);
+    return user;
     }
 
 
