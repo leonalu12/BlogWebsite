@@ -3,11 +3,13 @@
     import UserRegister from './UserRegister.svelte';
     import { goto } from '$app/navigation';
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
+    import { logedIn } from '../../store/userStore.js';
+
     let clickedRegister = false;
-    let logedIn = false;
-    function toggleLogedIn() {
-        logedIn = !logedIn;
-    }
+
+   function toggleLogedIn() {
+    logedIn.update(value=>!value);
+  }
     function toggleRegister() {
         clickedRegister = !clickedRegister;
     }
@@ -45,7 +47,7 @@
   </script>
 
 
-{#if !logedIn}
+{#if !$logedIn}
   {#if clickedRegister}
     <UserRegister />
   {:else}
@@ -69,7 +71,7 @@
           />
         </div>
         <div>
-          <button on:click={toggleRegister}>Hey, register one?</button>
+          <button type="button" on:click={toggleRegister}>Hey, register one?</button>
         </div>
         <div class="form-group">
           <button type="submit">登录</button>
