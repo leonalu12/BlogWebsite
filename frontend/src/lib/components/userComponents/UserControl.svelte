@@ -2,20 +2,17 @@
   import { User, Settings, LogOut } from 'lucide-svelte';
   import UserEdit from './UserEdit.svelte';
   import UserLogin from './UserLogin.svelte';
-
+  import { logedIn } from '../../store/userStore.js';
+  import { PUBLIC_API_BASE_URL } from "$env/static/public";
   let isOpen = false;
   let displayEdit = false;
   let displayLogin = false;
-  let logedIn = false;
 
   function toggleDisplayLogin() {
       displayLogin = !displayLogin;
-      toggleLogedIn();
   }
 
-  function toggleLogedIn() {
-    logedIn = !logedIn;
-  }
+  
 
   function toggleDisplayEdit() {
       displayEdit = !displayEdit;
@@ -26,18 +23,35 @@
     isOpen = !isOpen;
   }
 
+  async function userLogOut() {
+    const response = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
+      method: 'delete',
+      credentials: 'include'
+    }); 
+    console.log('log out response:', response);
+    logedIn.set(false);
+    toggleDropdown();
+    toggleDisplayLogin();
+  }
+
 
 </script>
 
-{#if !logedIn}
+{#if !$logedIn}
   <button on:click={toggleDisplayLogin}><User /></button>
+  {#if displayLogin}
+    <UserLogin />
+  {/if}
 {:else}
 <div class="dropdown">
   <button on:click={toggleDropdown}><User /></button>
   <div class="dropdown-content" style="display: {isOpen ? 'block' : 'none'};">
 
     <button on:click={toggleDisplayEdit} class="editButton"><User /> Profile</button>
-    <button on:click={toggleLogedIn} class="editButton"><LogOut /> Log out</button>
+    {#if displayEdit}
+    <UserEdit />
+  {/if}
+    <button on:click={userLogOut} class="editButton"><LogOut /> Log out</button>
 
   </div>
 </div>
@@ -45,13 +59,9 @@
 
 
 
-  {#if displayEdit}
-    <UserEdit />
-  {/if}
   
-  {#if displayLogin}
-    <UserLogin />
-  {/if}
+  
+  
 
 
 <style>
