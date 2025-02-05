@@ -3,27 +3,31 @@ import { getDatabase } from "./database.js";
 import { updateDatabase } from "./util.js";
 
 /**
- * 获取所有文章（支持动态搜索和排序）
- * @param {string} search 搜索关键词
- * @param {string} filterBy 过滤字段 (默认: title)
- * @param {string} sortBy 排序字段 (默认: date_time)
- * @param {string} order 排序方式 (默认: DESC)
- * @param {number} userId 可选，按用户ID筛选
- * @returns {Array} 文章列表
+ * Get all articles(search&sort)
+ * @param {string} search 
+ * @param {string} filterBy  (defult: title)
+ * @param {string} sortBy  (defult: date_time)
+ * @param {string} order  (defult: DESC)
+ * @param {number} userId 
+ * @returns {Array} 
  */
 export async function getAllArticles(search = "", filterBy = "title", sortBy = "date_time", order = "DESC", userId = null) {
   const db = await getDatabase();
+    // check `search` whether have""（Precise search）
+const isExactSearch = search.startsWith('"') && search.endsWith('"');
+// delete the ""，If the search is precise, it will be matched directly; otherwise, the fuzzy search will be performed
+const cleanSearch = isExactSearch ? search.slice(1, -1) : `%${search}%`;
 
-  let query = `
-    SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
-           (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
-           (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_url
-    FROM articles a
-    JOIN users u ON a.user_id = u.id
-    WHERE LOWER(${filterBy === "username" ? "u.username" : "a.title"}) LIKE LOWER(?)
-  `;
+let query = `
+SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
+       (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
+       (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_url
+FROM articles a
+JOIN users u ON a.user_id = u.id
+WHERE ${filterBy === "content" ? "a.content" : "a.title"} ${isExactSearch ? "=" : "LIKE"} ?
+`;
 
-  let params = [`%${search}%`];
+let params = [cleanSearch];  // 
 
   // 按用户ID筛选
   if (userId) {
@@ -31,7 +35,7 @@ export async function getAllArticles(search = "", filterBy = "title", sortBy = "
     params.push(userId);
   }
 
-  query += ` ORDER BY a.${sortBy} ${order};`;
+  query += ` ORDER BY ${sortBy === "username" ? "u.username" : "a." + sortBy} ${order};`;
 
   return await db.all(query, params);
 }
