@@ -23,6 +23,8 @@
   },
   "type": "module",
   "dependencies": {
-    "dayjs": "^1.11.11"
+    "dayjs": "^1.11.11",
+    "lucide": "^0.474.0",
+    "lucide-svelte": "^0.474.0"
   }
 }

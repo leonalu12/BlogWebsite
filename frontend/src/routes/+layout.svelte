@@ -1,8 +1,10 @@
 <script>
   import "$lib/css/app.css";
-
+  import UserControl from '$lib/components/userComponents/UserControl.svelte';
+  
   import { page } from "$app/stores";
   $: path = $page.url.pathname;
+
 </script>
 
 
@@ -19,18 +21,19 @@
       </span>
     
       <span>
-        <a href="/">icon</a>
+      
+        <UserControl />
       </span>
     </nav>
   </div>
 
-  <dir>
+  <div>
     <nav>
     <span><a href="/" class:active={path === "/"}>Explore</a></span>
     <span><a href="/" class:active={path === "/"}>Explore</a></span>
     <span><a href="/" class:active={path === "/"}>Explore</a></span>
     </nav>
-  </dir>
+  </div>
 </div>
 
 

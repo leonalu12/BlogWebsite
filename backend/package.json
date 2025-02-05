@@ -24,6 +24,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "lucide": "^0.474.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "sqlite": "^5.1.1",
