@@ -1,14 +1,16 @@
 <script>
     import "$lib/css/app.css";
+    import AddButton from "$lib/components/AddButton.svelte";
   
     import { page } from "$app/stores";
     $: path = $page.url.pathname;
   </script>
-
+<AddButton />
 <div class="article-nav">
     <span>Article</span>
     <span><button>like</button></span>
 </div>
+
 <slot />
 
 
