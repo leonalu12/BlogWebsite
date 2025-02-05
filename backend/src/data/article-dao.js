@@ -1,4 +1,5 @@
 
+
 import { getDatabase } from "./database.js";
 import { updateDatabase } from "./util.js";
 
@@ -157,3 +158,4 @@ export async function getArticleLikes(articleId) {
   const result = await db.get("SELECT COUNT(*) AS like_count FROM like_a WHERE article_id = ?", [articleId]);
   return result ? result.like_count : 0;
 }
+
