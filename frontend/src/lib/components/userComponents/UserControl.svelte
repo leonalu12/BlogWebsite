@@ -48,14 +48,17 @@
   <div class="dropdown-content" style="display: {isOpen ? 'block' : 'none'};">
 
     <button on:click={toggleDisplayEdit} class="editButton"><User /> Profile</button>
-    {#if displayEdit}
-    <UserEdit />
-  {/if}
+    
     <button on:click={userLogOut} class="editButton"><LogOut /> Log out</button>
 
   </div>
 </div>
 {/if}
+
+
+{#if displayEdit}
+    <UserEdit />
+  {/if}
 
 
 

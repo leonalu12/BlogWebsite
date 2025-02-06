@@ -33,12 +33,15 @@
   
         if (!response.ok) {
           throw new Error('login failed');
-        }
-  
-        const data = await response.json();
+        }else{
+          const data = await response.json();
         console.log('登录成功:', data);
         toggleLogedIn();
         goto('/');
+
+        }
+  
+        
         // redirect to the home page
       } catch (error) {
         console.error('登录失败:', error);
