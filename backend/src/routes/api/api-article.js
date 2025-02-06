@@ -92,8 +92,28 @@ router.put("/:id/edit", upload.single("image"), async (req, res) => {
 // 删除文章
 router.delete("/:id", async (req, res) => {
   try {
+    const { userId } = req.body; // Extract userId from request
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    // Fetch the article first
+    const article = await getArticleById(req.params.id);
+
+    if (!article) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+
+    
+
+    // Proceed with deletion
     const deleted = await deleteArticle(req.params.id);
-    res.status(deleted ? 204 : 404).send();
+    if (deleted) {
+      res.status(204).send(); // No content response on success
+    } else {
+      res.status(500).json({ error: "Failed to delete article" });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -9,6 +9,8 @@
 </svelte:head>
 
 <h1>home page test</h1>
+<a href={`/myArticles`} class="my-articles-btn">My Articles</a>
+
 
 
 
@@ -18,7 +20,7 @@
     <span class="article">
       <a href={`/articles/${article.id}`}>
         <div>
-          <div><img src="{article.image_url}" alt="{article.title}" /></div>
+          <div><img src="{ PUBLIC_IMAGES_URL }/{article.image_url}" alt="{article.title}" /></div>
           <div> {article.title}</div>
           <div> {article.content}</div>
         </div>
