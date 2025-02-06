@@ -1,7 +1,7 @@
 <script>
+  import TinyMCE from "@tinymce/tinymce-svelte";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import TinyMCE from "@tinymce/tinymce-svelte";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
 
   let title = "";
@@ -11,9 +11,13 @@
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
   let errorMessage = "";
 
-//   onMount(() => {
-//     tinymce.remove();
-//   });
+  //   onMount(() => {
+  //     tinymce.remove(); // Clears any previous TinyMCE instances
+  //   });
+
+  //   onDestroy(() => {
+  //     tinymce.remove(); // Ensure cleanup when navigating away
+  //   });
 
   // Function to handle form submission
   async function handleSubmit() {
@@ -33,7 +37,7 @@
     });
     if (res.ok) {
       alert("Article created successfully!");
-      goto("/articles"); // Redirect to the articles list after creation
+      goto("/");
     } else {
       errorMessage = "Something went wrong. Please try again.";
     }
@@ -52,22 +56,23 @@
   <label for="title">Title:</label>
   <input type="text" id="title" bind:value={title} placeholder="Enter article title" required />
 
-  <!-- WYSIWYG Editor -->
-  <label for="content">Content:</label>
+
+
+   <!-- WYSIWYG Editor -->
   <TinyMCE
-  {apiKey}
-  bind:value={content}
-  init={{
-    selector: "textarea", // Ensures TinyMCE is applied correctly
-    height: 300,
-    menubar: false,
-    plugins: "lists",  // Ensures bullet & numbered lists work
-    toolbar: "undo redo | formatselect | bold italic underline | bullist numlist",
-    menu: { tools: { title: "Tools", items: "listprops" }}, // Optional: Adds list options in menu
-    lists_indent_on_tab: false, // Enables Tab key for list indentation
-    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
-  }}
-/>
+    {apiKey}
+    bind:value={content}
+    init={{
+      selector: "textarea", // Ensures TinyMCE is applied correctly
+      height: 300,
+      menubar: false,
+      plugins: "lists advlist", // Ensures bullet & numbered lists work
+      toolbar: "undo redo | bold italic underline | bullist numlist",
+      menu: { tools: { title: "Tools", items: "listprops" } }, // Optional: Adds list options in menu
+      lists_indent_on_tab: false, // Enables Tab key for list indentation
+      content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
+    }}
+  />
 
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>

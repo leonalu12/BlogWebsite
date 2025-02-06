@@ -2,7 +2,7 @@
 
 import { getDatabase } from "./database.js";
 import { updateDatabase } from "./util.js";
-
+const PUBLIC_IMAGES_URL = process.env.PUBLIC_IMAGES_URL || "http://localhost:3000/images";
 /**
  * Get all articles(search&sort)
  * @param {string} search 
@@ -14,21 +14,23 @@ import { updateDatabase } from "./util.js";
  */
 export async function getAllArticles(search = "", filterBy = "title", sortBy = "date_time", order = "DESC", userId = null) {
   const db = await getDatabase();
-    // check `search` whether have""（Precise search）
-const isExactSearch = search.startsWith('"') && search.endsWith('"');
-// delete the ""，If the search is precise, it will be matched directly; otherwise, the fuzzy search will be performed
-const cleanSearch = isExactSearch ? search.slice(1, -1) : `%${search}%`;
+  // check `search` whether have""（Precise search）
 
-let query = `
+  const isExactSearch = search.startsWith('"') && search.endsWith('"');
+  // delete the ""，If the search is precise, it will be matched directly; otherwise, the fuzzy search will be performed
+  const cleanSearch = isExactSearch ? search.slice(1, -1) : `%${search}%`;
+
+  let query = `
 SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
        (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
        (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_url
 FROM articles a
 JOIN users u ON a.user_id = u.id
+LEFT JOIN imgs i ON a.id = i.article_id
 WHERE ${filterBy === "content" ? "a.content" : "a.title"} ${isExactSearch ? "=" : "LIKE"} ?
 `;
 
-let params = [cleanSearch];  // 
+  let params = [cleanSearch];  // 
 
   // 按用户ID筛选
   if (userId) {
@@ -38,8 +40,14 @@ let params = [cleanSearch];  //
 
   query += ` ORDER BY ${sortBy === "username" ? "u.username" : "a." + sortBy} ${order};`;
 
-  return await db.all(query, params);
+  let articles = await db.all(query, [`%${search}%`]);
+
+  return articles.map(article => ({
+    ...article,
+    image_url: article.image_url ? `${PUBLIC_IMAGES_URL}/${article.image_url}` : null
+  }));
 }
+
 
 /**
  * 获取单篇文章
@@ -48,14 +56,20 @@ let params = [cleanSearch];  //
  */
 export async function getArticleById(id) {
   const db = await getDatabase();
-  return await db.get(`
+  let article = await db.get(`
     SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
            (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
-           (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_url
+           (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_path
     FROM articles a
     JOIN users u ON a.user_id = u.id
     WHERE a.id = ?
   `, [id]);
+
+  if (article) {
+    article.image_url = article.image_path ? `${PUBLIC_IMAGES_URL}/${article.image_path}` : null;
+  }
+
+  return article;
 }
 
 /**
@@ -66,7 +80,7 @@ export async function getArticleById(id) {
 export async function addArticle({ title, content, userId, imageUrl }) {
   const db = await getDatabase();
 
-    const now = new Date();
+  const now = new Date();
   const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
 
   // 插入文章
@@ -100,8 +114,12 @@ export async function updateArticle(id, updateData) {
   const result = await updateDatabase(db, "articles", updateData, id);
 
   // 如果有新图片，更新 img 表
-  if (updateData.imageUrl) {
-    await db.run(`UPDATE imgs SET path = ? WHERE article_id = ?`, [updateData.imageUrl, id]);
+  if (updateData.imageUrl !== undefined) {
+    if (updateData.imageUrl) {
+      await db.run(`UPDATE imgs SET path = ? WHERE article_id = ?`, [updateData.imageUrl, id]);
+    } else {
+      await db.run(`DELETE FROM imgs WHERE article_id = ?`, [id]);
+    }
   }
 
   return result.changes > 0 ? { id, ...updateData } : null;
@@ -129,12 +147,12 @@ export async function likeArticle(userId, articleId) {
 
   // 检查是否已经点赞
   const existingLike = await db.get("SELECT * FROM like_a WHERE user_id = ? AND article_id = ?", [userId, articleId]);
-  
+
   if (!existingLike) {
     await db.run("INSERT INTO like_a (user_id, article_id) VALUES (?, ?)", [userId, articleId]);
     return true;
   }
-  
+
   return false;
 }
 
