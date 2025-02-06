@@ -2,6 +2,7 @@
   import { writable } from "svelte/store";
   // import CommentItem from "../components/CommentItem.svelte"-->
   import DeleteConfirmWindow from "../components/utils/DeleteConfirmWindow.svelte";
+  import { tick } from "svelte";
   export let comment={};
   export let replyContent;
   export let replyBoxVisible;
@@ -9,6 +10,7 @@
   export let toggleReplyBox;
   export let startReply;
   let showDeleteConfirm = false; // 控制删除确认框的显示
+  let replyInput; // 用于存储回复框的 DOM 参考
 
   // 触发删除确认弹窗
   function triggerDeleteConfirm() {
@@ -42,7 +44,22 @@
       comment.likes += comment.userLiked ? 1 : -1;
     }
   }
-  </script>
+
+  // 修改 toggleReplyBox 逻辑，使其在显示输入框后自动聚焦
+  async function handleToggleReplyBox(comment) {
+    toggleReplyBox(comment);
+    await tick(); // 等待 DOM 更新
+    replyInput?.focus(); // 聚焦到输入框
+  }
+
+  // 监听 Enter 键提交评论
+  function handleKeyDown(event, comment) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // 防止换行
+      startReply(comment); // 触发提交
+    }
+  }
+</script>
   
   {#if !comment.deleted} <!-- 仅在评论未被删除时渲染 -->
   <div class="comment-item" style="margin-left: {comment.layer * 20}px">
@@ -50,15 +67,21 @@
       <p>{comment.content}</p>
       <div class="comment-actions">
         <button on:click={toggleLike}>
-          {comment.userLiked ? "💔 Unlike" : "❤️ Like"} ({comment.likes || 0})
+          {comment.userLiked ? "❤️ Unlike" : " Like"} ({comment.likes || 0})
         </button>
-        <button on:click={() => toggleReplyBox(comment)}>Reply</button>
+        <button on:click={() => handleToggleReplyBox(comment)}>Reply</button>
         <button on:click={triggerDeleteConfirm}>❌ Delete</button>
       </div>
       
       {#if replyBoxVisible[comment.id]}
         <div class="reply-box">
-          <input type="text" bind:value={replyContent[comment.id]} placeholder="Write a reply..." />
+          <input 
+            type="text" 
+            bind:this={replyInput} 
+            bind:value={replyContent[comment.id]} 
+            placeholder="Write a reply..."
+            on:keydown={(event) => handleKeyDown(event, comment)} 
+          />
           <button on:click={() => startReply(comment)}>Post</button>
         </div>
       {/if}
