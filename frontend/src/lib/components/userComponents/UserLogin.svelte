@@ -4,8 +4,12 @@
     import { goto } from '$app/navigation';
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
     import { logedIn } from '../../store/userStore.js';
+    import AlertWindow from '../utils/alertWindow.svelte';  //import the alertWindow component
 
     let clickedRegister = false;
+    let displayloginFailed = false;
+
+    
 
    function toggleLogedIn() {
     logedIn.update(value=>!value);
@@ -37,6 +41,7 @@
           const data = await response.json();
         console.log('登录成功:', data);
         toggleLogedIn();
+        displayloginFailed = false;
         goto('/');
 
         }
@@ -44,11 +49,20 @@
         
         // redirect to the home page
       } catch (error) {
+        displayloginFailed = true;
         console.error('登录失败:', error);
       }
     }
   </script>
 
+{#if displayloginFailed}
+  <AlertWindow 
+  message="login failed" 
+  on:confirm={()=>displayloginFailed=false}
+  />  
+   <!-- pass the message prop to the alertWindow component -->
+
+{/if}
 
 {#if !$logedIn}
   {#if clickedRegister}
@@ -77,7 +91,7 @@
           <button type="button" on:click={toggleRegister}>Hey, register one?</button>
         </div>
         <div class="form-group">
-          <button type="submit">登录</button>
+          <button type="submit">login</button>
         </div>
       </form>
     </div>

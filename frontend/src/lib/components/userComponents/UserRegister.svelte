@@ -39,6 +39,24 @@
       const data = await response.json();
       console.log('注册成功:', data);
       logedIn.set(true);
+
+      const loginResponse = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ username, password })
+        });
+  
+        if (!loginResponse.ok) {
+          throw new Error('login failed');
+        }else{
+          const data = await response.json();
+        console.log('登录成功:', data);
+        toggleLogedIn();
+        goto('/');
+        }
     } catch (error) {
       console.error('注册错误:', error);
     } finally {
@@ -48,38 +66,38 @@
 </script>
 
 <div class="form-container">
-  <h2>用户注册</h2>
+  <h2>register one</h2>
   <form on:submit={handleRegister}>
     <div class="form-group">
-      <label for="username">用户名</label>
+      <label for="username">username</label>
       <input type="text" id="username" bind:value={user.username} required />
     </div>
     <div class="form-group">
-      <label for="fname">名字</label>
+      <label for="fname">first name</label>
       <input type="text" id="fname" bind:value={user.fname} required />
     </div>
     <div class="form-group">
-      <label for="lname">姓氏</label>
+      <label for="lname">last name</label>
       <input type="text" id="lname" bind:value={user.lname} required />
     </div>
     <div class="form-group">
-      <label for="description">描述</label>
+      <label for="description">description</label>
       <input type="text" id="description" bind:value={user.description} required />
     </div>
     <div class="form-group">
-      <label for="dob">出生日期</label>
+      <label for="dob">date of birth</label>
       <input type="date" id="dob" bind:value={user.dob} required />
     </div>
     <div class="form-group">
-      <label for="pwd">密码</label>
+      <label for="pwd">password</label>
       <input type="password" id="pwd" bind:value={user.pwd} required />
     </div>
     <div class="form-group">
-      <label for="icon">头像</label>
+      <label for="icon">icon</label>
       <input type="text" id="icon" bind:value={user.icon} required />
     </div>
     <div class="form-group">
-      <button type="submit">注册</button>
+      <button type="submit">finish</button>
     </div>
   </form>
 </div>
