@@ -8,3 +8,4 @@ export async function load({ params,fetch }) {
     console.log(comments);
     return { comments };
 }
+
