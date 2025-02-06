@@ -2,16 +2,13 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import CommentItem from "../../../../lib/components/CommentItem.svelte";
-  export let data;
-  let comments = writable(buildCommentTree(data.comments));
-  console.log(comments);
 
   import {page} from '$app/stores';
   export function load({params}){
     const {id} = params;
     return {id};
   }
-  $: article_id = $page.params.id;
+  $: article_id = $page && $page.params ? $page.params.id : null;
   let content = "";
   let user_id =1; //need to change!
   
@@ -33,11 +30,12 @@
       } else {
         rootComments.push(comment);}//没有父评论的是根评论
     });
-    
+
     return rootComments;
   }
-    
-
+  export let data;
+  let comments = writable(buildCommentTree(data.comments));
+  console.log(comments);
 
   // 获取评论和点赞数
   async function fetchComments() {
@@ -56,7 +54,7 @@
         }
       }
 
-      comments.set(commentsData);
+      comments.set(buildCommentTree(commentsData));
     }
   }
 
@@ -85,7 +83,7 @@
       const newCommentData = await res.json(); // 获取新评论数据
         comments.update(current => {
         // 直接将新评论添加到现有数组中
-        return buildCommentTree([...current.flat(), newCommentData]);
+        buildCommentTree([...current, newCommentData]);
       });
       content = ""; // 清空输入框
 
@@ -111,9 +109,10 @@
   async function deleteComment(commentId) {
     const res = await fetch(`http://localhost:3000/api/comments/${commentId}`, { method: "DELETE" });
     if (res.ok) {
-      await fetchComments(); // 重新获取评论
+      comments.update(cs => cs.filter(comment => comment.id !== commentId)); // 直接UI更新状态
+      }
     }
-  }
+  
   
 //reply to other comments  
   let replyContent = {}; // 存储每个评论的回复内容
@@ -180,76 +179,7 @@
     {deleteComment}
     comment={comment}
   />
-      <!-- <div class="comment-item" style="margin-left: {comment.layer * 24}px">
-        <div class="comment-content">
-          <p>{comment.content}</p>
-          <div class="comment-actions">
-            <button on:click={() => toggleReplyBox(comment)}>Reply</button>
-            <button on:click={() => deleteComment(comment.id)}>❌ Delete</button>
-          </div>
-          
-          {#if replyBoxVisible[comment.id]}
-            <div class="reply-box">
-              <input
-                type="text"
-                bind:value={replyContent[comment.id]}
-                placeholder="Write a reply..."
-              />
-              <button on:click={() => startReply(comment)}>Post</button>
-            </div>
-          {/if}
-        </div>
-        
-        {#if comment.children?.length}
-          {#each comment.children as childComment}
-            <div class="comment-item" style="margin-left: 24px">
-              <div class="comment-content">
-                <p>{childComment.content}</p>
-                <div class="comment-actions">
-                  <button on:click={() => toggleReplyBox(childComment)}>Reply</button>
-                  <button on:click={() => deleteComment(childComment.id)}>❌ Delete</button>
-                </div>
-                
-                {#if replyBoxVisible[childComment.id]}
-                  <div class="reply-box">
-                    <input
-                      type="text"
-                      bind:value={replyContent[childComment.id]}
-                      placeholder="Write a reply..."
-                    />
-                    <button on:click={() => startReply(childComment)}>Post</button>
-                  </div>
-                {/if}
-                {#if childComment.children?.length}
-                {#each childComment.children as grandchildComment}
-                  <div class="comment-item" style="margin-left: 48px">
-                    <div class="comment-content">
-                      <p>{grandchildComment.content}</p>
-                      <div class="comment-actions">
-                        <button on:click={() => toggleReplyBox(grandchildComment)}>Reply</button>
-                        <button on:click={() => deleteComment(grandchildComment.id)}>❌ Delete</button>
-                      </div>
-                     
-                      {#if replyBoxVisible[grandchildComment.id]}
-                        <div class="reply-box">
-                          <input
-                            type="text"
-                            bind:value={replyContent[grandchildComment.id]}
-                            placeholder="Write a reply..."
-                          />
-                          <button on:click={() => startReply(grandchildComment)}>Post</button>
-                        </div>
-                      {/if}
-                    </div>
-                  </div>
-                {/each}
-                {/if}
-              </div>
-            </div>
-          {/each}
-        {/if}
 
-      </div> -->
     {/each}
   </div>
 </div>
@@ -259,28 +189,6 @@
     max-width: 800px;
     margin: 0 auto;
   }
-
-  /* .comment-item {
-    border-left: 2px solid #e1e1e1;
-    margin: 12px 0;
-    padding: 8px 0 8px 12px;
-  }
-
-  .comment-content {
-    background: #f9f9f9;
-    padding: 12px;
-    border-radius: 8px;
-  }
-
-  .comment-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .reply-box {
-    margin-top: 8px;
-  } */
 
   .comment-box {
     width: 100%;

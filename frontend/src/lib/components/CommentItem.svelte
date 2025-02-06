@@ -10,7 +10,7 @@
   export let deleteComment;
   </script>
   
-  <div class="comment-item" style="margin-left: {comment.layer * 20}px">
+  <div class="comment-item" style="margin-left: calc({comment.layer}*24px)">
     <div class="comment-content">
       <p>{comment.content}</p>
       <div class="comment-actions">
@@ -30,7 +30,7 @@
       {/if}
     </div>
   
-    {#if comment.children?.length}
+    {#if comment.children?.length }
       <div class="comment-children">
         {#each comment.children as childComment}
           <svelte:self
@@ -41,7 +41,7 @@
            {startReply}
             {deleteComment}
             comment = {childComment}
-      />
+          />
         {/each}
       </div>
     {/if}
@@ -52,6 +52,7 @@
       border-left: 2px solid #ddd;
       padding-left: 12px;
       margin-top: 8px;
+      
     }
     .comment-content {
     background: #f9f9f9;
