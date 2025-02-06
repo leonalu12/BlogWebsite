@@ -1,23 +1,16 @@
-<!-- <script>
+<script>
     import { writable } from "svelte/store";
-    import { onMount } from "svelte";
-    // import CommentItem from "../components/CommentItem.svelte"
-    export let comment;
-    export let replyContent;
-    export let replyBoxVisible;
-    export let deleteComment;
-    export let startReply;
-    export let toggleReplyBox;
-  
-    // 监听可见状态
-    let isReplyVisible = writable(false);
-  
-    function handleToggleReply() {
-      isReplyVisible.update(current => !current);
-    }
+    // import CommentItem from "../components/CommentItem.svelte"-->
+  export let comment={};
+  export let replyContent;
+  export let replyBoxVisible;
+  export let user_id;
+  export let toggleReplyBox;
+  export let startReply;
+  export let deleteComment;
   </script>
   
-  <div class="comment-item" style="margin-left: {comment.layer * 24}px">
+  <div class="comment-item" style="margin-left: {comment.layer * 20}px">
     <div class="comment-content">
       <p>{comment.content}</p>
       <div class="comment-actions">
@@ -40,14 +33,15 @@
     {#if comment.children?.length}
       <div class="comment-children">
         {#each comment.children as childComment}
-          <CommentItem
-            comment={childComment}
-            replyContent={replyContent}
-            replyBoxVisible={replyBoxVisible}
-            deleteComment={deleteComment}
-            startReply={startReply}
-            toggleReplyBox={toggleReplyBox}
-          />
+          <svelte:self
+           bind:replyContent
+           bind:replyBoxVisible
+           {user_id}
+           {toggleReplyBox}
+           {startReply}
+            {deleteComment}
+            comment = {childComment}
+      />
         {/each}
       </div>
     {/if}
@@ -59,5 +53,17 @@
       padding-left: 12px;
       margin-top: 8px;
     }
+    .comment-content {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .comment-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .reply-box {
+    margin-top: 8px;
+  }
   </style>
-   -->

@@ -27,5 +27,6 @@
     "lucide-svelte": "^0.474.0",
     "@tinymce/tinymce-svelte": "^3.0.0",
     "lucide": "^0.474.0"
+
   }
 }
