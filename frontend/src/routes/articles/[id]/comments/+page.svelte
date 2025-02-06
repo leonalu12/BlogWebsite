@@ -81,10 +81,24 @@
     });
     if (res.ok) {
       const newCommentData = await res.json(); // 获取新评论数据
-        comments.update(current => {
-        // 直接将新评论添加到现有数组中
-        buildCommentTree([...current, newCommentData]);
-      });
+      comments.update(current => {
+      let flatComments = [];
+      
+      // 递归遍历树，将所有评论存入 `flatComments`
+      function flattenTree(commentsArray) {
+        for (let comment of commentsArray) {
+          flatComments.push(comment);
+          if (comment.children && comment.children.length > 0) {
+            flattenTree(comment.children);
+          }
+        }
+      }
+      flattenTree($comments); // 先把现有的树转换成列表
+
+      flatComments.push(newCommentData); // 添加新评论
+
+      return buildCommentTree(flatComments); // 重新构建树结构
+    });
       content = ""; // 清空输入框
 
     }
