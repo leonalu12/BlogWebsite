@@ -14,23 +14,17 @@ const PUBLIC_IMAGES_URL = process.env.PUBLIC_IMAGES_URL || "http://localhost:300
  */
 export async function getAllArticles(search = "", filterBy = "title", sortBy = "date_time", order = "DESC", userId = null) {
   const db = await getDatabase();
-  // check `search` whether have""（Precise search）
-
-  const isExactSearch = search.startsWith('"') && search.endsWith('"');
-  // delete the ""，If the search is precise, it will be matched directly; otherwise, the fuzzy search will be performed
-  const cleanSearch = isExactSearch ? search.slice(1, -1) : `%${search}%`;
 
   let query = `
-SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
-       (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
-       (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_url
-FROM articles a
-JOIN users u ON a.user_id = u.id
-LEFT JOIN imgs i ON a.id = i.article_id
-WHERE ${filterBy === "content" ? "a.content" : "a.title"} ${isExactSearch ? "=" : "LIKE"} ?
-`;
+    SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
+           (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
+           (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_url
+    FROM articles a
+    JOIN users u ON a.user_id = u.id
+    WHERE LOWER(${filterBy === "username" ? "u.username" : "a.title"}) LIKE LOWER(?)
+  `;
 
-  let params = [cleanSearch];  // 
+  let params = [`%${search}%`];
 
   // 按用户ID筛选
   if (userId) {
@@ -38,15 +32,11 @@ WHERE ${filterBy === "content" ? "a.content" : "a.title"} ${isExactSearch ? "=" 
     params.push(userId);
   }
 
-  query += ` ORDER BY ${sortBy === "username" ? "u.username" : "a." + sortBy} ${order};`;
+  query += ` ORDER BY a.${sortBy} ${order};`;
 
-  let articles = await db.all(query, [`%${search}%`]);
-
-  return articles.map(article => ({
-    ...article,
-    image_url: article.image_url ? `${PUBLIC_IMAGES_URL}/${article.image_url}` : null
-  }));
+  return await db.all(query, params);
 }
+
 
 
 /**
