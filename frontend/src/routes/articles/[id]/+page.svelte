@@ -1,6 +1,7 @@
 <script>
     import { Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
+    import { goto } from '$app/navigation'; // ✅ 引入 SvelteKit 的页面跳转函数
     export let data;
     const { article } = data;
     //存储文章的当前点赞数，如果undefine或者null则显示0
@@ -8,7 +9,7 @@
     //存储用户是否已点赞该文章。如果 article.isLiked 为 undefined 或 null，则默认值为 false
     let isLiked = article.isLiked || false;
 
-    const userId = 3; // 假设当前用户 ID
+    const userId = 2; // 假设当前用户 ID
 
     async function toggleLike(event) {
         event.stopPropagation();//阻止事件冒泡，避免触发其他点击事件
@@ -39,6 +40,11 @@
             console.error("❌ 点赞失败:", error);
         }
     }
+
+    console.log("当前用户ID:", userId);
+    console.log("文章作者ID:", article.user_id);
+    console.log("文章数据:", article);
+
 </script>
 
 <svelte:head>
@@ -62,6 +68,12 @@
             <button class="comment-button">
                 <MessageCircle size={20} color="blue" /> {article.comment_count || 0}
             </button>
+
+            {#if userId === article.user_id}  <!-- ✅ 修改：添加判断是否是文章作者 -->
+            <button class="edit-button" on:click={() => goto(`/articles/${article.id}/edit`)}>
+                edit
+            </button>
+        {/if} <!-- ✅ 修改结束 -->
         </div>
     </div>
 </div>
@@ -117,5 +129,11 @@
     }
     .comment-button:hover {
         color: blue;
+    }
+    .edit-button {  /* ✅ 修改：添加编辑按钮样式 */
+        color: green;
+    }
+    .edit-button:hover {
+        text-decoration: underline;
     }
 </style>
