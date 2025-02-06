@@ -66,8 +66,9 @@ router.post("/new", upload.single("image"), async (req, res) => {
 // 更新文章
 router.put("/:id/edit", upload.single("image"), async (req, res) => {
   try {
-    let { title, content } = req.body;
-    if (!title || content || !userId) {
+    let { title, content,userId } = req.body;
+    console.log("Received data:", { title, content, userId });
+    if (!title || !content || !userId)      {
       return res.status(400).json({ error: "title, content and userId are required!" })
     }
 
@@ -79,9 +80,12 @@ router.put("/:id/edit", upload.single("image"), async (req, res) => {
     if (existingArticle.user_id !== parseInt(userId)) {
       return res.status(403).json({ error: "Unauthorized: You can only edit your own articles" });
     }
+ // ✅ 只在 `imgs` 表里存图片，不再传给 `articles`
+ const imageUrl = req.file ? req.file.filename : null;
 
-    const imageUrl = req.file ? req.file.filename : null;
-    const updatedArticle = await updateArticle(req.params.id, { title, content, imageUrl });
+
+    // ✅ 调用 `updateArticle`，只更新 title 和 content
+    const updatedArticle = await updateArticle(req.params.id, { title, content, ...(imageUrl && { imageUrl }) });
 
     res.status(200).json(updatedArticle);
   } catch (err) {

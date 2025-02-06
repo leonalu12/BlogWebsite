@@ -47,7 +47,7 @@ export async function getAllArticles(search = "", filterBy = "title", sortBy = "
 export async function getArticleById(id) {
   const db = await getDatabase();
   let article = await db.get(`
-    SELECT a.id, a.title, a.content, a.date_time, u.username, u.icon,
+    SELECT a.id, a.title, a.content, a.date_time, user_id,u.username, u.icon,
            (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
            (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_path
     FROM articles a
@@ -95,24 +95,26 @@ export async function addArticle({ title, content, userId, imageUrl }) {
  */
 export async function updateArticle(id, updateData) {
   const db = await getDatabase();
+  const { title, content } = updateData;
+  await db.run(`UPDATE articles SET title = ?, content = ? WHERE id = ?`, [title, content, id]);
 
-  if (updateData.imageUrl === undefined) {
-    delete updateData.imageUrl;
-  }
-
-  // 更新文章
-  const result = await updateDatabase(db, "articles", updateData, id);
-
-  // 如果有新图片，更新 img 表
   if (updateData.imageUrl !== undefined) {
     if (updateData.imageUrl) {
-      await db.run(`UPDATE imgs SET path = ? WHERE article_id = ?`, [updateData.imageUrl, id]);
+        // ✅ 先检查是否已有图片
+        const existingImg = await db.get(`SELECT path FROM imgs WHERE article_id = ?`, [id]);
+        if (existingImg) {
+            await db.run(`UPDATE imgs SET path = ? WHERE article_id = ?`, [updateData.imageUrl, id]);
+        } else {
+            await db.run(`INSERT INTO imgs (article_id, path) VALUES (?, ?)`, [id, updateData.imageUrl]);
+        }
     } else {
-      await db.run(`DELETE FROM imgs WHERE article_id = ?`, [id]);
+        await db.run(`DELETE FROM imgs WHERE article_id = ?`, [id]);
     }
-  }
+}
 
-  return result.changes > 0 ? { id, ...updateData } : null;
+  return { id, title, content, imageUrl: updateData.imageUrl };
+
+
 }
 
 /**
