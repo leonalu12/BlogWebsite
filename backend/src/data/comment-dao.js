@@ -13,6 +13,10 @@ export async function addComment(content, layer, date_time, user_id, article_id,
     const dbResult = await db.run(
         "INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES(?, ?, ?, ?, ?, ?)",[content, layer, date_time, user_id, article_id, parent_cid]);
     const newComment = await db.get("SELECT * FROM comments WHERE id = ?" , [dbResult.lastID]);
+    // 获取该评论的点赞数
+    const likeCount = await getCommentLikes(newComment.id);
+    // 将点赞数添加到评论对象
+    newComment.likes = likeCount;
     return newComment;
 }
 
