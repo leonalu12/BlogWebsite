@@ -22,7 +22,7 @@
         <div>
           <div><img src="{ PUBLIC_IMAGES_URL }/{article.image_url}" alt="{article.title}" /></div>
           <div> {article.title}</div>
-          <div> {article.content}</div>
+          <div> {@html article.content}</div>
         </div>
       </a>
     </span>

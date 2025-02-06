@@ -1,7 +1,7 @@
 <script>
   import "$lib/css/app.css";
   import UserControl from '$lib/components/userComponents/UserControl.svelte';
-  
+  import AddButton from "$lib/components/AddButton.svelte";
   import { page } from "$app/stores";
   $: path = $page.url.pathname;
 
@@ -35,7 +35,7 @@
     </nav>
   </div>
 </div>
-
+<AddButton />
 
 <div class="container">
   <slot />
