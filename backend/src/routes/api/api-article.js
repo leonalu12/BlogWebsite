@@ -3,15 +3,15 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { getDatabase } from "../../data/database.js";
-import { 
-  addArticle, updateArticle, deleteArticle, getAllArticles, getArticleById, likeArticle, unlikeArticle,getArticleLikes 
+import {
+  addArticle, updateArticle, deleteArticle, getAllArticles, getArticleById, likeArticle, unlikeArticle, getArticleLikes
 } from "../../data/article-dao.js";
 
 const router = express.Router();
 
 // 配置 Multer 处理图片上传
 const storage = multer.diskStorage({
-  destination: "public/images",
+  destination: path.join(process.cwd(), "public/images"),
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   },
@@ -46,10 +46,15 @@ router.post("/new", upload.single("image"), async (req, res) => {
     let { title, content, userId } = req.body;
     userId = Number(userId);
 
-    if(!title||!content||!userId){
-      return res.status(400).json({error:"title, content and userId are required!"})
+    console.log("Request Body:", req.body);
+    console.log("Uploaded File:", req.file); // This should not be undefined
+
+    if (!title || !content || !userId) {
+      return res.status(400).json({ error: "title, content and userId are required!" })
     }
-    const imageUrl = req.file ? `/images/${req.file.filename}` : null;
+
+    const imageUrl = req.file ? req.file.filename : null;
+
 
     const article = await addArticle({ title, content, userId, imageUrl });
     res.status(201).json(article);
@@ -61,9 +66,9 @@ router.post("/new", upload.single("image"), async (req, res) => {
 // 更新文章
 router.put("/:id/edit", upload.single("image"), async (req, res) => {
   try {
-    const { title, content } = req.body;
-    if(!title||content||!userId){
-      return res.status(400).json({error:"title, content and userId are required!"})
+    let { title, content } = req.body;
+    if (!title || content || !userId) {
+      return res.status(400).json({ error: "title, content and userId are required!" })
     }
 
     const existingArticle = await getArticleById(req.params.id);
@@ -75,10 +80,10 @@ router.put("/:id/edit", upload.single("image"), async (req, res) => {
       return res.status(403).json({ error: "Unauthorized: You can only edit your own articles" });
     }
 
-    const imageUrl = req.file ? `/images/${req.file.filename}` : undefined;
+    const imageUrl = req.file ? req.file.filename : null;
     const updatedArticle = await updateArticle(req.params.id, { title, content, imageUrl });
 
-    res.json(updatedArticle);
+    res.status(200).json(updatedArticle);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -107,10 +112,10 @@ router.post("/:id/like", async (req, res) => {
 
     const success = await likeArticle(userId, req.params.id);
     const likeCount = await getArticleLikes(req.params.id);
-    res.json({ 
+    res.json({
       liked: success,
-      like_count: likeCount, 
-     });
+      like_count: likeCount,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -127,7 +132,7 @@ router.delete("/:id/like", async (req, res) => {
       liked: false,
       like_count: likeCount, // 返回最新点赞数
     });
-    
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -138,28 +143,28 @@ router.get("/:id/like/check", async (req, res) => {
     const { userId } = req.query;
     const db = await getDatabase();
 
-    console.log(`🔹 收到点赞检查请求: userId=${userId}, articleId=${req.params.id}`);
+    console.log(`收到点赞检查请求: userId=${userId}, articleId=${req.params.id}`);
 
     // 查询点赞数
     const likeCountResult = await db.get(
       "SELECT COUNT(*) AS like_count FROM like_a WHERE article_id = ?",
       [req.params.id]
     );
-    console.log("🔢 点赞数查询结果:", likeCountResult);
+    console.log("点赞数查询结果:", likeCountResult);
 
     // 查询用户是否已点赞
     const userLiked = await db.get(
       "SELECT * FROM like_a WHERE user_id = ? AND article_id = ?",
       [userId, req.params.id]
     );
-    console.log("🔍 用户点赞查询结果:", userLiked);
+    console.log("用户点赞查询结果:", userLiked);
 
     res.json({
       like_count: likeCountResult ? likeCountResult.like_count : 0,
       isLiked: !!userLiked,
     });
   } catch (err) {
-    console.error("❌ 点赞检查 API 出错:", err.message);
+    console.error("点赞检查 API 出错:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
