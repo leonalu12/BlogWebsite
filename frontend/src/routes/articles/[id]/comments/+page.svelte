@@ -1,8 +1,10 @@
 <script>
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
+  import CommentItem from "../../../../lib/components/CommentItem.svelte";
   export let data;
   let comments = writable(buildCommentTree(data.comments));
+  console.log(comments);
 
   import {page} from '$app/stores';
   export function load({params}){
@@ -12,6 +14,7 @@
   $: article_id = $page.params.id;
   let content = "";
   let user_id =1; //need to change!
+  
 
   // 将评论数据转换为树形结构
   function buildCommentTree(commentsArray) {
@@ -21,22 +24,19 @@
     commentsArray.forEach(comment => {
       comment.children = []; // 添加 children 数组属性, 存储子评论
       commentMap.set(comment.id, comment);
-    });
-
     // 构建树形结构
-    commentsArray.forEach(comment => {
       if (comment.parent_cid) {
         const parentComment = commentMap.get(comment.parent_cid);//找到父评论
         if (parentComment) {
           parentComment.children.push(comment);//将当前评论添加到父评论的 children 数组中
         }
       } else {
-        rootComments.push(comment);//没有父评论的是根评论
-      }
+        rootComments.push(comment);}//没有父评论的是根评论
     });
-
+    
     return rootComments;
   }
+    
 
 
   // 获取评论和点赞数
@@ -133,16 +133,16 @@
         user_id: 1, // 这里需要改成用户ID
         article_id: article_id,
         parent_cid: parentComment.id, // 关联父级评论
+        children:[]
       })
     });
 
     if (res.ok) {
       const newComment = await res.json();
-      comments.update(current => {
-        const flatComments = current.flat();//current.flat() 将嵌套的评论树结构展平成一维数组
-        flatComments.push(newComment);
-        return buildCommentTree(flatComments);//重新构建树形结构
-      });
+      if (!Array.isArray(parentComment.children)) {
+      parentComment.children = []; // 如果 undefined，则初始化为空数组
+    }
+      parentComment.children = [...parentComment.children, newComment];//插入父评论的children组
       replyContent[parentComment.id] = ""; // 清空输入框内容
       replyBoxVisible[parentComment.id] = false; // 提交后隐藏输入框
     }
@@ -152,7 +152,6 @@
     replyBoxVisible[comment.id] = !replyBoxVisible[comment.id]; // 切换输入框的显示状态
   }
 
-  onMount(data);
 </script>
 
 
@@ -172,7 +171,16 @@
 
   <div class="comments-list">
     {#each $comments as comment}
-      <div class="comment-item" style="margin-left: {comment.layer * 24}px">
+    <CommentItem
+    bind:replyContent
+    bind:replyBoxVisible
+    {user_id}
+    {toggleReplyBox}
+    {startReply}
+    {deleteComment}
+    comment={comment}
+  />
+      <!-- <div class="comment-item" style="margin-left: {comment.layer * 24}px">
         <div class="comment-content">
           <p>{comment.content}</p>
           <div class="comment-actions">
@@ -212,14 +220,36 @@
                     <button on:click={() => startReply(childComment)}>Post</button>
                   </div>
                 {/if}
+                {#if childComment.children?.length}
+                {#each childComment.children as grandchildComment}
+                  <div class="comment-item" style="margin-left: 48px">
+                    <div class="comment-content">
+                      <p>{grandchildComment.content}</p>
+                      <div class="comment-actions">
+                        <button on:click={() => toggleReplyBox(grandchildComment)}>Reply</button>
+                        <button on:click={() => deleteComment(grandchildComment.id)}>❌ Delete</button>
+                      </div>
+                     
+                      {#if replyBoxVisible[grandchildComment.id]}
+                        <div class="reply-box">
+                          <input
+                            type="text"
+                            bind:value={replyContent[grandchildComment.id]}
+                            placeholder="Write a reply..."
+                          />
+                          <button on:click={() => startReply(grandchildComment)}>Post</button>
+                        </div>
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+                {/if}
               </div>
             </div>
           {/each}
         {/if}
 
-
-        
-      </div>
+      </div> -->
     {/each}
   </div>
 </div>
@@ -230,7 +260,7 @@
     margin: 0 auto;
   }
 
-  .comment-item {
+  /* .comment-item {
     border-left: 2px solid #e1e1e1;
     margin: 12px 0;
     padding: 8px 0 8px 12px;
@@ -250,7 +280,7 @@
 
   .reply-box {
     margin-top: 8px;
-  }
+  } */
 
   .comment-box {
     width: 100%;
