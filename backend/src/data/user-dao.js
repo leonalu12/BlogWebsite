@@ -14,6 +14,13 @@ const userSchema = yup
     icon: yup.string().required()
 });
 
+async function saltNewUser(user) {
+    const saltRounds = 10;
+    user.pwd = await bcrypt.hash(user.pwd, saltRounds);
+    console.log("Salted Password:", user.pwd);
+    return user;
+}
+
 export async function createUser(user) {
     try {
         let newUser = userSchema.validateSync(user, {
@@ -21,8 +28,7 @@ export async function createUser(user) {
             stripUnknown: true
         });
 
-        const saltRounds = 10;
-        newUser.pwd = await bcrypt.hash(newUser.pwd, saltRounds);
+        newUser = await saltNewUser(newUser);
 
         const db = await getDatabase();
         const response = await db.run(
@@ -76,13 +82,28 @@ export async function updateUser(user,id) {
         abortEarly:false,
         stripUnknown: true
     });
-    
+
+    const saltedUser = await saltNewUser(newUser);
+    console.log("1234");
+    console.log(newUser);
 
     const db = await getDatabase();
-    const response= await updateDatabase(db, "users", newUser, id);
+    const response= await updateDatabase(db, "users", saltedUser, id);
 
     // Return true if changes were made, false otherwise.
     return response.changes > 0;
+}
+
+export async function getUsernameById(id) {
+    const db = await getDatabase();
+    const user = await db.get('SELECT username FROM users WHERE id = ?', id);
+    return user.username;
+}
+
+export async function getIdByUsername(username) {
+    const db = await getDatabase();
+    const user = await db.get('SELECT id FROM users WHERE username = ?', username);
+    return user.id;
 }
 
 

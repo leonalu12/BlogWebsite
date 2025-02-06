@@ -1,12 +1,13 @@
 import express from "express";
-import { createUser,getUsersByUsername,deleteUser,updateUser,getUsers} from "../../data/user-dao.js";
+import { createUser,getUsersByUsername,deleteUser,updateUser,getUsers, getIdByUsername} from "../../data/user-dao.js";
 import {requiresAuthentication} from "../../middleware/auth-middleware.js";
+import { getUsernameFromJWT } from "../../data/jwt-util.js";
 
 const router = express.Router();
 
 
 router.get("/", requiresAuthentication, async (req, res) => {
-  const username = req.query.username;
+  const username = getUsernameFromJWT(req.cookies.authToken);
   if (!username) {
     const users = await getUsers();
     return res.json(users);
@@ -33,8 +34,9 @@ router.delete("/:id", requiresAuthentication, async (req, res) => {
   return res.sendStatus(204);
 });
 
-router.patch("/:id", requiresAuthentication, async (req, res) => {
-  const id = req.params.id;
+router.patch("/", requiresAuthentication, async (req, res) => {
+  const username = getUsernameFromJWT(req.cookies.authToken);
+  const id = await getIdByUsername(username);
   const user = req.body;
   const updatedUser = await updateUser(user, id);
   return res.json(updatedUser);

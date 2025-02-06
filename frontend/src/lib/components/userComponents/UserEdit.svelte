@@ -1,25 +1,28 @@
 <script>
-  import { onMount } from 'svelte';
-  import { logedIn } from '../../store/userStore.js';
+  import { onMount } from "svelte";
+  import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
 
   let user = {
-    username: '',
-    fname: '',
-    lname: '',
-    description: '',
-    dob: '',
-    password: '',
-    icon: ''
+    username: "",
+    fname: "",
+    lname: "",
+    description: "",
+    dob: "",
+    pwd: "",
+    icon: ""
   };
   let loading = true;
 
   // 在组件挂载时获取数据
   onMount(async () => {
     try {
-      const response = await fetch('/n');
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) {
-        throw new Error('网络响应问题');
+        throw new Error("网络响应问题");
       }
       const data = await response.json();
       user = {
@@ -28,21 +31,39 @@
         lname: data.lname,
         description: data.description,
         dob: data.dob,
-        password: '',
+        pwd: "",
         icon: data.icon
       };
     } catch (error) {
-      console.error('获取数据失败:', error);
+      console.error("获取数据失败:", error);
     } finally {
       loading = false;
     }
   });
 
   // 提交表单的处理函数
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    console.log('User Information:', user);
+    console.log("User Information:", user);
     // 这里可以添加提交表单的逻辑，例如通过 API 保存用户信息
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify(user),
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("网络响应问题");
+      }
+    } catch (error) {
+      console.error("获取数据失败:", error);
+    } finally {
+      loading = false;
+    }
   }
 </script>
 
@@ -54,66 +75,31 @@
     <form on:submit={handleSubmit}>
       <div class="form-group">
         <label for="username">用户名</label>
-        <input
-          type="text"
-          id="username"
-          bind:value={user.username}
-          required
-        />
+        <input type="text" id="username" bind:value={user.username} required />
       </div>
       <div class="form-group">
         <label for="fname">名字</label>
-        <input
-          type="text"
-          id="fname"
-          bind:value={user.fname}
-          required
-        />
+        <input type="text" id="fname" bind:value={user.fname} required />
       </div>
       <div class="form-group">
         <label for="lname">姓氏</label>
-        <input
-          type="text"
-          id="lname"
-          bind:value={user.lname}
-          required
-        />
+        <input type="text" id="lname" bind:value={user.lname} required />
       </div>
       <div class="form-group">
         <label for="description">描述</label>
-        <input
-          type="text"
-          id="description"
-          bind:value={user.description}
-          required
-        />
+        <input type="text" id="description" bind:value={user.description} required />
       </div>
       <div class="form-group">
         <label for="dob">出生日期</label>
-        <input
-          type="date"
-          id="dob"
-          bind:value={user.dob}
-          required
-        />
+        <input type="date" id="dob" bind:value={user.dob} required />
       </div>
       <div class="form-group">
-        <label for="password">密码</label>
-        <input
-          type="password"
-          id="password"
-          bind:value={user.password}
-          required
-        />
+        <label for="pwd">密码</label>
+        <input type="pwd" id="pwd" bind:value={user.pwd} required />
       </div>
       <div class="form-group">
         <label for="icon">头像</label>
-        <input
-          type="text"
-          id="icon"
-          bind:value={user.icon}
-          required
-        />
+        <input type="text" id="icon" bind:value={user.icon} required />
       </div>
       <div class="form-group">
         <button type="submit">保存</button>
