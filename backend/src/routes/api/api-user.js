@@ -3,6 +3,7 @@ import { createUser,getUsersByUsername,deleteUser,updateUser,getUsers, getIdByUs
 import {requiresAuthentication} from "../../middleware/auth-middleware.js";
 import { getUsernameFromJWT } from "../../data/jwt-util.js";
 import { authenticateUser } from "../../data/user-dao.js";
+import { checkUserExists } from "../../data/user-dao.js";
 
 const router = express.Router();
 
@@ -54,6 +55,16 @@ router.post("/verify", requiresAuthentication, async (req, res) => {
     }
   } catch (e) {
     return res.status(401).json({ error: e.message });
+  }
+});
+
+router.post("/checkUsernameUnique", async (req, res) => {
+  const username = req.body.username;
+  const result = await checkUserExists(username);
+  if (result) {
+    return res.status(400).json({ error: "Username already exists" });
+  } else {
+    return res.status(200).json({ message: "Username is unique" });
   }
 });
 

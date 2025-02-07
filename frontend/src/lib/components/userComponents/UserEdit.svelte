@@ -4,6 +4,7 @@
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { displayEdit } from "../../store/userStore.js";
   import { displayEditSuccessAlert } from "../../store/userStore.js";
+  import AlertWindow from "../utils/AlertWindow.svelte";
 
   let user = {
     username: "",
@@ -11,10 +12,13 @@
     lname: "",
     description: "",
     dob: "",
-    pwd: "",
     icon: ""
   };
+  let tempUsername = "";
   let loading = true;
+  let alertMessage = "";
+  let isUniqueUsername = true;
+  let displayEditfailAlert = false;
 
   // 在组件挂载时获取数据
   onMount(async () => {
@@ -33,20 +37,26 @@
         lname: data.lname,
         description: data.description,
         dob: data.dob,
-        pwd: "data.pwd",
         icon: data.icon
       };
+      tempUsername = user.username;
     } catch (error) {
       console.error("获取数据失败:", error);
     } finally {
       loading = false;
     }
+    console.log("User Information:", user);
   });
 
   // 提交表单的处理函数
   async function handleSubmit(event) {
     event.preventDefault();
     console.log("User Information:", user);
+    if (!isUniqueUsername) {
+      displayEditfailAlert = true;
+      alertMessage = "username already exists";
+      return;
+    }
     // 这里可以添加提交表单的逻辑，例如通过 API 保存用户信息
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
@@ -60,62 +70,131 @@
       });
       if (!response.ok) {
         throw new Error("网络响应问题");
-      }else{
-
+      } else {
         displayEdit.set(false);
         displayEditSuccessAlert.set(true);
         console.log("User Information Updated");
-
       }
     } catch (error) {
       console.error("获取数据失败:", error);
     } finally {
       loading = false;
     }
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username: user.username }),
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("network response error");
+      }
+      const data = await response.json();
+      console.log("relogin success:", data);
+      logedIn.set(true);
+    } catch (error) {
+      console.error("relogin fail:", error);
+    }
+    console.log("User Information:", user);
+  }
+
+  async function checkUsername() {
+    if (!(user.username === tempUsername)) {
+      try {
+        const response = await fetch(`${PUBLIC_API_BASE_URL}/users/checkUsernameUnique`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username: user.username }),
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          isUniqueUsername = false;
+          const error = await response.json();
+          throw new Error(error.message);
+        }
+        isUniqueUsername = true;
+        const data = await response.json();
+        console.log("username checking:", data);
+      } catch (error) {
+        console.error("username alread existed:", error);
+      }
+    }
   }
 </script>
 
-
-<div class="form-container">
-  <h2>editing user information</h2>
-  {#if loading}
-    <p>loading...</p>
-  {:else}
-    <form on:submit={handleSubmit}>
-      <div class="form-group">
-        <label for="username">username</label>
-        <input type="text" id="username" bind:value={user.username}  required />
-      </div>
-      <div class="form-group">
-        <label for="fname">first ni</label>
-        <input type="text" id="fname" bind:value={user.fname} required />
-      </div>
-      <div class="form-group">
-        <label for="lname">last name</label>
-        <input type="text" id="lname" bind:value={user.lname} required />
-      </div>
-      <div class="form-group">
-        <label for="description">description</label>
-        <input type="text" id="description" bind:value={user.description} required />
-      </div>
-      <div class="form-group">
-        <label for="dob">date of birth</label>
-        <input type="date" id="dob" bind:value={user.dob} required />
-      </div>
-      <div class="form-group">
-        <label for="icon">icon</label>
-        <input type="text" id="icon" bind:value={user.icon} required />
-      </div>
-      <div class="form-group">
-        <button type="submit">save</button>
-      </div>
-    </form>
-  {/if}
+<div class="overlay">
+  <div class="form-container">
+    <h2>editing user information</h2>
+    {#if loading}
+      <p>loading...</p>
+    {:else}
+      <form on:submit={handleSubmit}>
+        <div class="form-group">
+          <label for="username">username</label>
+          <input
+            type="text"
+            id="username"
+            bind:value={user.username}
+            on:input={checkUsername}
+            required
+          />
+        </div>
+        {#if !isUniqueUsername}
+          <p style="color: red;">username already existed</p>
+        {/if}
+        <div class="form-group">
+          <label for="fname">first ni</label>
+          <input type="text" id="fname" bind:value={user.fname} required />
+        </div>
+        <div class="form-group">
+          <label for="lname">last name</label>
+          <input type="text" id="lname" bind:value={user.lname} required />
+        </div>
+        <div class="form-group">
+          <label for="description">description</label>
+          <input type="text" id="description" bind:value={user.description} required />
+        </div>
+        <div class="form-group">
+          <label for="dob">date of birth</label>
+          <input type="date" id="dob" bind:value={user.dob} required />
+        </div>
+        <div class="form-group">
+          <label for="icon">icon</label>
+          <input type="text" id="icon" bind:value={user.icon} required />
+        </div>
+        <div class="form-group">
+          <button type="submit">save</button>
+        </div>
+      </form>
+    {/if}
+  </div>
 </div>
 
+{#if displayEditfailAlert}
+  <AlertWindow message={alertMessage} on:confirm={() => (displayEditfailAlert = false)} />
+{/if}
 
 <style>
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5); /* half transparent */
+    z-index: 1000; /* make sure it's on top of everything */
+  }
   .form-container {
+    z-index: 1000;
     width: 65%;
     height: 70%;
     margin: 0 auto;

@@ -51,40 +51,52 @@
   }
 </script>
 
-{#if displayloginFailed}
-  <AlertWindow 
-  message="login failed" 
-  on:confirm={() => (displayloginFailed = false)} />
-  <!-- pass the message prop to the alertWindow component -->
-{/if}
-
-{#if !$logedIn}
-  {#if displayRegister}
-    <UserRegister />
-  {:else}
-    <div class="login-container">
-      <h2>login</h2>
-      <form on:submit={handleLogin}>
-        <div class="form-group">
-          <label for="username">username</label>
-          <input type="text" id="username" bind:value={username} required />
-        </div>
-        <div class="form-group">
-          <label for="password">password</label>
-          <input type="password" id="password" bind:value={password} required />
-        </div>
-        <div>
-          <button type="button" on:click={toggleRegister}>Hey, register one?</button>
-        </div>
-        <div class="form-group">
-          <button type="submit">login</button>
-        </div>
-      </form>
-    </div>
+<div class="overlay">
+  {#if displayloginFailed}
+    <AlertWindow message="login failed" on:confirm={() => (displayloginFailed = false)} />
+    <!-- pass the message prop to the alertWindow component -->
   {/if}
-{/if}
+
+  {#if !$logedIn}
+    {#if displayRegister}
+      <UserRegister />
+    {:else}
+      <div class="login-container">
+        <h2>login</h2>
+        <form on:submit={handleLogin}>
+          <div class="form-group">
+            <label for="username">username</label>
+            <input type="text" id="username" bind:value={username} required />
+          </div>
+          <div class="form-group">
+            <label for="password">password</label>
+            <input type="password" id="password" bind:value={password} required />
+          </div>
+          <div>
+            <button type="button" on:click={toggleRegister}>Hey, register one?</button>
+          </div>
+          <div class="form-group">
+            <button type="submit">login</button>
+          </div>
+        </form>
+      </div>
+    {/if}
+  {/if}
+</div>
 
 <style>
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5); /* half transparent */
+    z-index: 1000; /* make sure it's on top of everything */
+  }
   .login-container {
     width: 300px;
     margin: 0 auto;

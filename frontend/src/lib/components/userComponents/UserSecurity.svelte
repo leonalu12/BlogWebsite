@@ -1,8 +1,8 @@
 <script>
   import { onMount } from "svelte";
-  import {  logedIn } from "../../store/userStore.js";
+  import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
-  import AlertWindow from "../utils/alertWindow.svelte";
+  import AlertWindow from "../utils/AlertWindow.svelte";
   import { displaySecurity } from "../../store/userStore.js"; //import the alertWindow component
   import { displayChangePwdAlert } from "../../store/userStore.js";
 
@@ -16,7 +16,7 @@
   let showCurrentPwdNotCorrect = false;
   $: user = {
     username: username,
-    pwd: newPwd,
+    pwd: newPwd
   };
 
   // get data when the component is mounted
@@ -30,7 +30,7 @@
         throw new Error("network response problem");
       }
       const data = await response.json();
-    
+
       username = data.username;
       console.log("Username:", username);
     } catch (error) {
@@ -51,7 +51,7 @@
     }
 
     try {
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/users/verify`, {
+      const verifyResponse = await fetch(`${PUBLIC_API_BASE_URL}/users/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -60,10 +60,10 @@
         body: JSON.stringify({ password: currentPwd })
       });
 
-      if (!response.status === 200) {
+      if (!verifyResponse.ok) {
         throw new Error("change failed");
       } else {
-        const data = await response.json();
+        const data = await verifyResponse.json();
         console.log("current password matched:", data);
       }
     } catch (error) {
@@ -83,7 +83,7 @@
       });
       if (!response.ok) {
         throw new Error("network response problem");
-      }else{
+      } else {
         displayChangePwdAlert.set(true);
         showPwdNotMatch = false;
         showCurrentPwdNotCorrect = false;
@@ -98,36 +98,38 @@
   }
 </script>
 
-<div class="form-container">
-  <h2>change password</h2>
-  {#if loading}
-    <p>loading...</p>
-  {:else}
-    <form on:submit={handleSubmit}>
-      <div class="form-group">
-        <label for="pwd">password</label>
-        <input type="password" id="pwd" bind:value={currentPwd} required />
-      </div>
-      <div>
+<div class="overlay">
+  <div class="form-container">
+    <h2>change password</h2>
+    {#if loading}
+      <p>loading...</p>
+    {:else}
+      <form on:submit={handleSubmit}>
         <div class="form-group">
-          <label for="newPwd">new password</label>
-          <input type="password" id="newPwd" bind:value={newPwd} required />
+          <label for="pwd">password</label>
+          <input type="password" id="pwd" bind:value={currentPwd} required />
         </div>
-        <div class="form-group">
-          <label for="confirmPwd">confirm password</label>
-          <input type="password" id="confirmPwd" bind:value={confirmPwd} required />
+        <div>
           <div class="form-group">
-            {#if newPwd && confirmPwd}
-              {#if newPwd !== confirmPwd}
-                <p style="color: red;">passwords do not match</p>
+            <label for="newPwd">new password</label>
+            <input type="password" id="newPwd" bind:value={newPwd} required />
+          </div>
+          <div class="form-group">
+            <label for="confirmPwd">confirm password</label>
+            <input type="password" id="confirmPwd" bind:value={confirmPwd} required />
+            <div class="form-group">
+              {#if newPwd && confirmPwd}
+                {#if newPwd !== confirmPwd}
+                  <p style="color: red;">passwords do not match</p>
+                {/if}
               {/if}
-            {/if}
-            <button type="submit">submit</button>
+              <button type="submit">submit</button>
+            </div>
           </div>
         </div>
-      </div>
-    </form>
-  {/if}
+      </form>
+    {/if}
+  </div>
 </div>
 
 {#if showPwdNotMatch}
@@ -141,6 +143,18 @@
 {/if}
 
 <style>
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5); /* half transparent */
+    z-index: 1000; /* make sure it's on top of everything */
+  }
   .form-container {
     width: 65%;
     height: 70%;
