@@ -91,19 +91,43 @@
     {#if comment.children?.length}
       <div class="comment-children">
         {#each comment.children as childComment}
-          <svelte:self
-            bind:replyContent
-            bind:replyBoxVisible
-            {user_id}
-            {toggleReplyBox}
-            {startReply}
-            comment={childComment}
-          />
+          {#if comment.layer<3}
+            <svelte:self
+              bind:replyContent
+              bind:replyBoxVisible
+              {user_id}
+              {toggleReplyBox}
+              {startReply}
+              comment={childComment}
+            />
+            <!-- Show after layer 3 -->
+          {:else}
+          <div class="nested-comment">
+            <p>{childComment.content}</p>
+            <div class="comment-actions">
+              <button on:click={() => toggleLike(childComment)}>
+                {childComment.userLiked ? "💔 Unlike" : "❤️ Like"} ({childComment.likes || 0})
+              </button>
+              <button on:click={() => toggleReplyBox(childComment)}>Reply</button>
+              <button on:click={() => triggerDeleteConfirm(childComment)}>❌ Delete</button>
+            </div>
+            
+            {#if replyBoxVisible[childComment.id]}
+              <div class="reply-box">
+                <input 
+                  type="text" 
+                  bind:value={replyContent[childComment.id]} 
+                  placeholder="Write a reply..."
+                />
+                <button on:click={() => startReply(childComment)}>Post</button>
+              </div>
+            {/if}
+          </div>
+          {/if}
         {/each}
       </div>
+ 
     {/if}
-  </div>
-
   <!-- 删除确认弹窗 -->
   {#if showDeleteConfirm}
     <DeleteConfirmWindow
@@ -112,6 +136,7 @@
       on:cancel={cancelDelete}
     />
   {/if}
+</div>
 {/if}
   
   <style>
@@ -133,5 +158,11 @@
   }
   .reply-box {
     margin-top: 8px;
+  }
+  .nested-comment {
+    background: #f5f5f5;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 6px;
   }
   </style>
