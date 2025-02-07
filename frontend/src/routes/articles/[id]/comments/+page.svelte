@@ -120,7 +120,7 @@
     const newComment = {
       content,
       layer: 1,
-      date_time:new Date().toISOString(),
+      date_time:new Date().toLocaleString(),
       user_id,
       article_id: article_id,
       parent_cid:  null
@@ -195,7 +195,7 @@
       body: JSON.stringify({
         content,
         layer: parentComment.layer + 1, 
-        date_time: new Date().toISOString(),
+        date_time: new Date().toLocaleString(),
         user_id: 1, // 这里需要改成用户ID
         article_id: article_id,
         parent_cid: parentComment.id, // 关联父级评论

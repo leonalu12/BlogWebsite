@@ -64,6 +64,11 @@
   {#if !comment.deleted} <!-- 仅在评论未被删除时渲染 -->
   <div class="comment-item" style="margin-left: {comment.layer * 20}px">
     <div class="comment-content">
+      <div class="user-info">
+        <img class="user-avatar" src={comment.icon} alt={comment.username} />
+        <span class="username">{comment.username}</span>
+        <span class="comment-time">{comment.date_time}</span>
+      </div>
       <p>{comment.content}</p>
       <div class="comment-actions">
         <button on:click={toggleLike}>
@@ -103,6 +108,11 @@
             <!-- Show after layer 3 -->
           {:else}
           <div class="nested-comment">
+            <div class="user-info">
+              <img class="user-avatar" src={childComment.icon} alt={childComment.username} />
+              <span class="username">{childComment.username}</span>
+              <span class="comment-time">{childComment.date_time}</span>
+            </div>
             <p>{childComment.content}</p>
             <div class="comment-actions">
               <button on:click={() => toggleLike(childComment)}>
@@ -164,5 +174,27 @@
     padding: 8px;
     margin-top: 8px;
     border-radius: 6px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .username {
+    font-weight: bold;
+  }
+
+  .comment-time {
+    font-size: 0.9rem;
+    color: gray;
+    margin-left: 10px;
   }
   </style>
