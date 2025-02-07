@@ -3,6 +3,7 @@
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { displayEdit } from "../../store/userStore.js";
+  import { displayEditSuccessAlert } from "../../store/userStore.js";
 
   let user = {
     username: "",
@@ -32,7 +33,7 @@
         lname: data.lname,
         description: data.description,
         dob: data.dob,
-        pwd: "",
+        pwd: "data.pwd",
         icon: data.icon
       };
     } catch (error) {
@@ -60,8 +61,11 @@
       if (!response.ok) {
         throw new Error("网络响应问题");
       }else{
+
         displayEdit.set(false);
+        displayEditSuccessAlert.set(true);
         console.log("User Information Updated");
+
       }
     } catch (error) {
       console.error("获取数据失败:", error);
@@ -73,17 +77,17 @@
 
 
 <div class="form-container">
-  <h2>编辑用户信息</h2>
+  <h2>editing user information</h2>
   {#if loading}
-    <p>正在加载数据...</p>
+    <p>loading...</p>
   {:else}
     <form on:submit={handleSubmit}>
       <div class="form-group">
         <label for="username">username</label>
-        <input type="text" id="username" bind:value={user.username} required />
+        <input type="text" id="username" bind:value={user.username}  required />
       </div>
       <div class="form-group">
-        <label for="fname">first name</label>
+        <label for="fname">first ni</label>
         <input type="text" id="fname" bind:value={user.fname} required />
       </div>
       <div class="form-group">
@@ -97,10 +101,6 @@
       <div class="form-group">
         <label for="dob">date of birth</label>
         <input type="date" id="dob" bind:value={user.dob} required />
-      </div>
-      <div class="form-group">
-        <label for="pwd">password</label>
-        <input type="pwd" id="pwd" bind:value={user.pwd} required />
       </div>
       <div class="form-group">
         <label for="icon">icon</label>

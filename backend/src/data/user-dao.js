@@ -6,12 +6,12 @@ import bcrypt from 'bcrypt';
 const userSchema = yup
 .object({
     username: yup.string().required(),
-    fname: yup.string().required(),
-    lname: yup.string().required(),
-    description : yup.string().required(),
-    dob: yup.date().required(),
+    fname: yup.string(),
+    lname: yup.string(),
+    description : yup.string(),
+    dob: yup.date(),
     pwd: yup.string().required(),
-    icon: yup.string().required()
+    icon: yup.string()
 });
 
 async function saltNewUser(user) {

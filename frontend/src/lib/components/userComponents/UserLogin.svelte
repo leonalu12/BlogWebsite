@@ -52,7 +52,9 @@
 </script>
 
 {#if displayloginFailed}
-  <AlertWindow message="login failed" on:confirm={() => (displayloginFailed = false)} />
+  <AlertWindow 
+  message="login failed" 
+  on:confirm={() => (displayloginFailed = false)} />
   <!-- pass the message prop to the alertWindow component -->
 {/if}
 
