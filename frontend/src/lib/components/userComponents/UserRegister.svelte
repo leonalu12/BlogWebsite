@@ -1,17 +1,22 @@
 <script>
-  import { onMount } from 'svelte';
-  import { logedIn } from '../../store/userStore.js';
+  import { onMount } from "svelte";
+  import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
-  import { BedDouble } from 'lucide-svelte';
-  
+  import { BedDouble } from "lucide-svelte";
+
   let user = {
-    username: '',
-    fname: '',
-    lname: '',
-    description: '',
-    dob: '',
-    pwd: '',
-    icon: ''
+    username: "",
+    fname: "",
+    lname: "",
+    description: "",
+    dob: "",
+    pwd: "",
+    icon: ""
+  };
+
+  $: logInInfo = {
+    username: user.username,
+    password: user.pwd
   };
   let loading = false; // 设置初始加载状态为false
 
@@ -21,14 +26,14 @@
     loading = true;
 
     try {
-      console.log('发送用户数据:', user);
+      console.log("发送用户数据:", user);
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/register`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(user),
-        credentials: 'include'
+        credentials: "include"
       });
 
       if (!response.ok) {
@@ -37,28 +42,26 @@
       }
 
       const data = await response.json();
-      console.log('注册成功:', data);
+      console.log("注册成功:", data);
       logedIn.set(true);
 
       const loginResponse = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify({ username, password })
-        });
-  
-        if (!loginResponse.ok) {
-          throw new Error('login failed');
-        }else{
-          const data = await response.json();
-        console.log('登录成功:', data);
-        toggleLogedIn();
-        goto('/');
-        }
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(logInInfo)
+      });
+
+      if (!loginResponse.ok) {
+        throw new Error("login failed");
+      } else {
+        const logedInData = await loginResponse.json();
+        console.log("登录成功:", logedInData);
+      }
     } catch (error) {
-      console.error('注册错误:', error);
+      console.error("注册错误:", error);
     } finally {
       loading = false; // 确保在请求后将加载状态设置为false
     }
