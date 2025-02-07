@@ -1,21 +1,24 @@
 import yup from 'yup';
-import {getDatabase} from './database.js';
-import {updateDatabase} from './util.js';
+import { getDatabase } from './database.js';
+import { updateDatabase } from './util.js';
 import bcrypt from 'bcrypt';
 
 const userSchema = yup
-.object({
-    username: yup.string().required(),
-    fname: yup.string(),
-    lname: yup.string(),
-    description : yup.string(),
-    dob: yup.date(),
-    pwd: yup.string().required(),
-    icon: yup.string()
-});
+    .object({
+        username: yup.string().required(),
+        fname: yup.string(),
+        lname: yup.string(),
+        description: yup.string(),
+        dob: yup.date(),
+        pwd: yup.string(),
+        icon: yup.string()
+    });
 
 async function saltNewUser(user) {
     const saltRounds = 10;
+    if (!user.pwd) {
+        return user;
+    }
     user.pwd = await bcrypt.hash(user.pwd, saltRounds);
     console.log("Salted Password:", user.pwd);
     return user;
@@ -32,12 +35,12 @@ export async function createUser(user) {
 
         const db = await getDatabase();
         const response = await db.run(
-            'INSERT INTO users (username, fname, lname, description, dob, pwd, icon) VALUES(?, ?, ?, ?, ?, ?, ?)', 
-            newUser.username, 
+            'INSERT INTO users (username, fname, lname, description, dob, pwd, icon) VALUES(?, ?, ?, ?, ?, ?, ?)',
+            newUser.username,
             newUser.fname,
-            newUser.lname, 
+            newUser.lname,
             newUser.description,
-            newUser.dob, 
+            newUser.dob,
             newUser.pwd,
             newUser.icon
         );
@@ -65,21 +68,21 @@ export async function authenticateUser(username, pwd) {
 
 
 export async function getUsers() {
-  const db = await getDatabase();
-  const users = await db.all('SELECT * FROM users');
-  return users;
+    const db = await getDatabase();
+    const users = await db.all('SELECT * FROM users');
+    return users;
 }
- 
+
 export async function getUsersByUsername(username) {
     const db = await getDatabase();
     const user = await db.get('SELECT * FROM users WHERE username = ?', username);
     return user;
-    }
+}
 
 
-export async function updateUser(user,id) {
-    const newUser=userSchema.validateSync(user,{
-        abortEarly:false,
+export async function updateUser(user, id) {
+    const newUser = userSchema.validateSync(user, {
+        abortEarly: false,
         stripUnknown: true
     });
 
@@ -88,7 +91,7 @@ export async function updateUser(user,id) {
     console.log(newUser);
 
     const db = await getDatabase();
-    const response= await updateDatabase(db, "users", saltedUser, id);
+    const response = await updateDatabase(db, "users", saltedUser, id);
 
     // Return true if changes were made, false otherwise.
     return response.changes > 0;
@@ -111,4 +114,14 @@ export async function deleteUser(id) {
     const db = await getDatabase();
     const response = await db.run('DELETE FROM Users WHERE id = ?', id);
     return response.changes > 0;
+}
+
+export async function checkUserExists(username) {
+    const db = await getDatabase();
+    const user = await db.get('SELECT * FROM users WHERE username = ?', username);
+    if (user) {
+        return true;
+    } else {
+        return false;
+    }
 }

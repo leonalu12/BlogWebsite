@@ -1,9 +1,7 @@
 <script>
-  import { onMount } from "svelte";
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
-  import { BedDouble } from "lucide-svelte";
-  
+  import AlertWindow from "../utils/AlertWindow.svelte";
 
   let user = {
     username: "",
@@ -21,10 +19,27 @@
   };
   let loading = false; // 设置初始加载状态为false
 
+  let diapalyAlert = false;
+  let comfirmPwd = "";
+  let isUniqueUsername = true;
+  let alertMessage = "";
+
   // 提交表单的处理函数
   async function handleRegister(event) {
     event.preventDefault();
     loading = true;
+    if (user.pwd !== comfirmPwd) {
+      diapalyAlert = true;
+      loading = false;
+      alertMessage = "passwords do not match";
+      return;
+    }
+    if (!isUniqueUsername) {
+      loading = false;
+      diapalyAlert = true;
+      alertMessage = "username already exists";
+      return;
+    }
 
     try {
       console.log("发送用户数据:", user);
@@ -67,6 +82,30 @@
       loading = false; // 确保在请求后将加载状态设置为false
     }
   }
+
+  async function checkUsername() {
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/users/checkUsernameUnique`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username: user.username }),
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        isUniqueUsername = false;
+        const error = await response.json();
+        throw new Error(error.message);
+      }
+      isUniqueUsername = true;
+      const data = await response.json();
+      console.log("username checking:", data);
+    } catch (error) {
+      console.error("username alread existed:", error);
+    }
+  }
 </script>
 
 <div class="form-container">
@@ -74,28 +113,59 @@
   <form on:submit={handleRegister}>
     <div class="form-group">
       <label for="username">username</label>
-      <input type="text" id="username" bind:value={user.username} required />
+      <input
+        type="text"
+        id="username"
+        bind:value={user.username}
+        placeholder="Display to others"
+        on:input={checkUsername}
+        required
+      />
     </div>
+    <p style="color: red;">
+      {#if !isUniqueUsername}username already exists{/if}
+    </p>
     <div class="form-group">
       <label for="fname">first name</label>
-      <input type="text" id="fname" bind:value={user.fname} required />
+      <input
+        type="text"
+        id="fname"
+        bind:value={user.fname}
+        placeholder="First name on ID"
+        required
+      />
     </div>
     <div class="form-group">
       <label for="lname">last name</label>
-      <input type="text" id="lname" bind:value={user.lname} required />
+      <input type="text" id="lname" bind:value={user.lname} placeholder="Surname on ID" required />
     </div>
     <div class="form-group">
       <label for="description">description</label>
-      <input type="text" id="description" bind:value={user.description} required />
+      <input
+        type="text"
+        id="description"
+        bind:value={user.description}
+        placeholder="Briefly introduce yourself"
+        required
+      />
     </div>
     <div class="form-group">
       <label for="dob">date of birth</label>
-      <input type="date" id="dob" bind:value={user.dob} required />
+      <input type="date" id="dob" bind:value={user.dob} placeholder="Birthdate" required />
     </div>
     <div class="form-group">
       <label for="pwd">password</label>
       <input type="password" id="pwd" bind:value={user.pwd} required />
     </div>
+    <div class="form-group">
+      <label for="comfirmPwd">comfirm password</label>
+      <input type="password" id="comfirmPwd" bind:value={comfirmPwd} required />
+    </div>
+    {#if user.pwd !== comfirmPwd}
+      {#if user.pwd && comfirmPwd}
+        <p style="color: red;">passwords do not match</p>
+      {/if}
+    {/if}
     <div class="form-group">
       <label for="icon">icon</label>
       <input type="text" id="icon" bind:value={user.icon} required />
@@ -105,6 +175,25 @@
     </div>
   </form>
 </div>
+
+{#if diapalyAlert}
+  <AlertWindow message={alertMessage} on:confirm={() => (diapalyAlert = false)} />
+{/if}
+
+{#if loading}
+  <div
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;"
+  >
+    <div style="background-color: white; padding: 20px; border-radius: 8px;">
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p style="margin-left: 10px;">loading...</p>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   .form-container {

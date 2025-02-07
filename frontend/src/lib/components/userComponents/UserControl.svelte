@@ -7,17 +7,16 @@
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../utils/AlertWindow.svelte";
   import { displayEdit } from "../../store/userStore.js";
-  import { displaySecurity} from "../../store/userStore.js";
-  import {displayEditSuccessAlert} from "../../store/userStore.js";
-  import {displayChangePwdAlert} from "../../store/userStore.js";
+  import { displaySecurity } from "../../store/userStore.js";
+  import { displayEditSuccessAlert } from "../../store/userStore.js";
+  import { displayChangePwdAlert } from "../../store/userStore.js";
   let showLogoutAlert = false;
   let isOpen = false;
   let displayLogin = false;
-  
-  
 
   function toggleDisplaySecurity() {
     displaySecurity.update((value) => !value);
+    displayEdit.set(false);
     toggleDropdown();
   }
 
@@ -28,6 +27,7 @@
 
   function toggleDisplayEdit() {
     displayEdit.update((value) => !value);
+    displaySecurity.set(false);
     toggleDropdown();
   }
 
@@ -58,7 +58,6 @@
   {#if showLogoutAlert}
     <AlertWindow message="Log out successfully" on:confirm={() => (showLogoutAlert = false)} />
   {/if}
-
 {:else}
   <div class="dropdown">
     <button on:click={toggleDropdown}><User /></button>
@@ -69,7 +68,6 @@
     </div>
   </div>
 
-
   {#if $displaySecurity}
     <UserSecurity />
   {/if}
@@ -79,13 +77,15 @@
   {/if}
 
   {#if $displayEditSuccessAlert}
-    <AlertWindow message="User Information Updated" on:confirm={() => (displayEditSuccessAlert.set(false))} />
+    <AlertWindow
+      message="User Information Updated"
+      on:confirm={() => displayEditSuccessAlert.set(false)}
+    />
   {/if}
 
   {#if $displayChangePwdAlert}
-    <AlertWindow message="password changed" on:confirm={() => (displayChangePwdAlert.set(false))} />
+    <AlertWindow message="password changed" on:confirm={() => displayChangePwdAlert.set(false)} />
   {/if}
-
 {/if}
 
 <style>

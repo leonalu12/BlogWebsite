@@ -28,6 +28,25 @@ try{
   }
 });
 
+router.post("/update", async (req, res) => {
+  try {
+    const {username} = req.body;
+    if (username) {
+      const userToken = createUserJWT(username);
+      return res.cookie("authToken", userToken, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 24*60*60*1000),
+        path: "/"
+      }).json({username});  
+    } else {
+      return res.sendStatus(401);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
 
 router.delete("/", (req, res) => {
 
@@ -36,5 +55,7 @@ router.delete("/", (req, res) => {
         }).sendStatus(204);
 
   });
+
+
 
 export default router;
