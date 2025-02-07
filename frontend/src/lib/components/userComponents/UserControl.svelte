@@ -2,15 +2,24 @@
   import { User, Settings, LogOut } from "lucide-svelte";
   import UserEdit from "./UserEdit.svelte";
   import UserLogin from "./UserLogin.svelte";
+  import UserSecurity from "./UserSecurity.svelte";
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
-  import { onMount } from "svelte";
   import AlertWindow from "../utils/AlertWindow.svelte";
   import { displayEdit } from "../../store/userStore.js";
-
+  import { displaySecurity} from "../../store/userStore.js";
+  import {displayEditSuccessAlert} from "../../store/userStore.js";
+  import {displayChangePwdAlert} from "../../store/userStore.js";
   let showLogoutAlert = false;
   let isOpen = false;
   let displayLogin = false;
+  
+  
+
+  function toggleDisplaySecurity() {
+    displaySecurity.update((value) => !value);
+    toggleDropdown();
+  }
 
   function toggleDisplayLogin() {
     displayLogin = !displayLogin;
@@ -49,18 +58,34 @@
   {#if showLogoutAlert}
     <AlertWindow message="Log out successfully" on:confirm={() => (showLogoutAlert = false)} />
   {/if}
+
 {:else}
   <div class="dropdown">
     <button on:click={toggleDropdown}><User /></button>
     <div class="dropdown-content" style="display: {isOpen ? 'block' : 'none'};">
       <button on:click={toggleDisplayEdit} class="editButton"><User /> Profile</button>
-
+      <button on:click={toggleDisplaySecurity} class="editButton"><User /> security</button>
       <button on:click={userLogOut} class="editButton"><LogOut /> Log out</button>
     </div>
   </div>
+
+
+  {#if $displaySecurity}
+    <UserSecurity />
+  {/if}
+
   {#if $displayEdit}
     <UserEdit />
   {/if}
+
+  {#if $displayEditSuccessAlert}
+    <AlertWindow message="User Information Updated" on:confirm={() => (displayEditSuccessAlert.set(false))} />
+  {/if}
+
+  {#if $displayChangePwdAlert}
+    <AlertWindow message="password changed" on:confirm={() => (displayChangePwdAlert.set(false))} />
+  {/if}
+
 {/if}
 
 <style>

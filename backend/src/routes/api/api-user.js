@@ -2,6 +2,7 @@ import express from "express";
 import { createUser,getUsersByUsername,deleteUser,updateUser,getUsers, getIdByUsername} from "../../data/user-dao.js";
 import {requiresAuthentication} from "../../middleware/auth-middleware.js";
 import { getUsernameFromJWT } from "../../data/jwt-util.js";
+import { authenticateUser } from "../../data/user-dao.js";
 
 const router = express.Router();
 
@@ -39,7 +40,22 @@ router.patch("/", requiresAuthentication, async (req, res) => {
   const id = await getIdByUsername(username);
   const user = req.body;
   const updatedUser = await updateUser(user, id);
-  return res.json(updatedUser);
+  return res.json(updatedUser).status(200);
 });
+
+router.post("/verify", requiresAuthentication, async (req, res) => {
+  const username = getUsernameFromJWT(req.cookies.authToken);
+  try {
+    const user = await authenticateUser(username, req.body.password);
+    if (user) {
+      return res.status(200).json({ message: "Valid credentials" });
+    } else {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+  } catch (e) {
+    return res.status(401).json({ error: e.message });
+  }
+});
+
 
 export default router;
