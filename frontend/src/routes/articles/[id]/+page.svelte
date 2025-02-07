@@ -9,7 +9,7 @@
     //存储用户是否已点赞该文章。如果 article.isLiked 为 undefined 或 null，则默认值为 false
     let isLiked = article.isLiked || false;
 
-    const userId = 2; // 假设当前用户 ID
+    const userId = 3; // 假设当前用户 ID
 
     async function toggleLike(event) {
         event.stopPropagation();//阻止事件冒泡，避免触发其他点击事件

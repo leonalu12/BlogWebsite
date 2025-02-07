@@ -25,6 +25,7 @@
   "dependencies": {
     "@tinymce/tinymce-svelte": "^3.0.0",
     "dayjs": "^1.11.11",
+    "flatpickr": "^4.6.13",
     "lucide": "^0.474.0",
     "lucide-svelte": "^0.474.0"
   }
