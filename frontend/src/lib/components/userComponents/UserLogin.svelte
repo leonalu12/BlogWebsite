@@ -4,16 +4,17 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { logedIn } from "../../store/userStore.js";
-  import AlertWindow from "../utils/alertWindow.svelte"; //import the alertWindow component
+  import AlertWindow from "../utils/AlertWindow.svelte"; //import the alertWindow component
+  import { displayEdit } from "../../store/userStore.js";
 
-  let clickedRegister = false;
+  let displayRegister = false;
   let displayloginFailed = false;
 
   function toggleLogedIn() {
     logedIn.update((value) => !value);
   }
   function toggleRegister() {
-    clickedRegister = !clickedRegister;
+    displayRegister = !displayRegister;
   }
   let username = "";
   let password = "";
@@ -56,7 +57,7 @@
 {/if}
 
 {#if !$logedIn}
-  {#if clickedRegister}
+  {#if displayRegister}
     <UserRegister />
   {:else}
     <div class="login-container">

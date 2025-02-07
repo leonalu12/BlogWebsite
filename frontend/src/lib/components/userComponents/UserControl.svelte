@@ -4,16 +4,21 @@
   import UserLogin from "./UserLogin.svelte";
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import { onMount } from "svelte";
+  import AlertWindow from "../utils/AlertWindow.svelte";
+  import { displayEdit } from "../../store/userStore.js";
+
+  let showLogoutAlert = false;
   let isOpen = false;
-  let displayEdit = false;
   let displayLogin = false;
 
   function toggleDisplayLogin() {
     displayLogin = !displayLogin;
+    displayEdit.set(false);
   }
 
   function toggleDisplayEdit() {
-    displayEdit = !displayEdit;
+    displayEdit.update((value) => !value);
     toggleDropdown();
   }
 
@@ -29,7 +34,10 @@
     console.log("log out response:", response);
     logedIn.set(false);
     toggleDropdown();
-    toggleDisplayLogin();
+    displayLogin = false;
+    logedIn.set(false);
+    displayEdit.set(false);
+    showLogoutAlert = true;
   }
 </script>
 
@@ -37,6 +45,9 @@
   <button on:click={toggleDisplayLogin}><User /></button>
   {#if displayLogin}
     <UserLogin />
+  {/if}
+  {#if showLogoutAlert}
+    <AlertWindow message="Log out successfully" on:confirm={() => (showLogoutAlert = false)} />
   {/if}
 {:else}
   <div class="dropdown">
@@ -47,7 +58,7 @@
       <button on:click={userLogOut} class="editButton"><LogOut /> Log out</button>
     </div>
   </div>
-  {#if displayEdit}
+  {#if $displayEdit}
     <UserEdit />
   {/if}
 {/if}
