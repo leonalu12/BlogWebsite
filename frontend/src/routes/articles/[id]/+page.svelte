@@ -59,7 +59,7 @@
     <div class="article-content">
         <h1>{article.title}</h1>
         <p class="article-meta">Published on {article.date_time} by {article.username}</p>
-        <p class="article-text">{article.content}</p>
+        <p class="article-text">{@html article.content}</p>
 
         <div class="article-actions">
             <button class="like-button" on:click={toggleLike}>

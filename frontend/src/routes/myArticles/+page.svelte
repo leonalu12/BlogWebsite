@@ -78,7 +78,7 @@
               {/if}
             </div>
             <div>{article.title}</div>
-            <div>{article.content}</div>
+            <div>{@html article.content}</div>
           </div>
         </a>
         <button class="delete-button" on:click={() => deleteArticle(article.id)}>Delete</button>
@@ -86,7 +86,7 @@
     {/each}
   </div>
 {:else}
-  <p>⚠️ No articles found.</p>
+  <p>No articles found.</p>
 {/if}
 
 <style>
