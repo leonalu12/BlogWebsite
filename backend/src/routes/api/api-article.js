@@ -21,8 +21,10 @@ const upload = multer({ storage });
 // 获取文章（支持搜索、排序、按用户ID获取）
 router.get("/", async (req, res) => {
   try {
-    const { search, filterBy, sortBy, order, userId } = req.query;
-    const articles = await getAllArticles(search || "", filterBy || "title", sortBy || "date_time", order || "DESC", userId || null);
+    const { search, filterBy, sortBy, order, userId, exactDate} = req.query;
+    console.log("🛠 收到的请求参数:", { search, filterBy, sortBy, order, userId, exactDate }); // ✅ **调试**
+    // const articles = await getAllArticles(search || "", filterBy || "title", sortBy || "date_time", order || "DESC", userId || null);
+    const articles = await getAllArticles(search, filterBy, sortBy, order, userId, exactDate);
     res.json(articles);
   } catch (err) {
     res.status(500).json({ error: err.message });
