@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import { displayEdit } from "../../store/userStore.js";
 
   let user = {
     username: "",
@@ -58,6 +59,9 @@
       });
       if (!response.ok) {
         throw new Error("网络响应问题");
+      }else{
+        displayEdit.set(false);
+        console.log("User Information Updated");
       }
     } catch (error) {
       console.error("获取数据失败:", error);
@@ -66,6 +70,7 @@
     }
   }
 </script>
+
 
 <div class="form-container">
   <h2>编辑用户信息</h2>
@@ -107,6 +112,7 @@
     </form>
   {/if}
 </div>
+
 
 <style>
   .form-container {

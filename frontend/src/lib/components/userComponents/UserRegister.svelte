@@ -3,6 +3,7 @@
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { BedDouble } from "lucide-svelte";
+  
 
   let user = {
     username: "",
