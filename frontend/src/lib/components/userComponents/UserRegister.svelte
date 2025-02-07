@@ -1,17 +1,22 @@
 <script>
-  import { onMount } from 'svelte';
-  import { logedIn } from '../../store/userStore.js';
+  import { onMount } from "svelte";
+  import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
-  import { BedDouble } from 'lucide-svelte';
-  
+  import { BedDouble } from "lucide-svelte";
+
   let user = {
-    username: '',
-    fname: '',
-    lname: '',
-    description: '',
-    dob: '',
-    pwd: '',
-    icon: ''
+    username: "",
+    fname: "",
+    lname: "",
+    description: "",
+    dob: "",
+    pwd: "",
+    icon: ""
+  };
+
+  $: logInInfo = {
+    username: user.username,
+    password: user.pwd
   };
   let loading = false; // 设置初始加载状态为false
 
@@ -21,14 +26,14 @@
     loading = true;
 
     try {
-      console.log('发送用户数据:', user);
+      console.log("发送用户数据:", user);
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/register`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(user),
-        credentials: 'include'
+        credentials: "include"
       });
 
       if (!response.ok) {
@@ -37,10 +42,26 @@
       }
 
       const data = await response.json();
-      console.log('注册成功:', data);
+      console.log("注册成功:", data);
       logedIn.set(true);
+
+      const loginResponse = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(logInInfo)
+      });
+
+      if (!loginResponse.ok) {
+        throw new Error("login failed");
+      } else {
+        const logedInData = await loginResponse.json();
+        console.log("登录成功:", logedInData);
+      }
     } catch (error) {
-      console.error('注册错误:', error);
+      console.error("注册错误:", error);
     } finally {
       loading = false; // 确保在请求后将加载状态设置为false
     }
@@ -48,38 +69,38 @@
 </script>
 
 <div class="form-container">
-  <h2>用户注册</h2>
+  <h2>register one</h2>
   <form on:submit={handleRegister}>
     <div class="form-group">
-      <label for="username">用户名</label>
+      <label for="username">username</label>
       <input type="text" id="username" bind:value={user.username} required />
     </div>
     <div class="form-group">
-      <label for="fname">名字</label>
+      <label for="fname">first name</label>
       <input type="text" id="fname" bind:value={user.fname} required />
     </div>
     <div class="form-group">
-      <label for="lname">姓氏</label>
+      <label for="lname">last name</label>
       <input type="text" id="lname" bind:value={user.lname} required />
     </div>
     <div class="form-group">
-      <label for="description">描述</label>
+      <label for="description">description</label>
       <input type="text" id="description" bind:value={user.description} required />
     </div>
     <div class="form-group">
-      <label for="dob">出生日期</label>
+      <label for="dob">date of birth</label>
       <input type="date" id="dob" bind:value={user.dob} required />
     </div>
     <div class="form-group">
-      <label for="pwd">密码</label>
+      <label for="pwd">password</label>
       <input type="password" id="pwd" bind:value={user.pwd} required />
     </div>
     <div class="form-group">
-      <label for="icon">头像</label>
+      <label for="icon">icon</label>
       <input type="text" id="icon" bind:value={user.icon} required />
     </div>
     <div class="form-group">
-      <button type="submit">注册</button>
+      <button type="submit">finish</button>
     </div>
   </form>
 </div>

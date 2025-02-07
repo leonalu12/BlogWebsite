@@ -3,7 +3,11 @@ import { getDatabase } from "./database.js";
 /* get all comments from given article id */
 export async function getCommentsWithArticleId(articleId) {
     const db = await getDatabase();
-    const comments = await db.all("SELECT * FROM comments WHERE article_id = ?", [articleId]);
+    const comments = await db.all(`
+        SELECT comments.*, users.username, users.icon
+        FROM comments
+        LEFT JOIN users ON comments.user_id = users.id
+        WHERE article_id = ?`, [articleId]);
     return comments;
 }
 

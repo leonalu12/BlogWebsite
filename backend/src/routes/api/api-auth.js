@@ -3,20 +3,29 @@ import { authenticateUser } from "../../data/user-dao.js";
 import { createUserJWT} from "../../data/jwt-util.js";
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
+
+try{
     const{username,password}=req.body;
     console.log(req.body);
-    if(authenticateUser(username,password)){
+    const user = await authenticateUser(username,password);
+    if((user)){
       console.log(username);
       const userToken =createUserJWT(username);
+      console.log("got token",userToken);
       return res.cookie("authToken",userToken,{
         httpOnly:true,
         expires: new Date(Date.now() + 24*60*60*1000),
         path : "/"
       }).json({username})
     }else{
+      console.log("wrong username or password");
       return res.sendStatus(401);
     }
+  }catch(error){
+    console.error(error);
+    return res.sendStatus(500);
+  }
 });
 
 

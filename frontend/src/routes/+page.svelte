@@ -146,11 +146,13 @@ async function fetchArticles() {
     <span class="article">
       <a href={`/articles/${article.id}`}>
         <div>
-          <div><img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt="{article.title}" /></div>
-          <div>{article.title}</div>
-          <div>By: {article.username}</div> <!-- ✅ **新增：显示作者用户名** -->
+
+          <div><img src="{ PUBLIC_IMAGES_URL }/{article.image_url}" alt="{article.title}" /></div>
+          <div> {article.title}</div>
+         <div>By: {article.username}</div> <!-- ✅ **新增：显示作者用户名** -->
           <div>Published on: {article.date_time}</div> <!-- ✅ **新增：显示发布时间** -->
-          <div>{article.content}</div>
+          <div> {@html article.content}</div>
+
         </div>
       </a>
     </span>

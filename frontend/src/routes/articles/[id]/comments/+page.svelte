@@ -13,26 +13,79 @@
   let user_id =1; //need to change!
   
 
-  // 将评论数据转换为树形结构
   function buildCommentTree(commentsArray) {
-    const commentMap = new Map();//store all the comments
-    const rootComments = [];
+  const commentMap = new Map(); // store all the comments
+  const rootComments = [];
 
+  // First pass: initialize comments and map
     commentsArray.forEach(comment => {
-      comment.children = []; // 添加 children 数组属性, 存储子评论
-      commentMap.set(comment.id, comment);
-    // 构建树形结构
-      if (comment.parent_cid) {
-        const parentComment = commentMap.get(comment.parent_cid);//找到父评论
-        if (parentComment) {
-          parentComment.children.push(comment);//将当前评论添加到父评论的 children 数组中
-        }
-      } else {
-        rootComments.push(comment);}//没有父评论的是根评论
-    });
+    comment.children = []; // Initialize children array
+    commentMap.set(comment.id, comment);
+  });
 
-    return rootComments;
+  // Second pass: build tree structure
+  commentsArray.forEach(comment => {
+    if (comment.parent_cid) {
+      let parentComment = commentMap.get(comment.parent_cid);
+      
+      // Handle comments beyond level 3
+      if (comment.layer > 3) {
+        // Find the closest level 2 ancestor
+        let currentParent = parentComment;
+        let ancestorChain = [currentParent];
+        
+        // Build chain of ancestors until we reach root or level 1
+        while (currentParent && currentParent.parent_cid) {
+          currentParent = commentMap.get(currentParent.parent_cid);
+          if (currentParent) {
+            ancestorChain.push(currentParent);
+          }
+        }
+        
+        // Find the level 2 ancestor from the chain
+        parentComment = ancestorChain.find(ancestor => ancestor.layer === 2);
+        
+        // If no level 2 ancestor found, use the first level 2 or lower ancestor
+        if (!parentComment) {
+          parentComment = ancestorChain.find(ancestor => ancestor.layer < 3);
+        }
+        
+        // If still no appropriate ancestor found, use original parent
+        if (!parentComment) {
+          parentComment = commentMap.get(comment.parent_cid);
+        }
+      }
+
+      if (parentComment) {
+        // Ensure comment is at correct layer
+        comment.layer = Math.min(comment.layer, 3);
+        
+        // Add to parent's children
+        parentComment.children.push(comment);
+      } else {
+        // If no parent found, add to root
+        rootComments.push(comment);
+      }
+    } else {
+      // Root level comments
+      rootComments.push(comment);
+    }
+  });
+
+  // Final pass: sort children by date or other criteria if needed
+  function sortComments(comments) {
+    comments.forEach(comment => {
+      if (comment.children.length > 0) {
+        comment.children.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
+        sortComments(comment.children);
+      }
+    });
   }
+  sortComments(rootComments);
+  return rootComments;
+}
+
+
   export let data;
   let comments = writable(buildCommentTree(data.comments));
   console.log(comments);
@@ -67,7 +120,7 @@
     const newComment = {
       content,
       layer: 1,
-      date_time:new Date().toISOString,
+      date_time:new Date().toLocaleString(),
       user_id,
       article_id: article_id,
       parent_cid:  null
@@ -119,13 +172,13 @@
     }
   }
 
-  // delete
-  async function deleteComment(commentId) {
-    const res = await fetch(`http://localhost:3000/api/comments/${commentId}`, { method: "DELETE" });
-    if (res.ok) {
-      comments.update(cs => cs.filter(comment => comment.id !== commentId)); // 直接UI更新状态
-      }
-    }
+  // // delete
+  // async function deleteComment(commentId) {
+  //   const res = await fetch(`http://localhost:3000/api/comments/${commentId}`, { method: "DELETE" });
+  //   if (res.ok) {
+  //     comments.update(cs => cs.filter(comment => comment.id !== commentId)); // 直接UI更新状态
+  //     }
+  //   }
   
   
 //reply to other comments  
@@ -141,8 +194,8 @@
       credentials: "include",
       body: JSON.stringify({
         content,
-        layer: parentComment.layer + 1 > 3 ? 3 : parentComment.layer + 1, // 最多 3 层
-        date_time: new Date().toISOString(),
+        layer: parentComment.layer + 1, 
+        date_time: new Date().toLocaleString(),
         user_id: 1, // 这里需要改成用户ID
         article_id: article_id,
         parent_cid: parentComment.id, // 关联父级评论
@@ -152,10 +205,27 @@
 
     if (res.ok) {
       const newComment = await res.json();
-      if (!Array.isArray(parentComment.children)) {
-      parentComment.children = []; // 如果 undefined，则初始化为空数组
-    }
-      parentComment.children = [...parentComment.children, newComment];//插入父评论的children组
+      comments.update(current => {
+        const flatComments = [];
+        function flattenTree(commentsArray) {
+          for (let comment of commentsArray) {
+            flatComments.push({ ...comment });
+            if (comment.children?.length > 0) {
+              flattenTree(comment.children);
+            }
+          }
+        }
+        flattenTree(current);
+        flatComments.push(newComment);
+        
+        return buildCommentTree(flatComments);
+      });
+
+    //   if (!Array.isArray(parentComment.children)) {
+    //   parentComment.children = []; // 如果 undefined，则初始化为空数组
+    // }
+    //   parentComment.children = [...parentComment.children, newComment];//插入父评论的children组
+
       replyContent[parentComment.id] = ""; // 清空输入框内容
       replyBoxVisible[parentComment.id] = false; // 提交后隐藏输入框
     }
@@ -190,7 +260,6 @@
     {user_id}
     {toggleReplyBox}
     {startReply}
-    {deleteComment}
     comment={comment}
   />
 
