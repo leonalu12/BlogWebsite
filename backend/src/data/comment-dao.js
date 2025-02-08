@@ -54,3 +54,10 @@ export async function getCommentLikes(comment_id) {
     const result = await db.get("SELECT COUNT(*) AS like_count FROM like_c WHERE comment_id = ?", [comment_id]);
     return result ? result.like_count : 0;
 }
+
+/* get the layer from a comment */
+export async function getLayer(comment_id) {
+    const db = await getDatabase();
+    const result = await db.get("SELECT layer FROM comments WHERE id = ?", [comment_id]);
+    return result;
+}

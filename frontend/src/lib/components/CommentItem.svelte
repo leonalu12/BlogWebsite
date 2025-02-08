@@ -62,7 +62,7 @@
 </script>
   
   {#if !comment.deleted} <!-- 仅在评论未被删除时渲染 -->
-  <div class="comment-item" style="margin-left: {comment.layer * 20}px">
+  <div class="comment-item" style="margin-left: {comment.displayLayer * 20}px">
     <div class="comment-content">
       <div class="user-info">
         <img class="user-avatar" src={comment.icon} alt={comment.username} />
@@ -96,7 +96,7 @@
     {#if comment.children?.length}
       <div class="comment-children">
         {#each comment.children as childComment}
-          {#if comment.layer<3}
+          {#if comment.displayLayer <= 3}
             <svelte:self
               bind:replyContent
               bind:replyBoxVisible
@@ -106,8 +106,8 @@
               comment={childComment}
             />
             <!-- Show after layer 3 -->
-          {:else}
-          <div class="nested-comment">
+          <!-- {:else} -->
+          <!-- <div class="nested-comment">
             <div class="user-info">
               <img class="user-avatar" src={childComment.icon} alt={childComment.username} />
               <span class="username">{childComment.username}</span>
@@ -132,7 +132,7 @@
                 <button on:click={() => startReply(childComment)}>Post</button>
               </div>
             {/if}
-          </div>
+          </div> -->
           {/if}
         {/each}
       </div>
@@ -152,7 +152,6 @@
   <style>
     .comment-item {
       border-left: 2px solid #ddd;
-      padding-left: 12px;
       margin-top: 8px;
       
     }
@@ -169,12 +168,13 @@
   .reply-box {
     margin-top: 8px;
   }
-  .nested-comment {
+
+  /* .nested-comment {
     background: #f5f5f5;
     padding: 8px;
     margin-top: 8px;
     border-radius: 6px;
-  }
+  } */
 
   .user-info {
     display: flex;

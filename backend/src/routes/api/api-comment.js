@@ -1,5 +1,5 @@
 import express from "express";
-import { getCommentsWithArticleId, addComment, deleteComment, likeComment, unlikeComment, getCommentLikes } from "../../data/comment-dao.js";
+import { getCommentsWithArticleId, addComment, deleteComment, likeComment, unlikeComment, getCommentLikes,getLayer } from "../../data/comment-dao.js";
 
 const router = express.Router();
 
@@ -16,13 +16,18 @@ router.get("/:articleId", async (req, res) => {
 //create comment
 router.post("/", async (req, res) => {
   try{
-    const { content, layer, date_time, user_id, article_id, parent_cid } = req.body;
+    const { content, date_time, user_id, article_id, parent_cid } = req.body;
     if (!content) {
         return res.status(400);
-    }
+    }   
+    let layer = 1;
+    if(parent_cid){
+    const parentLayer= await getLayer(parent_cid);
+    layer = parentLayer.layer +1;
+  }
   const newComment = await addComment(content, layer, date_time, user_id, article_id, parent_cid);
-  return res.status(201).json(newComment);}
-  catch(err){
+  return res.status(201).json(newComment);
+  }catch(err){
     res.status(500).json({ message: "Failed to add comment", error: err.message });
   }
 });
