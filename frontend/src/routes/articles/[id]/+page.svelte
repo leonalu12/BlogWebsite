@@ -2,6 +2,7 @@
     import { Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
     import { goto } from '$app/navigation'; // ✅ 引入 SvelteKit 的页面跳转函数
+    import Comments from './Comments/Comments.svelte';  // 直接导入组件
     export let data;
     const { article } = data;
     //存储文章的当前点赞数，如果undefine或者null则显示0
@@ -77,6 +78,8 @@
         </div>
     </div>
 </div>
+
+<Comments article_id = {article.id} />
 
 <style>
     .article-container {
