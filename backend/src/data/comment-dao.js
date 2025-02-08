@@ -4,25 +4,47 @@ import { getDatabase } from "./database.js";
 export async function getCommentsWithArticleId(articleId) {
     const db = await getDatabase();
     const comments = await db.all(`
-        SELECT comments.*, users.username, users.icon
+        SELECT 
+            comments.*, 
+            users.username, users.icon,
+            parent_users.username AS parent_username  -- 获取父评论的用户名
         FROM comments
         LEFT JOIN users ON comments.user_id = users.id
-        WHERE article_id = ?`, [articleId]);
+        LEFT JOIN comments AS parent_comments ON comments.parent_cid = parent_comments.id
+        LEFT JOIN users AS parent_users ON parent_comments.user_id = parent_users.id  -- 关联父评论的用户
+        WHERE comments.article_id = ?`, 
+        [articleId]
+    );
     return comments;
 }
+
 
 /* add comment */
 export async function addComment(content, layer, date_time, user_id, article_id, parent_cid) {
     const db = await getDatabase();
     const dbResult = await db.run(
-        "INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES(?, ?, ?, ?, ?, ?)",[content, layer, date_time, user_id, article_id, parent_cid]);
-    const newComment = await db.get("SELECT * FROM comments WHERE id = ?" , [dbResult.lastID]);
+        "INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES(?, ?, ?, ?, ?, ?)",
+        [content, layer, date_time, user_id, article_id, parent_cid]
+    );
+
+    const newComment = await db.get(`
+        SELECT 
+            comments.*, 
+            users.username, users.icon,
+            parent_users.username AS parent_username 
+        FROM comments
+        LEFT JOIN users ON comments.user_id = users.id
+        LEFT JOIN comments AS parent_comments ON comments.parent_cid = parent_comments.id
+        LEFT JOIN users AS parent_users ON parent_comments.user_id = parent_users.id
+        WHERE comments.id = ?`, 
+        [dbResult.lastID]
+    );
+
     // 获取该评论的点赞数
-    const likeCount = await getCommentLikes(newComment.id);
-    // 将点赞数添加到评论对象
-    newComment.likes = likeCount;
+    newComment.likes = await getCommentLikes(newComment.id);
     return newComment;
 }
+
 
 /* delete comment */
 export async function deleteComment(id) {
