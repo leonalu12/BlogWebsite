@@ -139,30 +139,6 @@
     }
   }
 
-  //like and unlike
-   async function toggleLike(comment) {
-    const res = await fetch(`http://localhost:3000/api/comments/${comment.id}/like`, {
-      method: comment.userLiked ? "DELETE" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id })
-    });
-
-    if (res.ok) {
-      comment.userLiked = !comment.userLiked;
-      comment.likes += comment.userLiked ? 1 : -1;
-      comments.update(cs => [...cs]); // 触发 Svelte 更新
-    }
-  }
-
-  // // delete
-  // async function deleteComment(commentId) {
-  //   const res = await fetch(`http://localhost:3000/api/comments/${commentId}`, { method: "DELETE" });
-  //   if (res.ok) {
-  //     comments.update(cs => cs.filter(comment => comment.id !== commentId)); // 直接UI更新状态
-  //     }
-  //   }
-  
-  
 //reply to other comments  
   let replyContent = {}; // 存储每个评论的回复内容
   let replyBoxVisible = {}; // 控制每个评论的回复框是否可见
