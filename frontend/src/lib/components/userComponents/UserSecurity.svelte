@@ -5,6 +5,10 @@
   import AlertWindow from "../utils/AlertWindow.svelte";
   import { displaySecurity } from "../../store/userStore.js"; //import the alertWindow component
   import { displayChangePwdAlert } from "../../store/userStore.js";
+  import DeleteComfirmWindow from "../utils/DeleteConfirmWindow.svelte";
+  import { goto } from "$app/navigation";
+  import { deleteUserSuccess } from "../../store/userStore.js";
+  import { displayLogin } from "../../store/userStore.js";
 
   let username = "";
 
@@ -14,6 +18,8 @@
   let showPwdNotMatch = false;
   let currentPwd = "";
   let showCurrentPwdNotCorrect = false;
+  let comfirmDeleteUser = false;
+
   $: user = {
     username: username,
     pwd: newPwd
@@ -96,6 +102,44 @@
       loading = false;
     }
   }
+
+  function toggleDisplayDeleteUserWindow() {
+    comfirmDeleteUser = !comfirmDeleteUser;
+  }
+
+  async function deleteUser() {
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message);
+      }
+      console.log("delete user response:", response);
+    } catch (error) {
+      console.error("delete user error:", error);
+    }
+
+   try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+      console.log("log out response:", response);
+      deleteUserSuccess.set(true);
+      logedIn.set(false);
+      displaySecurity.set(false);
+      displayLogin.set(false);
+    } catch (error) {
+      console.error("log out error:", error);
+    }
+  }
 </script>
 
 <div class="overlay">
@@ -128,6 +172,16 @@
           </div>
         </div>
       </form>
+      <div>
+        <button on:click={toggleDisplayDeleteUserWindow}>delete user</button>
+        {#if comfirmDeleteUser}
+          <DeleteComfirmWindow
+            message="Are you sure to delete this user?"
+            on:confirm={deleteUser}
+            on:cancel={toggleDisplayDeleteUserWindow}
+          />
+        {/if}
+      </div>
     {/if}
   </div>
 </div>
@@ -141,6 +195,9 @@
     on:confirm={() => (showCurrentPwdNotCorrect = false)}
   />
 {/if}
+
+
+
 
 <style>
   .overlay {
