@@ -20,58 +20,40 @@
   // First pass: initialize comments and map
     commentsArray.forEach(comment => {
     comment.children = []; // Initialize children array
-    commentMap.set(comment.id, comment);
-  });
+    commentMap.set(comment.id, comment);});
 
   // Second pass: build tree structure
   commentsArray.forEach(comment => {
     if (comment.parent_cid) {
       let parentComment = commentMap.get(comment.parent_cid);
-      
-      // Handle comments beyond level 3
-      if (comment.layer > 3) {
-        // Find the closest level 2 ancestor
-        let currentParent = parentComment;
-        let ancestorChain = [currentParent];
-        
-        // Build chain of ancestors until we reach root or level 1
-        while (currentParent && currentParent.parent_cid) {
-          currentParent = commentMap.get(currentParent.parent_cid);
-          if (currentParent) {
-            ancestorChain.push(currentParent);
-          }
-        }
-        
-        // Find the level 2 ancestor from the chain
-        parentComment = ancestorChain.find(ancestor => ancestor.layer === 2);
-        
-        // If no level 2 ancestor found, use the first level 2 or lower ancestor
         if (!parentComment) {
-          parentComment = ancestorChain.find(ancestor => ancestor.layer < 3);
+          // 如果找不到父评论，作为根评论处理
+          rootComments.push(comment);
+          return;
         }
-        
-        // If still no appropriate ancestor found, use original parent
-        if (!parentComment) {
-          parentComment = commentMap.get(comment.parent_cid);
+      // 找到要插入的目标评论（实际显示位置的父评论）
+      let targetParent = parentComment;
+      if (parentComment.layer >= 3) {
+        // 如果父评论层级已经是3或以上，往上找到第二层的祖先评论
+        let ancestor = parentComment;
+        while (ancestor.parent_cid && ancestor.layer > 2) {
+          ancestor = commentMap.get(ancestor.parent_cid);
         }
+        targetParent = ancestor;
       }
 
-      if (parentComment) {
-        // Ensure comment is at correct layer
-        comment.layer = Math.min(comment.layer, 3);
-        
-        // Add to parent's children
-        parentComment.children.push(comment);
-      } else {
-        // If no parent found, add to root
-        rootComments.push(comment);
-      }
+      // 保持原始 layer 值，但在显示时放在第三层
+      comment.displayLayer = targetParent.layer >= 2 ? 3 : targetParent.layer + 1;
+      
+      // 将评论添加到目标父评论的 children 中
+      targetParent.children.push(comment);
     } else {
       // Root level comments
+      comment.displayLayer = 1;
       rootComments.push(comment);
     }
-  });
-
+  })
+  
   // Final pass: sort children by date or other criteria if needed
   function sortComments(comments) {
     comments.forEach(comment => {
