@@ -12,6 +12,10 @@ export const displayEditSuccessAlert = writable(false);
 
 export const displayChangePwdAlert = writable(false);
 
+export const deleteUserSuccess = writable(false);
+
+export const displayLogin = writable(false);
+
 displayEdit.subscribe(value => {
   console.log(value);
 }); 

@@ -30,8 +30,9 @@ router.post("/register", async (req, res) => {
 
 
 
-router.delete("/:id", requiresAuthentication, async (req, res) => {
-  const id = req.params.id;
+router.delete("/", requiresAuthentication, async (req, res) => {
+  const username = getUsernameFromJWT(req.cookies.authToken);
+  const id = await getIdByUsername(username);
   await deleteUser(id);
   return res.sendStatus(204);
 });

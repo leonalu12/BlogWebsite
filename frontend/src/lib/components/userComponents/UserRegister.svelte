@@ -2,7 +2,6 @@
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../utils/AlertWindow.svelte";
-
   let user = {
     username: "",
     fname: "",
@@ -106,6 +105,8 @@
       console.error("username alread existed:", error);
     }
   }
+
+  
 </script>
 
 <div class="form-container">
@@ -179,6 +180,8 @@
 {#if diapalyAlert}
   <AlertWindow message={alertMessage} on:confirm={() => (diapalyAlert = false)} />
 {/if}
+
+
 
 {#if loading}
   <div

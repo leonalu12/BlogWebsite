@@ -1,5 +1,5 @@
 <script>
-  import { User, Settings, LogOut } from "lucide-svelte";
+  import { User, Settings, LogOut, GhostIcon } from "lucide-svelte";
   import UserEdit from "./UserEdit.svelte";
   import UserLogin from "./UserLogin.svelte";
   import UserSecurity from "./UserSecurity.svelte";
@@ -10,9 +10,12 @@
   import { displaySecurity } from "../../store/userStore.js";
   import { displayEditSuccessAlert } from "../../store/userStore.js";
   import { displayChangePwdAlert } from "../../store/userStore.js";
+  import { deleteUserSuccess } from "../../store/userStore.js";
+  import { goto } from "$app/navigation";
+  import { displayLogin } from "../../store/userStore.js";
+
   let showLogoutAlert = false;
   let isOpen = false;
-  let displayLogin = false;
 
   function toggleDisplaySecurity() {
     displaySecurity.update((value) => !value);
@@ -21,7 +24,7 @@
   }
 
   function toggleDisplayLogin() {
-    displayLogin = !displayLogin;
+    displayLogin.update((value) => !value);
     displayEdit.set(false);
   }
 
@@ -43,7 +46,7 @@
     console.log("log out response:", response);
     logedIn.set(false);
     toggleDropdown();
-    displayLogin = false;
+    displayLogin.set
     logedIn.set(false);
     displayEdit.set(false);
     showLogoutAlert = true;
@@ -52,7 +55,7 @@
 
 {#if !$logedIn}
   <button on:click={toggleDisplayLogin}><User /></button>
-  {#if displayLogin}
+  {#if $displayLogin}
     <UserLogin />
   {/if}
   {#if showLogoutAlert}
@@ -86,6 +89,16 @@
   {#if $displayChangePwdAlert}
     <AlertWindow message="password changed" on:confirm={() => displayChangePwdAlert.set(false)} />
   {/if}
+{/if}
+
+{#if $deleteUserSuccess}
+  <AlertWindow message="User deleted" on:confirm={() =>{
+    displayEdit.set(false);
+    displaySecurity.set(false);
+    logedIn.set(false);
+    deleteUserSuccess.set(false);
+    goto("/");
+  }} />
 {/if}
 
 <style>
