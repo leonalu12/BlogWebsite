@@ -81,13 +81,26 @@
       {/if}
       <p>{comment.content}</p>
       <div class="comment-actions">
-        <button on:click={toggleLike}>
-          {comment.userLiked ? "❤️ Unlike" : " Like"} ({comment.likes || 0})
+        <button on:click={toggleLike} class="icon-btn">
+          {@html comment.userLiked 
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="red" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24">
+                 <path fill="black" d="M12 4.528a6 6 0 0 0-8.243 8.715l6.829 6.828a2 2 0 0 0 2.828 0l6.829-6.828A6 6 0 0 0 12 4.528m-1.172 1.644l.465.464a1 1 0 0 0 1.414 0l.465-.464a4 4 0 1 1 5.656 5.656L12 18.657l-6.828-6.829a4 4 0 0 1 5.656-5.656"/>
+               </svg>`}
+          {comment.likes || 0}
         </button>
-        <button on:click={() => handleToggleReplyBox(comment)}>Reply</button>
+        <button on:click={() => handleToggleReplyBox(comment)} class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 8.046H11V6.119c0-.921-.9-1.446-1.524-.894l-5.108 4.49a1.2 1.2 0 0 0 0 1.739l5.108 4.49c.624.556 1.524.027 1.524-.893v-1.928h2a3.023 3.023 0 0 1 3 3.046V19a5.593 5.593 0 0 0-1.5-10.954"/>
+          </svg>Reply
+        </button>
         <!-- Only comment owner/article owner can see the "Delete" button -->
         {#if user_id &&( user_id == comment.user_id || user_id == article.user_id) }
-          <button on:click={triggerDeleteConfirm}>❌ Delete</button>
+          <button on:click={triggerDeleteConfirm} class="icon-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17 6h5v2h-2v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8H2V6h5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1zm1 2H6v12h12zm-9 3h2v6H9zm4 0h2v6h-2zM9 4v2h6V4z"/>
+            </svg>
+            Delete</button>
         {/if}
       </div>
       
@@ -193,4 +206,42 @@
     font-weight: bold;
     color: #007bff;
   }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .icon-btn svg {
+    transition: transform 0.2s ease, fill 0.2s ease;
+  }
+
+  /* 按钮的悬停效果 */
+  .icon-btn:hover {
+    color: #007bff;  /* 悬停时改变按钮文字颜色 */
+    
+  }
+
+  .icon-btn:hover svg {
+    fill: #007bff;  /* 悬停时改变 SVG 图标颜色 */
+  }
+
   </style>

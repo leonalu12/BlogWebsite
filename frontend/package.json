@@ -23,6 +23,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@iconify/svelte": "^4.2.0",
     "@tinymce/tinymce-svelte": "^3.0.0",
     "dayjs": "^1.11.11",
     "flatpickr": "^4.6.13",
