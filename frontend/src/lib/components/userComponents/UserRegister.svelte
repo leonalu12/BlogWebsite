@@ -12,6 +12,8 @@
     icon: ""
   };
 
+  let iconImage = null;
+
   $: logInInfo = {
     username: user.username,
     password: user.pwd
@@ -42,12 +44,19 @@
 
     try {
       console.log("发送用户数据:", user);
+      const formData = new FormData();
+      formData.append("username", user.username);
+      formData.append("fname", user.fname);
+      formData.append("lname", user.lname);
+      formData.append("description", user.description);
+      formData.append("dob", user.dob);
+      formData.append("pwd", user.pwd);
+      formData.append("icon", iconImage);
+
+
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(user),
+        body: formData,
         credentials: "include"
       });
 
@@ -106,7 +115,12 @@
     }
   }
 
-  
+  // function handleIconChange(event) {
+  //   iconImage = event.target.files[0];
+  //   console.log("iconImage:", iconImage);
+  //   user.icon = iconImage ? iconImage.name : "";
+  //   console.log("user:", user);
+  // }
 </script>
 
 <div class="form-container">
@@ -169,7 +183,12 @@
     {/if}
     <div class="form-group">
       <label for="icon">icon</label>
-      <input type="text" id="icon" bind:value={user.icon} required />
+      <input
+        type="file"
+        id="icon"
+        accept="image/*"
+        on:change={(e) => (iconImage = e.target.files[0])}
+      />
     </div>
     <div class="form-group">
       <button type="submit">finish</button>
@@ -180,8 +199,6 @@
 {#if diapalyAlert}
   <AlertWindow message={alertMessage} on:confirm={() => (diapalyAlert = false)} />
 {/if}
-
-
 
 {#if loading}
   <div

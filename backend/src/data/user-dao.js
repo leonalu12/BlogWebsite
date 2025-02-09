@@ -125,3 +125,9 @@ export async function checkUserExists(username) {
         return false;
     }
 }
+
+export async function getUserIcon(username) {
+    const db = await getDatabase();
+    const user = await db.get('SELECT icon FROM users WHERE username = ?', username);
+    return user.icon;
+}
