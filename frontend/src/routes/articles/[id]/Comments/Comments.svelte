@@ -2,15 +2,11 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import CommentItem from "../../../../lib/components/CommentItem.svelte";
+  import { loadComments,comments } from './CommentLoader.js';
+  export let article_id;
 
-  import {page} from '$app/stores';
-  export function load({params}){
-    const {id} = params;
-    return {id};
-  }
-  $: article_id = $page && $page.params ? $page.params.id : null;
   let content = "";
-  let user_id =1; //need to change!
+  export let user_id =1; //need to change!
   
 
   function buildCommentTree(commentsArray) {
@@ -67,10 +63,9 @@
   return rootComments;
 }
 
-
-  export let data;
-  let comments = writable(buildCommentTree(data.comments));
-  console.log(comments);
+onMount(async () => {
+        await loadComments( article_id  , fetch);
+    });
 
   // 获取评论和点赞数
   async function fetchComments() {
@@ -139,6 +134,7 @@
     }
   }
 
+  
 //reply to other comments  
   let replyContent = {}; // 存储每个评论的回复内容
   let replyBoxVisible = {}; // 控制每个评论的回复框是否可见
