@@ -24,6 +24,8 @@
   let comfirmPwd = "";
   let isUniqueUsername = true;
   let alertMessage = "";
+  let displayUserPopUpwindow = true;
+
 
   // 提交表单的处理函数
   async function handleRegister(event) {
