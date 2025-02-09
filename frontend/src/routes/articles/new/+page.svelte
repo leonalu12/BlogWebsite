@@ -3,67 +3,74 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
 
+ 
   let title = "";
-    let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
-    let userId = 2; // Replace with dynamic authentication in the future
-    let errorMessage = "";
-    let content = '';
-    let image = null;
-    let conf = {
-        toolbar: 'undo redo | formatselect | bold italic underline | bullist numlist| alignleft aligncenter alignright alignjustify | table',
-        menubar: false,
-        plugins: 'lists table',
-    //     forced_root_block: "",  // 彻底禁用 <p>，改为空字符串
-    // force_br_newlines: true,  //   换行使用 <br>
-    // force_p_newlines: false,  //   禁止换行时自动生成 <p>
-    // valid_elements: "*[*]",   //   允许所有元素，不进行强制格式化
-    // extended_valid_elements: "*[*]",
-        content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }'
-    };
+  let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
+  let userId = 2; // Replace with dynamic authentication in the future
+  let errorMessage = "";
+  let content = "";
+  let image = null;
+  let showWindow = false;
+  let windowMessage = "";
+  let showErrorWindow = false;
+  let errorWindowMessage="";
 
+  let conf = {
+    toolbar:
+      "undo redo | formatselect | bold italic underline | bullist numlist| alignleft aligncenter alignright alignjustify | table",
+    menubar: false,
+    plugins: "lists table",
+    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
+  };
 
-  //   onMount(() => {
-  //     tinymce.remove(); // Clears any previous TinyMCE instances
-  //   });
-
-  //   onDestroy(() => {
-  //     tinymce.remove(); // Ensure cleanup when navigating away
-  //   });
+  console.log("Editor Content Before Submit:", content);
 
   // Function to handle form submission
-  console.log("Editor Content Before Submit:", content);
   async function handleSubmit() {
     if (!title.trim() || !content.trim()) {
-      errorMessage = "Title and content are required.";
+      errorWindowMessage = "Title and content are required.";
+      showErrorWindow = true;
       return;
     }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
     formData.append("userId", userId);
 
     if (image) formData.append("image", image);
+    
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/new`, {
       method: "POST",
       body: formData
     });
+
     if (res.ok) {
-      alert("Article created successfully!");
-      goto("/");
+      windowMessage = ("Article created successfully!");
+      showWindow = true;
     } else {
-      errorMessage = "Something went wrong. Please try again.";
+      errorWindowMessage = "Article title and content cannot be empty!"
+      showErrorWindow = true;
     }
+  
+ 
+  
+  }
+
+  function handleConfirm(){
+    showWindow = false;
+    goto("/");
+  }
+
+  function handleErrorSubmit(){
+    showErrorWindow = false;
   }
 </script>
 
 <div class="article-form">
   <h1>Write your article here</h1>
-
-  <!-- Error Message -->
-  {#if errorMessage}
-    <p class="error">{errorMessage}</p>
-  {/if}
 
   <!-- Article Title -->
   <label for="title">Title:</label>
@@ -71,12 +78,7 @@
 
   <!-- WYSIWYG Editor -->
   <label for="content">Content:</label>
-  <TinyMCE
-      {apiKey}
-      bind:value={content}
-      conf={conf}
-  />
- 
+  <TinyMCE {apiKey} bind:value={content} {conf} />
 
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
@@ -85,6 +87,14 @@
   <!-- Submit Button -->
   <button on:click={handleSubmit}>Publish</button>
 </div>
+
+{#if showWindow}
+<AlertWindow message = {windowMessage} on:confirm={handleConfirm} />
+{/if}
+
+{#if showErrorWindow}
+<AlertWindow message = {errorWindowMessage} on:confirm = {handleErrorSubmit} />
+{/if}
 
 <style>
   .article-form {
