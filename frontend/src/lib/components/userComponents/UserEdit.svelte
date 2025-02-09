@@ -21,6 +21,13 @@
   let alertMessage = "";
   let isUniqueUsername = true;
   let displayEditfailAlert = false;
+  let displayUserPopUpwindow = true;
+
+
+  function closeUserPopUpwindow() {
+    displayUserPopUpwindow = false;
+    displayEdit.set(false);
+  }
 
   // 在组件挂载时获取数据
   onMount(async () => {
@@ -155,7 +162,8 @@
   }
 </script>
 
-<div class="overlay">
+<button class="overlay" on:click={closeUserPopUpwindow}>
+  <button on:click|stopPropagation>
   <div class="form-container">
     <h2>editing user information</h2>
     {#if loading}
@@ -206,7 +214,8 @@
       </form>
     {/if}
   </div>
-</div>
+</button>
+</button>
 
 {#if displayEditfailAlert}
   <AlertWindow message={alertMessage} on:confirm={() => (displayEditfailAlert = false)} />

@@ -7,12 +7,21 @@
   import AlertWindow from "../utils/AlertWindow.svelte"; //import the alertWindow component
   import { displayEdit } from "../../store/userStore.js";
   import { iconName } from "../../store/userStore.js";
+  import { displayLogin } from "../../store/userStore.js";
+
 
   let displayRegister = false;
   let displayloginFailed = false;
+  let displayUserPopUpwindow = true;
+
+  function closeUserPopUpwindow() {
+    displayUserPopUpwindow=false;
+    displayLogin.set(false);
+  }
 
   function toggleLogedIn() {
     logedIn.update((value) => !value);
+    closeUserPopUpwindow();
   }
   function toggleRegister() {
     displayRegister = !displayRegister;
@@ -69,8 +78,9 @@
     }
   }
 </script>
-
-<div class="overlay">
+{#if displayUserPopUpwindow}
+<button class="overlay" on:click={closeUserPopUpwindow}  >
+  <button on:click|stopPropagation>
   {#if displayloginFailed}
     <AlertWindow message="login failed" on:confirm={() => (displayloginFailed = false)} />
     <!-- pass the message prop to the alertWindow component -->
@@ -80,6 +90,7 @@
     {#if displayRegister}
       <UserRegister />
     {:else}
+    
       <div class="login-container">
         <h2>login</h2>
         <form on:submit={handleLogin}>
@@ -99,9 +110,12 @@
           </div>
         </form>
       </div>
-    {/if}
+      {/if}
   {/if}
-</div>
+  </button>
+</button>
+{/if}
+
 
 <style>
   .overlay {
@@ -114,7 +128,7 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5); /* half transparent */
-    z-index: 1000; /* make sure it's on top of everything */
+    z-index: 10; /* make sure it's on top of everything */
   }
   .login-container {
     width: 300px;
@@ -127,6 +141,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 11;
   }
 
   .form-group {

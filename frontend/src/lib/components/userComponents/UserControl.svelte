@@ -64,6 +64,8 @@
     <span class="icon"><User /></span>
     
   </button>
+
+
   {#if $displayLogin}
     <UserLogin />
   {/if}
