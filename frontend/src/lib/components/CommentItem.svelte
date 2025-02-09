@@ -70,7 +70,7 @@
   <div class="comment-item" style="margin-left: {comment.displayLayer * 20}px">
     <div class="comment-content">
       <div class="user-info">
-        <img class="user-avatar" src={comment.icon} alt={comment.username} />
+        <img class="user-avatar" src={`http://localhost:3000/images/${comment.icon}`} alt={comment.username} />
         <span class="username">{comment.username}</span>
         <span class="comment-time">{comment.date_time}</span>
       </div>
