@@ -2,12 +2,35 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import CommentItem from "../../../../lib/components/CommentItem.svelte";
-  import { loadComments,comments } from './CommentLoader.js';
-  export let article_id;
-
+  import { PUBLIC_API_BASE_URL} from "$env/static/public";
+  export let article;
+  let article_id = article.id;
+  export let user = writable(null);
+  const comments = writable([]);
+  let error= "";
+  let user_id = null; // 设定默认值
+  $: if ($user) {
+    user_id = $user.id;
+  }
   let content = "";
-  export let user_id =1; //need to change!
+  onMount(async()=>{
+  await fetchComments();
+  await fetchUser();}
+  );
   
+  async function fetchUser() {
+    try {    
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+      method: "get",
+      credentials: "include"
+    });
+    if (res.ok) {
+      const userData = await res.json();
+      user.set(userData);}
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+    }
 
   function buildCommentTree(commentsArray) {
   const commentMap = new Map(); // store all the comments
@@ -63,16 +86,15 @@
   return rootComments;
 }
 
-onMount(async () => {
-        await loadComments( article_id  , fetch);
-    });
+// onMount(async () => {
+//         await loadComments( article_id  , fetch);
+//     });
 
   // 获取评论和点赞数
   async function fetchComments() {
     const res = await fetch(`http://localhost:3000/api/comments/${article_id}`);
     if (res.ok) {
       let commentsData = await res.json();
-
       // 获取每个评论的点赞数
       for (let comment of commentsData) {
         const likeRes = await fetch(`http://localhost:3000/api/comments/${comment.id}/likes`);
@@ -83,15 +105,18 @@ onMount(async () => {
           comment.likes = 0;
         }
       }
-
+      //get comments from backend and build in tree pattern.
       comments.set(buildCommentTree(commentsData));
+      console.log(comments);
     }
   }
 
-  onMount(fetchComments);
-
 //add comment to article
   async function addComment() {
+    if (!$user) {
+      error = 'Please log in.';
+      return;
+    }
     if (!content.trim()) return;
 
     const newComment = {
@@ -139,6 +164,10 @@ onMount(async () => {
   let replyContent = {}; // 存储每个评论的回复内容
   let replyBoxVisible = {}; // 控制每个评论的回复框是否可见
   async function startReply(parentComment) {
+    if (!$user) {
+      error = 'Please log in';
+      return;
+    }
     const content = replyContent[parentComment.id]?.trim();
     if (!content) return;
 
@@ -150,7 +179,7 @@ onMount(async () => {
         content,
         layer: parentComment.layer + 1, 
         date_time: new Date().toLocaleString(),
-        user_id: 1, // 这里需要改成用户ID
+        user_id, 
         article_id: article_id,
         parent_cid: parentComment.id, // 关联父级评论
         children:[]
@@ -174,12 +203,6 @@ onMount(async () => {
         
         return buildCommentTree(flatComments);
       });
-
-    //   if (!Array.isArray(parentComment.children)) {
-    //   parentComment.children = []; // 如果 undefined，则初始化为空数组
-    // }
-    //   parentComment.children = [...parentComment.children, newComment];//插入父评论的children组
-
       replyContent[parentComment.id] = ""; // 清空输入框内容
       replyBoxVisible[parentComment.id] = false; // 提交后隐藏输入框
     }
@@ -211,7 +234,8 @@ onMount(async () => {
     <CommentItem
     bind:replyContent
     bind:replyBoxVisible
-    {user_id}
+    {user}
+    {article}
     {toggleReplyBox}
     {startReply}
     comment={comment}

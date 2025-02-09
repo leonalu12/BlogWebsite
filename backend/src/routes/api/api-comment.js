@@ -1,5 +1,6 @@
 import express from "express";
 import { getCommentsWithArticleId, addComment, deleteComment, likeComment, unlikeComment, getCommentLikes,getLayer } from "../../data/comment-dao.js";
+import {requiresAuthentication} from "../../middleware/auth-middleware.js";
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.get("/:articleId", async (req, res) => {
 });
 
 //create comment
-router.post("/", async (req, res) => {
+router.post("/", requiresAuthentication, async (req, res) => {
   try{
     const { content, date_time, user_id, article_id, parent_cid } = req.body;
     if (!content) {
@@ -33,7 +34,7 @@ router.post("/", async (req, res) => {
 });
 
 //delete comment
-router.delete("/:id", async(req, res) => {
+router.delete("/:id",requiresAuthentication, async(req, res) => {
     try {
         const comment_id = req.params.id;
         await deleteComment(comment_id);
@@ -44,7 +45,7 @@ router.delete("/:id", async(req, res) => {
 });
 
 //like comment
-router.post("/:id/like", async (req, res) => {
+router.post("/:id/like",requiresAuthentication, async (req, res) => {
     try {
       const { user_id } = req.body;
       const success = await likeComment(user_id, req.params.id);
@@ -55,7 +56,7 @@ router.post("/:id/like", async (req, res) => {
   });
 
 //unlike comment
-router.delete("/:id/like", async (req, res) => {
+router.delete("/:id/like",requiresAuthentication, async (req, res) => {
     try {
       const { user_id } = req.body;
       await unlikeComment(user_id, req.params.id);

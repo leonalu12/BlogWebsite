@@ -6,12 +6,16 @@
   export let comment={};
   export let replyContent;
   export let replyBoxVisible;
-  export let user_id;
+  export let user;
   export let toggleReplyBox;
   export let startReply;
+  export let article;
   let showDeleteConfirm = false; // 控制删除确认框的显示
   let replyInput; // 用于存储回复框的 DOM 参考
-
+  let user_id = null; // 设定默认值
+  $: if ($user) {
+    user_id = $user.id;
+  }
   // 触发删除确认弹窗
   function triggerDeleteConfirm() {
     showDeleteConfirm = true;
@@ -80,7 +84,10 @@
           {comment.userLiked ? "❤️ Unlike" : " Like"} ({comment.likes || 0})
         </button>
         <button on:click={() => handleToggleReplyBox(comment)}>Reply</button>
-        <button on:click={triggerDeleteConfirm}>❌ Delete</button>
+        <!-- Only comment owner/article owner can see the "Delete" button -->
+        {#if user_id &&( user_id == comment.user_id || user_id == article.user_id) }
+          <button on:click={triggerDeleteConfirm}>❌ Delete</button>
+        {/if}
       </div>
       
       {#if replyBoxVisible[comment.id]}
@@ -105,39 +112,12 @@
             <svelte:self
               bind:replyContent
               bind:replyBoxVisible
-              {user_id}
+              {user}
+              {article}
               {toggleReplyBox}
               {startReply}
               comment={childComment}
             />
-            <!-- Show after layer 3 -->
-          <!-- {:else} -->
-          <!-- <div class="nested-comment">
-            <div class="user-info">
-              <img class="user-avatar" src={childComment.icon} alt={childComment.username} />
-              <span class="username">{childComment.username}</span>
-              <span class="comment-time">{childComment.date_time}</span>
-            </div>
-            <p>{childComment.content}</p>
-            <div class="comment-actions">
-              <button on:click={() => toggleLike(childComment)}>
-                {childComment.userLiked ? "💔 Unlike" : "❤️ Like"} ({childComment.likes || 0})
-              </button>
-              <button on:click={() => toggleReplyBox(childComment)}>Reply</button>
-              <button on:click={() => triggerDeleteConfirm(childComment)}>❌ Delete</button>
-            </div>
-            
-            {#if replyBoxVisible[childComment.id]}
-              <div class="reply-box">
-                <input 
-                  type="text" 
-                  bind:value={replyContent[childComment.id]} 
-                  placeholder="Write a reply..."
-                />
-                <button on:click={() => startReply(childComment)}>Post</button>
-              </div>
-            {/if}
-          </div> -->
           {/if}
         {/each}
       </div>
