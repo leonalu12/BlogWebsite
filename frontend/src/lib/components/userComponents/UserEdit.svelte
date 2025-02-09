@@ -5,6 +5,7 @@
   import { displayEdit } from "../../store/userStore.js";
   import { displayEditSuccessAlert } from "../../store/userStore.js";
   import AlertWindow from "../utils/AlertWindow.svelte";
+  import { iconName } from "../../store/userStore.js";
 
   let user = {
     username: "",
@@ -14,6 +15,7 @@
     dob: "",
     icon: ""
   };
+  let iconImage = null;
   let tempUsername = "";
   let loading = true;
   let alertMessage = "";
@@ -59,13 +61,19 @@
     }
     // 这里可以添加提交表单的逻辑，例如通过 API 保存用户信息
     try {
+      console.log("发送用户数据:", user);
+      const formData = new FormData();
+      formData.append("username", user.username);
+      formData.append("fname", user.fname);
+      formData.append("lname", user.lname);
+      formData.append("description", user.description);
+      formData.append("dob", user.dob);
+      formData.append("icon", iconImage);
+
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json"
-        },
-        body: JSON.stringify(user),
+
+        body: formData,
         credentials: "include"
       });
       if (!response.ok) {
@@ -99,6 +107,25 @@
       console.error("relogin fail:", error);
     }
     console.log("User Information:", user);
+
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("获取用户头像失败");
+      } else {
+        const data = await response.json();
+        iconName.set(data);
+        console.log("获取用户头像成功:", data);
+      }
+    } catch (error) {
+      console.error("获取用户头像失败:", error);
+    }
   }
 
   async function checkUsername() {
@@ -149,7 +176,7 @@
           <p style="color: red;">username already existed</p>
         {/if}
         <div class="form-group">
-          <label for="fname">first ni</label>
+          <label for="fname">first name</label>
           <input type="text" id="fname" bind:value={user.fname} required />
         </div>
         <div class="form-group">
@@ -166,7 +193,12 @@
         </div>
         <div class="form-group">
           <label for="icon">icon</label>
-          <input type="text" id="icon" bind:value={user.icon} required />
+          <input
+            type="file"
+            id="icon"
+            accept="image/*"
+            on:change={(e) => (iconImage = e.target.files[0])}
+          />
         </div>
         <div class="form-group">
           <button type="submit">save</button>

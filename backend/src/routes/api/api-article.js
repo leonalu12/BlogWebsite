@@ -57,7 +57,6 @@ router.post("/new", upload.single("image"), async (req, res) => {
 
     const imageUrl = req.file ? req.file.filename : null;
 
-
     const article = await addArticle({ title, content, userId, imageUrl });
     res.status(201).json(article);
   } catch (err) {

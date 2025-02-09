@@ -4,6 +4,7 @@ import {requiresAuthentication} from "../../middleware/auth-middleware.js";
 import { getUsernameFromJWT } from "../../data/jwt-util.js";
 import { authenticateUser } from "../../data/user-dao.js";
 import { checkUserExists } from "../../data/user-dao.js";
+import { uploadIcon } from "../../middleware/upload-icon-middleware.js";
 
 const router = express.Router();
 
@@ -18,9 +19,17 @@ router.get("/", requiresAuthentication, async (req, res) => {
   return res.json(user);
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register",uploadIcon, async (req, res) => {
   try {
-    const user = req.body;
+    console.log("request body:", req.body);    
+    console.log("request file:", req.file);
+
+    const data = req.body;
+    if (req.file) {
+      data.icon = req.file.filename; 
+    }
+    const user = JSON.parse(JSON.stringify(data));
+
     const newUser = await createUser(user);
     return res.status(201).location(`/api/users/${newUser.id}`).json(newUser);
   } catch (e) {
@@ -37,10 +46,17 @@ router.delete("/", requiresAuthentication, async (req, res) => {
   return res.sendStatus(204);
 });
 
-router.patch("/", requiresAuthentication, async (req, res) => {
+router.patch("/", requiresAuthentication, uploadIcon, async (req, res) => {
   const username = getUsernameFromJWT(req.cookies.authToken);
   const id = await getIdByUsername(username);
-  const user = req.body;
+  console.log("request body:", req.body);
+  console.log("request file:", req.file);
+
+    const data = req.body;
+    if (req.file) {
+      data.icon = req.file.filename; 
+    }
+    const user = JSON.parse(JSON.stringify(data));
   const updatedUser = await updateUser(user, id);
   return res.json(updatedUser).status(200);
 });
@@ -67,6 +83,12 @@ router.post("/checkUsernameUnique", async (req, res) => {
   } else {
     return res.status(200).json({ message: "Username is unique" });
   }
+});
+
+router.get("/icon", requiresAuthentication, async (req, res) => {
+  const username = getUsernameFromJWT(req.cookies.authToken);
+  const user = await getUsersByUsername(username);
+  return res.json(user.icon);
 });
 
 

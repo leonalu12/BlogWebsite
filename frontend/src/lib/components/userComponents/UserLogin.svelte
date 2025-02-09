@@ -6,6 +6,7 @@
   import { logedIn } from "../../store/userStore.js";
   import AlertWindow from "../utils/AlertWindow.svelte"; //import the alertWindow component
   import { displayEdit } from "../../store/userStore.js";
+  import { iconName } from "../../store/userStore.js";
 
   let displayRegister = false;
   let displayloginFailed = false;
@@ -41,6 +42,24 @@
         console.log("登录成功:", data);
         toggleLogedIn();
         displayloginFailed = false;
+        try {
+          const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            credentials: "include"
+          });
+          if (!response.ok) {
+            throw new Error("获取用户头像失败");
+          } else {
+            const data = await response.json();
+            iconName.set(data);
+            console.log("获取用户头像成功:", data);
+          }
+        } catch (error) {
+          console.error("获取用户头像失败:", error);
+        }
       }
 
       // redirect to the home page

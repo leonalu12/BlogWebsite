@@ -4,7 +4,7 @@
   import UserLogin from "./UserLogin.svelte";
   import UserSecurity from "./UserSecurity.svelte";
   import { logedIn } from "../../store/userStore.js";
-  import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import { PUBLIC_API_BASE_URL} from "$env/static/public";
   import AlertWindow from "../utils/AlertWindow.svelte";
   import { displayEdit } from "../../store/userStore.js";
   import { displaySecurity } from "../../store/userStore.js";
@@ -13,6 +13,10 @@
   import { deleteUserSuccess } from "../../store/userStore.js";
   import { goto } from "$app/navigation";
   import { displayLogin } from "../../store/userStore.js";
+  import { PUBLIC_IMAGES_URL} from "$env/static/public";
+  import { iconName } from "../../store/userStore.js";
+
+  
 
   let showLogoutAlert = false;
   let isOpen = false;
@@ -46,7 +50,7 @@
     console.log("log out response:", response);
     logedIn.set(false);
     toggleDropdown();
-    displayLogin.set
+    displayLogin.set(false);
     logedIn.set(false);
     displayEdit.set(false);
     showLogoutAlert = true;
@@ -54,7 +58,7 @@
 </script>
 
 {#if !$logedIn}
-  <button on:click={toggleDisplayLogin}><User /></button>
+  <button class="icon" on:click={toggleDisplayLogin}><User /></button>
   {#if $displayLogin}
     <UserLogin />
   {/if}
@@ -63,7 +67,7 @@
   {/if}
 {:else}
   <div class="dropdown">
-    <button on:click={toggleDropdown}><User /></button>
+    <button class="logedIcon" on:click={toggleDropdown}> <img class="iconImg" src="{ PUBLIC_IMAGES_URL}/{ $iconName }" alt="no img"> </button>
     <div class="dropdown-content" style="display: {isOpen ? 'block' : 'none'};">
       <button on:click={toggleDisplayEdit} class="editButton"><User /> Profile</button>
       <button on:click={toggleDisplaySecurity} class="editButton"><User /> security</button>
@@ -127,5 +131,25 @@
 
   .editButton:hover {
     background-color: #f1f1f1;
+  }
+
+  .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .logedIcon {
+    background-color: transparent;
+      border: none; 
+      padding: 0; 
+      cursor: pointer;
+  }
+  .iconImg {
+    margin: 0;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
   }
 </style>
