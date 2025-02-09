@@ -69,6 +69,11 @@
         <span class="username">{comment.username}</span>
         <span class="comment-time">{comment.date_time}</span>
       </div>
+      {#if comment.parent_username}
+        <div class="reply-to">
+          Reply <span class="reply-username">@{comment.parent_username}</span>
+        </div>
+      {/if}
       <p>{comment.content}</p>
       <div class="comment-actions">
         <button on:click={toggleLike}>
@@ -196,5 +201,15 @@
     font-size: 0.9rem;
     color: gray;
     margin-left: 10px;
+  }
+
+  .reply-to {
+    font-size: 0.9rem;
+    color: gray;
+    margin-bottom: 4px;
+  }
+  .reply-username {
+    font-weight: bold;
+    color: #007bff;
   }
   </style>
