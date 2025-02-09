@@ -34,7 +34,7 @@ router.post("/", requiresAuthentication, async (req, res) => {
 });
 
 //delete comment
-router.delete("/:id",requiresAuthentication, async(req, res) => {
+router.delete("/:id", async(req, res) => {
     try {
         const comment_id = req.params.id;
         await deleteComment(comment_id);

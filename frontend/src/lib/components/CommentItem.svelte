@@ -39,6 +39,7 @@
   async function toggleLike() {
     const res = await fetch(`http://localhost:3000/api/comments/${comment.id}/like`, {
       method: comment.userLiked ? "DELETE" : "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id })
     });
