@@ -1,5 +1,5 @@
 <script>
-  import { User, Settings, LogOut, GhostIcon } from "lucide-svelte";
+  import { User, Settings, LogOut, Menu } from "lucide-svelte";
   import UserEdit from "./UserEdit.svelte";
   import UserLogin from "./UserLogin.svelte";
   import UserSecurity from "./UserSecurity.svelte";
@@ -58,7 +58,12 @@
 </script>
 
 {#if !$logedIn}
-  <button class="icon" on:click={toggleDisplayLogin}><User /></button>
+
+  <button class="userBUtton" on:click={toggleDisplayLogin}> 
+    <span class="menu"><Menu /></span>
+    <span class="icon"><User /></span>
+    
+  </button>
   {#if $displayLogin}
     <UserLogin />
   {/if}
@@ -106,6 +111,19 @@
 {/if}
 
 <style>
+
+  .userBUtton {
+    background-color: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e7e4e4;
+    border-radius: 30px;
+    padding: 7px 12px;
+    gap: 13px;
+  }
   .dropdown {
     position: relative;
     display: inline-block;
@@ -133,10 +151,30 @@
     background-color: #f1f1f1;
   }
 
+  .menu {
+    width: 16px;
+    height: 16px;
+    color: #343434;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+    
   .icon {
-    width: 40px;
-    height: 40px;
+    width: 30.6px;
+    height: 30.6px;
     border-radius: 50%;
+    background-color: #929292;
+    color: #fff;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .logedIcon {
@@ -151,5 +189,11 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+  }
+
+  .userBUtton:hover {
+    outline: transparent;
+    box-shadow: 0 3px 5px #b6b5b5;
+
   }
 </style>
