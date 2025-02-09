@@ -1,5 +1,5 @@
 <script>
-    import { Heart, MessageCircle } from "lucide-svelte";
+    import { ArrowLeftCircleIcon, Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
     import { goto } from '$app/navigation'; // ✅ 引入 SvelteKit 的页面跳转函数
     import Comments from './Comments/Comments.svelte';  // 直接导入组件
@@ -79,7 +79,7 @@
     </div>
 </div>
 
-<Comments article_id = {article.id} />
+<Comments article = {article} />
 
 <style>
     .article-container {
