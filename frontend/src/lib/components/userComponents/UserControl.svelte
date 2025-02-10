@@ -136,10 +136,12 @@
     position: absolute;
     top: 100%;
     right: 0;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1; /*layer on top of everything*/
+    background-color: #ffffff;
+    
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 8px;
+    overflow: hidden;
   }
 
   .editButton {
@@ -147,10 +149,11 @@
     padding: 12px 16px;
     text-decoration: none;
     display: block;
+    border: none;
   }
 
   .editButton:hover {
-    background-color: #f1f1f1;
+    background-color: #e7e4e4;
   }
 
   .menu {
