@@ -12,3 +12,4 @@ export async function authenticateAdmin(username, pwd) {
     }
     return admin;
 }
+
