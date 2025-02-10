@@ -62,6 +62,13 @@ CREATE TABLE IF NOT EXISTS like_a (
     FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
 );
 
+-- Create admins table
+CREATE TABLE IF NOT EXISTS admins (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    pwd VARCHAR(255)
+);
+
 -- Insert data into users table
 INSERT INTO users (username, fname, lname, description, dob, icon, pwd) VALUES
 ('john_dssoe', 'John', 'Doe', 'A sample user', '1985-06-15', 'icon1.png', 'password123'),
@@ -97,3 +104,11 @@ INSERT INTO like_a (user_id, article_id) VALUES
 (1, 1),
 (2, 2),
 (3, 3);
+
+-- Insert data into admins table
+INSERT INTO admins (username, pwd) VALUES
+('admin1', 'admin1'),
+('admin2', 'admin2'),
+('admin3', 'admin3'),
+('admin4', 'admin4'),
+('admin5', 'admin5');
