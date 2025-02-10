@@ -16,5 +16,7 @@ router.use("/auth", authRouter);
 import commentRouter from "./api-comment.js";
 router.use("/comments", commentRouter);
 
+import adminRouter from "./api-admin.js";
+router.use("/admins", adminRouter);
 
 export default router;

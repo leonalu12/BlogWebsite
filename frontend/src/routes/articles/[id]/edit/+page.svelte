@@ -4,14 +4,18 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { page } from "$app/stores";
+
   import { get } from "svelte/store"; // 订阅 store 以获取 articleId
   import AlertWindow from "../../../../lib/components/utils/alertWindow.svelte";
+
+  import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
+
 
   let title = "";
   let content = "";
   let image = null;
-  let userId = 2; // Replace with dynamic authentication in the future
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
+
   let articleId = ""; // 存储文章 ID
   let showUpdateWindow=false;
   let updateMessage = "Article edited successfully!"
@@ -39,7 +43,13 @@
       content = article.content || "";
     } else {
       showErrorWindow=true;
+
     }
+  }
+
+  onMount(async () => {
+    await fetchUser(); // ✅ 先获取用户
+    await fetchArticle(); // ✅ 再获取文章
   });
 
   // 发送更新请求
@@ -49,20 +59,23 @@
       showErrorWindow = true;
       return;
     }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    formData.append("userId", userId);
 
     if (image) formData.append("image", image);
 
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}/edit`, {
       method: "PUT",
-      body: formData
+      body: formData,
+      credentials: "include" // ✅ 让请求带上 session
     });
 
     if (res.ok) {
+
       showUpdateWindow = true;
+
     } else {
       showErrorWindow = true;
     }

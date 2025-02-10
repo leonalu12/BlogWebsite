@@ -2,6 +2,7 @@
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../utils/AlertWindow.svelte";
+
   let user = {
     username: "",
     fname: "",
@@ -13,19 +14,18 @@
   };
 
   let iconImage = null;
-
   $: logInInfo = {
     username: user.username,
     password: user.pwd
   };
-  let loading = false; // 设置初始加载状态为false
 
+  let loading = false;
   let diapalyAlert = false;
   let comfirmPwd = "";
   let isUniqueUsername = true;
   let alertMessage = "";
+  let displayUserPopUpwindow = true;
 
-  // 提交表单的处理函数
   async function handleRegister(event) {
     event.preventDefault();
     loading = true;
@@ -43,7 +43,6 @@
     }
 
     try {
-      console.log("发送用户数据:", user);
       const formData = new FormData();
       formData.append("username", user.username);
       formData.append("fname", user.fname);
@@ -52,7 +51,6 @@
       formData.append("dob", user.dob);
       formData.append("pwd", user.pwd);
       formData.append("icon", iconImage);
-
 
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/register`, {
         method: "POST",
@@ -87,7 +85,7 @@
     } catch (error) {
       console.error("注册错误:", error);
     } finally {
-      loading = false; // 确保在请求后将加载状态设置为false
+      loading = false;
     }
   }
 
@@ -114,84 +112,70 @@
       console.error("username alread existed:", error);
     }
   }
-
-  // function handleIconChange(event) {
-  //   iconImage = event.target.files[0];
-  //   console.log("iconImage:", iconImage);
-  //   user.icon = iconImage ? iconImage.name : "";
-  //   console.log("user:", user);
-  // }
 </script>
 
-<div class="form-container">
-  <h2>register one</h2>
+<div class="register-container">
+  <div class="register-header">
+    <p class="RegisterTitle">Register</p>
+  </div>
+  <p class="welcomeMsg">Welcome to Pinkbook</p>
   <form on:submit={handleRegister}>
-    <div class="form-group">
-      <label for="username">username</label>
-      <input
-        type="text"
-        id="username"
-        bind:value={user.username}
-        placeholder="Display to others"
-        on:input={checkUsername}
-        required
-      />
-    </div>
-    <p style="color: red;">
-      {#if !isUniqueUsername}username already exists{/if}
-    </p>
-    <div class="form-group">
-      <label for="fname">first name</label>
-      <input
-        type="text"
-        id="fname"
-        bind:value={user.fname}
-        placeholder="First name on ID"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="lname">last name</label>
-      <input type="text" id="lname" bind:value={user.lname} placeholder="Surname on ID" required />
-    </div>
-    <div class="form-group">
-      <label for="description">description</label>
-      <input
-        type="text"
-        id="description"
-        bind:value={user.description}
-        placeholder="Briefly introduce yourself"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="dob">date of birth</label>
-      <input type="date" id="dob" bind:value={user.dob} placeholder="Birthdate" required />
-    </div>
-    <div class="form-group">
-      <label for="pwd">password</label>
-      <input type="password" id="pwd" bind:value={user.pwd} required />
-    </div>
-    <div class="form-group">
-      <label for="comfirmPwd">comfirm password</label>
-      <input type="password" id="comfirmPwd" bind:value={comfirmPwd} required />
-    </div>
-    {#if user.pwd !== comfirmPwd}
-      {#if user.pwd && comfirmPwd}
-        <p style="color: red;">passwords do not match</p>
+    <div class="userInput">
+      <div class="form-group input-container">
+        <input
+          type="text"
+          id="username"
+          bind:value={user.username}
+          placeholder=" "
+          on:input={checkUsername}
+          required
+        />
+        <label for="username">username</label>
+      </div>
+      {#if !isUniqueUsername}
+        <p style="color: red;">username already exists</p>
       {/if}
-    {/if}
-    <div class="form-group">
-      <label for="icon">icon</label>
-      <input
-        type="file"
-        id="icon"
-        accept="image/*"
-        on:change={(e) => (iconImage = e.target.files[0])}
-      />
+      <div class="form-group input-container">
+        <input type="text" id="fname" bind:value={user.fname} placeholder=" " required />
+        <label for="fname">first name</label>
+      </div>
+      <div class="form-group input-container">
+        <input type="text" id="lname" bind:value={user.lname} placeholder=" " required />
+        <label for="lname">last name</label>
+      </div>
+      <div class="form-group input-container">
+        <input type="text" id="description" bind:value={user.description} placeholder=" " required />
+        <label for="description">description</label>
+      </div>
+      <div class="form-group input-container">
+        <input type="date" id="dob" bind:value={user.dob} placeholder=" " required />
+        <label for="dob">date of birth</label>
+      </div>
+      <div class="form-group input-container">
+        <input type="password" id="pwd" bind:value={user.pwd} placeholder=" " required />
+        <label for="pwd">password</label>
+      </div>
+      <div class="form-group input-container">
+        <input type="password" id="comfirmPwd" bind:value={comfirmPwd} placeholder=" " required />
+        <label for="comfirmPwd">confirm password</label>
+      </div>
+      {#if user.pwd !== comfirmPwd}
+        {#if user.pwd && comfirmPwd}
+          <p style="color: red;">passwords do not match</p>
+        {/if}
+      {/if}
+      <div class="form-group input-container">
+        <input
+          type="file"
+          id="icon"
+          accept="image/*"
+          on:change={(e) => (iconImage = e.target.files[0])}
+        />
+        <label for="icon">icon</label>
+      </div>
     </div>
     <div class="form-group">
-      <button type="submit">finish</button>
+      <button type="submit" class="registerBtn">finish</button>
     </div>
   </form>
 </div>
@@ -201,33 +185,62 @@
 {/if}
 
 {#if loading}
-  <div
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;"
-  >
-    <div style="background-color: white; padding: 20px; border-radius: 8px;">
-      <div style="display: flex; justify-content: center; align-items: center;">
-        <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <p style="margin-left: 10px;">loading...</p>
+  <div class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
       </div>
+      <p>loading...</p>
     </div>
   </div>
 {/if}
 
 <style>
-  .form-container {
-    width: 65%;
-    height: 70%;
+  .register-container {
+    width: 60%;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
-    position: fixed;
+    background: lightpink;
+    transition: background 5s ease;
+    opacity: 0.9;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 11;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .RegisterTitle {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-family: "Arial", sans-serif;
+    text-align: center;
+    border-bottom: #9c9b9b 1px solid;
+    padding-bottom: 10px;
+    margin: 0;
+  }
+
+  .welcomeMsg {
+    font-size: 23px;
+    font-weight: bold;
+    margin: 40px 0px;
+    text-align: left;
+    font-family: "Arial", sans-serif;
+  }
+
+  .userInput {
+    border-radius: 10px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    outline: rgb(130, 130, 130) 1px solid;
+    padding-top: 17px;
   }
 
   .form-group {
@@ -245,17 +258,69 @@
     box-sizing: border-box;
   }
 
-  .form-group button {
+  .input-container {
+    position: relative;
+  }
+
+  .input-container label {
+    top: 2px;
+    left: 10px;
+    transition: all 0.3s;
+    color: #575656;
+    position: absolute;
+    font-size: 17px;
+  }
+
+  .input-container input:focus + label,
+  .input-container input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 15px;
+  }
+
+  input {
     width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #000;
+    background-color: transparent;
+    margin-top: 3px;
+    margin-bottom: 0;
+  }
+
+  .registerBtn {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    padding: 10px;
+    background: linear-gradient(90deg, pink, #FFE4E1);
+    transition: background 5s ease;
+    height: 50px;
+    font-size: 16px;
+    opacity: 1;
   }
 
-  .form-group button:hover {
-    background-color: #0056b3;
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .loading-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .loading-content p {
+    margin-left: 10px;
   }
 </style>

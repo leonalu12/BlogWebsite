@@ -3,7 +3,7 @@
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../utils/AlertWindow.svelte";
-  import { displaySecurity } from "../../store/userStore.js"; //import the alertWindow component
+  import { displaySecurity } from "../../store/userStore.js";
   import { displayChangePwdAlert } from "../../store/userStore.js";
   import DeleteComfirmWindow from "../utils/DeleteConfirmWindow.svelte";
   import { goto } from "$app/navigation";
@@ -11,7 +11,6 @@
   import { displayLogin } from "../../store/userStore.js";
 
   let username = "";
-
   let newPwd = "";
   let confirmPwd = "";
   let loading = true;
@@ -19,6 +18,12 @@
   let currentPwd = "";
   let showCurrentPwdNotCorrect = false;
   let comfirmDeleteUser = false;
+  let displayUserPopUpwindow = true;
+
+  function closeUserPopUpwindow() {
+    displayUserPopUpwindow = false;
+    displaySecurity.set(false);
+  }
 
   $: user = {
     username: username,
@@ -36,7 +41,6 @@
         throw new Error("network response problem");
       }
       const data = await response.json();
-
       username = data.username;
       console.log("Username:", username);
     } catch (error) {
@@ -50,7 +54,6 @@
   async function handleSubmit(event) {
     event.preventDefault();
     console.log("User Information:", user);
-    //can not submit if new password and confirm password do not match
     if (newPwd !== confirmPwd) {
       showPwdNotMatch = true;
       return;
@@ -126,7 +129,7 @@
       console.error("delete user error:", error);
     }
 
-   try {
+    try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
         method: "DELETE",
         credentials: "include"
@@ -142,49 +145,61 @@
   }
 </script>
 
-<div class="overlay">
-  <div class="form-container">
-    <h2>change password</h2>
-    {#if loading}
-      <p>loading...</p>
-    {:else}
-      <form on:submit={handleSubmit}>
-        <div class="form-group">
-          <label for="pwd">password</label>
-          <input type="password" id="pwd" bind:value={currentPwd} required />
+{#if displayUserPopUpwindow}
+  <button class="overlay" on:click={closeUserPopUpwindow}>
+    <button on:click|stopPropagation>
+      <div class="security-container">
+        <div class="security-header">
+          <p class="SecurityTitle">Change Password</p>
         </div>
-        <div>
-          <div class="form-group">
-            <label for="newPwd">new password</label>
-            <input type="password" id="newPwd" bind:value={newPwd} required />
-          </div>
-          <div class="form-group">
-            <label for="confirmPwd">confirm password</label>
-            <input type="password" id="confirmPwd" bind:value={confirmPwd} required />
-            <div class="form-group">
+        {#if loading}
+          <p>loading...</p>
+        {:else}
+          <form on:submit={handleSubmit}>
+            <div class="userInput">
+              <div class="form-group input-container">
+                <input type="password" id="pwd" bind:value={currentPwd} placeholder=" " required />
+                <label for="pwd">current password</label>
+              </div>
+              <div class="form-group input-container">
+                <input type="password" id="newPwd" bind:value={newPwd} placeholder=" " required />
+                <label for="newPwd">new password</label>
+              </div>
+              <div class="form-group input-container">
+                <input
+                  type="password"
+                  id="confirmPwd"
+                  bind:value={confirmPwd}
+                  placeholder=" "
+                  required
+                />
+                <label for="confirmPwd">confirm password</label>
+              </div>
               {#if newPwd && confirmPwd}
                 {#if newPwd !== confirmPwd}
                   <p style="color: red;">passwords do not match</p>
                 {/if}
               {/if}
-              <button type="submit">submit</button>
+              <div class="form-group">
+                <button type="submit" class="securityBtn">submit</button>
+              </div>
             </div>
+          </form>
+          <div>
+            <button class="deleteUserBtn" on:click={toggleDisplayDeleteUserWindow}>delete user</button>
+            {#if comfirmDeleteUser}
+              <DeleteComfirmWindow
+                message="Are you sure to delete this user?"
+                on:confirm={deleteUser}
+                on:cancel={toggleDisplayDeleteUserWindow}
+              />
+            {/if}
           </div>
-        </div>
-      </form>
-      <div>
-        <button on:click={toggleDisplayDeleteUserWindow}>delete user</button>
-        {#if comfirmDeleteUser}
-          <DeleteComfirmWindow
-            message="Are you sure to delete this user?"
-            on:confirm={deleteUser}
-            on:cancel={toggleDisplayDeleteUserWindow}
-          />
         {/if}
       </div>
-    {/if}
-  </div>
-</div>
+    </button>
+  </button>
+{/if}
 
 {#if showPwdNotMatch}
   <AlertWindow message="passwords do not match" on:confirm={() => (showPwdNotMatch = false)} />
@@ -195,9 +210,6 @@
     on:confirm={() => (showCurrentPwdNotCorrect = false)}
   />
 {/if}
-
-
-
 
 <style>
   .overlay {
@@ -212,18 +224,44 @@
     background-color: rgba(0, 0, 0, 0.5); /* half transparent */
     z-index: 1000; /* make sure it's on top of everything */
   }
-  .form-container {
-    width: 65%;
-    height: 70%;
+
+  .security-container {
+    width: 60%;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
-    position: fixed;
+    background: lightpink;
+    transition: background 5s ease;
+    opacity: 0.9;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 1001;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .SecurityTitle {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-family: "Arial", sans-serif;
+    text-align: center;
+    border-bottom: #9c9b9b 1px solid;
+    padding-bottom: 10px;
+    margin: 0;
+  }
+
+  .userInput {
+    border-radius: 10px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    outline: rgb(130, 130, 130) 1px solid;
+    padding-top: 17px;
   }
 
   .form-group {
@@ -241,17 +279,58 @@
     box-sizing: border-box;
   }
 
-  .form-group button {
+  .input-container {
+    position: relative;
+  }
+
+  .input-container label {
+    top: 2px;
+    left: 10px;
+    transition: all 0.3s;
+    color: #575656;
+    position: absolute;
+    font-size: 17px;
+  }
+
+  .input-container input:focus + label,
+  .input-container input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 15px;
+  }
+
+  input {
     width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #000;
+    background-color: transparent;
+    margin-top: 3px;
+    margin-bottom: 0;
+  }
+
+  .securityBtn {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    padding: 10px;
+    background: linear-gradient(90deg, pink, #FFE4E1);
+    transition: background 5s ease;
+    height: 50px;
+    font-size: 16px;
+    opacity: 1;
   }
 
-  .form-group button:hover {
-    background-color: #0056b3;
+  .deleteUserBtn {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 10px;
+    background: linear-gradient(90deg, pink, #FFE4E1);
+    transition: background 5s ease;
+    height: 50px;
+    font-size: 16px;
+    opacity: 1;
+    margin-top: 10px;
   }
 </style>
