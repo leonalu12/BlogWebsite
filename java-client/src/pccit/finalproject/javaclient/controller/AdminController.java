@@ -45,6 +45,7 @@ public class AdminController {
             if (response != null) {
                 loginPanel.setLoggedInState(true);
                 JOptionPane.showMessageDialog(dashboard, "Login successful!");
+                //display table
 
             } else {
                 JOptionPane.showMessageDialog(dashboard, "Access denied.");
