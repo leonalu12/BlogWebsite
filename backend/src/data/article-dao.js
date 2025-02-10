@@ -12,7 +12,14 @@ const PUBLIC_IMAGES_URL = process.env.PUBLIC_IMAGES_URL || "http://localhost:300
  * @param {number} userId 
  * @returns {Array} 
  */
-export async function getAllArticles(search = "", filterBy = "title", sortBy = "date_time", order = "DESC", userId = null, exactDate = null) {
+export async function getAllArticles(
+  search = "",
+  filterBy = "title",
+  sortBy = "date_time",
+  order = "DESC",
+  userId = null,
+  exactDate = null
+) {
   const db = await getDatabase();
 
   let query = `
@@ -26,29 +33,40 @@ export async function getAllArticles(search = "", filterBy = "title", sortBy = "
 
   let params = [];
 
-  // 模糊查找和精确查找
-  if (search) {
-    if (search.startsWith('"') && search.endsWith('"')) {
-      // 精确查找
-      search = search.slice(1, -1); // 去掉引号
-      query += ` AND ${filterBy === "username" ? "u.username" : "a.title"} = ?`;
-      params.push(search);
-    } else {
-      // 模糊查找
-      query += ` AND LOWER(${filterBy === "username" ? "u.username" : "a.title"}) LIKE LOWER(?)`;
-      params.push(`%${search}%`);
+  // ✅ 处理精准搜索（去掉 Unicode 引号 & 空格）
+  search = search.replace(/[“”„‟❝❞＂]/g, '"').trim();
+
+  if (search.startsWith('"') && search.endsWith('"')) {
+    search = search.slice(1, -1).trim(); // 去掉引号并去空格
+
+    if (filterBy === "title") {
+      // ✅ **精准匹配完整单词**
+      query += ` AND LOWER(' ' || a.title || ' ') LIKE LOWER(?)`;
+      params.push(`% ${search} %`); // 🔥 让搜索匹配完整单词
+    } else if (filterBy === "username") {
+      // ✅ 让 SQLite 替换 `_` 为 ` ` 并确保匹配完整单词
+      query += ` AND LOWER(' ' || REPLACE(u.username, '_', ' ') || ' ') LIKE LOWER(?)`;
+      params.push(`% ${search} %`); // 🔥 让搜索匹配完整单词
     }
+  } 
+  // ✅ 处理模糊搜索（仍然替换 `_` 为 ` `）
+  else if (filterBy === "username") {
+    query += ` AND LOWER(REPLACE(u.username, '_', ' ')) LIKE LOWER(?)`;  
+    params.push(`%${search}%`);
+  } 
+  else {
+    query += ` AND LOWER(a.title) LIKE LOWER(?)`;  
+    params.push(`%${search}%`);
   }
+
 
   if (filterBy === "date_time" && exactDate && exactDate !== "null") {
-    console.log("📌 正在筛选日期:", exactDate); // ✅ **调试**
-    query += " AND strftime('%Y-%m-%d', a.date_time) = ?";  // ✅ **高亮：SQLite 3.0 的日期格式**
+    console.log("📌 正在筛选日期:", exactDate); 
+    query += " AND strftime('%Y-%m-%d', a.date_time) = ?";  
     params.push(exactDate);
   }
-  
-  
 
-  // 按用户ID筛选
+  // **按用户ID筛选**
   if (userId) {
     query += " AND a.user_id = ?";
     params.push(userId);
@@ -57,10 +75,10 @@ export async function getAllArticles(search = "", filterBy = "title", sortBy = "
   query += ` ORDER BY ${sortBy === "username" ? "u.username" : `a.${sortBy}`} ${order};`;
 
   console.log("🔍 Generated SQL Query:", query);
-  console.log("📝 Query Params:", params); // ✅ **高亮：调试 SQL 查询参数**
+  console.log("📝 Query Params:", params); 
 
-  return await db.all(query, params);
-}
+  return await db.all(query, params); // ✅ **这里正确返回**
+} // **确保这里正确结束函数**
 
 
 

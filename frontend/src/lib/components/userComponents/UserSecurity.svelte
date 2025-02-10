@@ -19,6 +19,12 @@
   let currentPwd = "";
   let showCurrentPwdNotCorrect = false;
   let comfirmDeleteUser = false;
+  let displayUserPopUpwindow = true;
+
+  function closeUserPopUpwindow() {
+    displayUserPopUpwindow = false;
+    displaySecurity.set(false);
+  }
 
   $: user = {
     username: username,
@@ -126,7 +132,7 @@
       console.error("delete user error:", error);
     }
 
-   try {
+    try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
         method: "DELETE",
         credentials: "include"
@@ -142,7 +148,8 @@
   }
 </script>
 
-<div class="overlay">
+<button class="overlay" on:click={closeUserPopUpwindow}>
+  <button on:click|stopPropagation>
   <div class="form-container">
     <h2>change password</h2>
     {#if loading}
@@ -184,7 +191,8 @@
       </div>
     {/if}
   </div>
-</div>
+</button>
+</button>
 
 {#if showPwdNotMatch}
   <AlertWindow message="passwords do not match" on:confirm={() => (showPwdNotMatch = false)} />
@@ -195,9 +203,6 @@
     on:confirm={() => (showCurrentPwdNotCorrect = false)}
   />
 {/if}
-
-
-
 
 <style>
   .overlay {

@@ -1,13 +1,15 @@
 <script>
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
-  import CommentItem from "../../../../lib/components/CommentItem.svelte";
+  import CommentItem from "./CommentItem.svelte";
   import { PUBLIC_API_BASE_URL} from "$env/static/public";
+  import UserLogin from "./userComponents/UserLogin.svelte";
   export let article;
   let article_id = article.id;
   export let user = writable(null);
   const comments = writable([]);
-  let error= "";
+  let showLogin = false; // 控制是否显示登录组件
+
   let user_id = null; // 设定默认值
   $: if ($user) {
     user_id = $user.id;
@@ -86,9 +88,6 @@
   return rootComments;
 }
 
-// onMount(async () => {
-//         await loadComments( article_id  , fetch);
-//     });
 
   // 获取评论和点赞数
   async function fetchComments() {
@@ -114,7 +113,7 @@
 //add comment to article
   async function addComment() {
     if (!$user) {
-      error = 'Please log in.';
+      showLogin = true; // need to show login
       return;
     }
     if (!content.trim()) return;
@@ -164,10 +163,7 @@
   let replyContent = {}; // 存储每个评论的回复内容
   let replyBoxVisible = {}; // 控制每个评论的回复框是否可见
   async function startReply(parentComment) {
-    if (!$user) {
-      error = 'Please log in';
-      return;
-    }
+
     const content = replyContent[parentComment.id]?.trim();
     if (!content) return;
 
@@ -209,6 +205,10 @@
   }
 
   function toggleReplyBox(comment) {
+    if (!$user) {
+      showLogin = true; // need to show login
+      return;
+    }
     replyBoxVisible[comment.id] = !replyBoxVisible[comment.id]; // 切换输入框的显示状态
   }
 
@@ -227,6 +227,9 @@
     <button class="comment-btn" on:click={addComment} disabled={!content.trim()}>
       Post
     </button>
+    {#if showLogin}
+      <UserLogin />
+    {/if}
   </div>
 
   <div class="comments-list">

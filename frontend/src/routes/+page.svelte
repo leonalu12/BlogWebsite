@@ -46,9 +46,9 @@ async function fetchArticles() {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles?${queryParams}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       articles = await response.json();
-      console.log("✅ 获取到的文章:", articles); // ✅ **调试**
+      console.log(" 获取到的文章:", articles); // ✅ **调试**
     } catch (error) {
-      console.error("❌ 获取文章失败:", error);
+      console.error(" 获取文章失败:", error);
     }
 }
 
@@ -59,14 +59,17 @@ async function fetchArticles() {
   function handleSearch() {
   if (filterBy === "date_time" && exactDate) {
     let formattedDate = new Date(exactDate).toISOString().split("T")[0]; 
-    console.log("📅 传递到后端的日期:", formattedDate); // ✅ **调试**
+    console.log("📅 传递到后端的日期:", formattedDate);
     exactDate = formattedDate;
   } else {
     console.log("🔎 不是日期筛选，正常查询");
   }
+
+  // ✅ **去除 Unicode 引号，防止错误字符**
+  searchQuery = searchQuery.replace(/[“”„‟❝❞＂]/g, '"').trim();
+
   fetchArticles();
 }
-
   
   // **新增：支持动态切换搜索类型（title, username, date_time）**
   function handleFilterChange(event) {
