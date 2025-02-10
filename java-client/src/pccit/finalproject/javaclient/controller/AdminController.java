@@ -1,19 +1,21 @@
 package pccit.finalproject.javaclient.controller;
 
-import pccit.finalproject.javaclient.utils.HttpClient;
+import pccit.finalproject.javaclient.utils.*;
 import pccit.finalproject.javaclient.view.AdminDashboard;
 import pccit.finalproject.javaclient.view.LoginPanel;
+import pccit.finalproject.javaclient.utils.HttpUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 public class AdminController {
     private AdminDashboard dashboard;
-
+    private LoginPanel loginPanel;
     public AdminController(AdminDashboard dashboard) {
         this.dashboard = dashboard;
-        LoginPanel loginPanel = dashboard.getLoginPanel();
+        loginPanel = dashboard.getLoginPanel();
 
         loginPanel.setLoginAction(new ActionListener() {
             @Override
@@ -31,24 +33,37 @@ public class AdminController {
     }
 
     private void login() {
-        LoginPanel loginPanel = dashboard.getLoginPanel();
-        String username = loginPanel.getUsername();
-        String password = loginPanel.getPassword();
+        String username = LoginPanel.getUsername();
+        String password = LoginPanel.getPassword();
 
         try {
-            String response = HttpClient.sendPostRequest("/login", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }");
-            if (response.contains("admin")) {
+            String requestBody= "{\"username\":\""+username+"\",\"password\":\""+password+"\"}";
+
+            String response = HttpUtils.sendGetRequestWithBody("/api/admins", requestBody);
+
+            // 简单检查响应是否返回非空
+            if (response != null) {
+                loginPanel.setLoggedInState(true);
                 JOptionPane.showMessageDialog(dashboard, "Login successful!");
+
             } else {
                 JOptionPane.showMessageDialog(dashboard, "Access denied.");
                 logout();
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(dashboard, "Login failed: " + ex.getMessage());
+            logout();
         }
     }
 
     private void logout() {
+        loginPanel.setLoggedInState(false);
+        loginPanel.clearFields();
+        //later implement clear user table method and call here
         JOptionPane.showMessageDialog(dashboard, "Logged out.");
+
+    }
+    private void clearUserTable() {
+
     }
 }
