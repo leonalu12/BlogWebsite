@@ -1,85 +1,129 @@
 <script>
     import { ArrowLeftCircleIcon, Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
-    import { goto } from '$app/navigation'; // ✅ 引入 SvelteKit 的页面跳转函数
-    import Comments from '../../../lib/components/Comments.svelte';  // 直接导入组件
-    export let data;
-    const { article } = data;
-    //存储文章的当前点赞数，如果undefine或者null则显示0
-    let likeCount = article.like_count || 0;
-    //存储用户是否已点赞该文章。如果 article.isLiked 为 undefined 或 null，则默认值为 false
-    let isLiked = article.isLiked || false;
+    import { goto } from '$app/navigation';
+    import Comments from './Comments/Comments.svelte';
+    import { onMount } from "svelte";
+    import { writable } from "svelte/store"; // ✅ 存储用户信息
 
-    const userId = 3; // 假设当前用户 ID
+    export let data;
+    const article = data?.article || {}; // ✅ 避免 `null`
+    
+    let likeCount = article?.like_count ?? 0;
+    let isLiked = article?.isLiked ?? false;
+
+    let showComments = false; // ✅ 控制评论区是否展开
+    
+    let user = writable(null); // ✅ 存储用户信息
+
+    // ✅ 获取用户信息
+    async function fetchUser() {
+        try {
+            const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+                method: "GET",
+                credentials: "include" // ✅ 让请求带上 session
+            });
+
+            if (res.ok) {
+                const userData = await res.json();
+                user.set(userData); // ✅ 存储用户信息
+                console.log("✅ Fetched user:", userData);
+            } else if (res.status === 401) {
+                console.error("❌ User is not logged in. Redirecting...");
+                goto("/login");
+            }
+        } catch (error) {
+            console.error("❌ Error fetching user:", error);
+        }
+    }
+
+    onMount(fetchUser); // ✅ 页面加载时获取用户信息
 
     async function toggleLike(event) {
-        event.stopPropagation();//阻止事件冒泡，避免触发其他点击事件
+        event.stopPropagation();
 
-        const newLikeStatus = !isLiked;// 切换点赞状态
-        console.log("当前 isLiked 状态:", isLiked);
-        console.log("切换后的 newLikeStatus:", newLikeStatus);
+        if (!article?.id) {
+            console.error("❌ Error: Article ID is undefined. Cannot like.");
+            return;
+        }
 
+        let currentUser;
+        user.subscribe(value => currentUser = value)();
+
+        if (!currentUser) {
+            console.error("❌ User is not logged in.");
+            return;
+        }
+
+        const newLikeStatus = !isLiked;
         try {
             const method = newLikeStatus ? "POST" : "DELETE";
-            console.log(`🔹 发送请求: ${method} ${PUBLIC_API_BASE_URL}/articles/${article.id}/like`);
 
             const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${article.id}/like`, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId })
+                credentials: "include" // ✅ 让 session 传递到后端
             });
 
             if (!response.ok) throw new Error("API 请求失败");
 
             const data = await response.json();
-            console.log("🔹 API 返回的数据:", data);
-
             isLiked = newLikeStatus;
-            likeCount = data.like_count; // ✅ 确保点赞数从 API 更新
-            console.log("✅ UI 更新: isLiked =", isLiked, "likeCount =", likeCount);
+            likeCount = data.like_count;
         } catch (error) {
             console.error("❌ 点赞失败:", error);
         }
     }
 
-    console.log("当前用户ID:", userId);
-    console.log("文章作者ID:", article.user_id);
-    console.log("文章数据:", article);
+    function toggleComments() {
+        showComments = !showComments; // ✅ 切换评论区的展开/收起状态
+    }
 
+    console.log("文章数据:", article);
+    
 </script>
 
 <svelte:head>
-    <title>{article.title}</title>  
+    <title>{article?.title || "Loading..."}</title>  
 </svelte:head>
 
-<div class="article-container">
-    <div class="article-image">
-        <img src={article.image_url ? article.image_url : "/images/default-placeholder.jpg"} alt={article.title} />
-    </div>
+{#if article?.id}
+    <div class="article-container">
+        <div class="article-image">
+            <img src={article.image_url ? article.image_url : "/images/default-placeholder.jpg"} alt={article.title} />
+        </div>
 
-    <div class="article-content">
-        <h1>{article.title}</h1>
-        <p class="article-meta">Published on {article.date_time} by {article.username}</p>
-        <p class="article-text">{@html article.content}</p>
+        <div class="article-content">
+            <h1>{article.title || "Untitled"}</h1>
+            <p class="article-meta">Published on {article.date_time || "Unknown"} by {article.username || "Anonymous"}</p>
+            <p class="article-text">{@html article.content || "No content available."}</p>
 
-        <div class="article-actions">
-            <button class="like-button" on:click={toggleLike}>
-                <Heart size={20} fill={isLiked ? "red" : "none"} color="red" /> {likeCount}
-            </button>
-            <button class="comment-button">
-                <MessageCircle size={20} color="blue" /> {article.comment_count || 0}
-            </button>
+            <div class="article-actions">
+                <button class="like-button" on:click={toggleLike}>
+                    <Heart size={20} fill={isLiked ? "red" : "none"} color="red" /> {likeCount}
+                </button>
+                <button class="comment-button" on:click={toggleComments}> 
+                    <MessageCircle size={20} color={showComments ? "black" : "blue"} /> {article.comment_count ?? 0}
+                </button>
 
-            {#if userId === article.user_id}  <!-- ✅ 修改：添加判断是否是文章作者 -->
-            <button class="edit-button" on:click={() => goto(`/articles/${article.id}/edit`)}>
-                edit
-            </button>
-        {/if} <!-- ✅ 修改结束 -->
+                {#if $user && $user.id === article.user_id}
+                <button class="edit-button" on:click={() => goto(`/articles/${article.id}/edit`)}>
+                    edit
+                </button>
+                {/if}
+            </div>
         </div>
     </div>
-</div>
 
-<Comments article = {article} />
+<!-- ✅ 仅当 `showComments` 为 `true` 时显示评论区 -->
+{#if showComments}
+<Comments article={article} />
+{/if}
+{:else}
+<p>Loading article...</p>
+{/if}
+
+
 
 <style>
     .article-container {
@@ -133,7 +177,7 @@
     .comment-button:hover {
         color: blue;
     }
-    .edit-button {  /* ✅ 修改：添加编辑按钮样式 */
+    .edit-button {
         color: green;
     }
     .edit-button:hover {

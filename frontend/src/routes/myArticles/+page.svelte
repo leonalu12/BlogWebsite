@@ -1,48 +1,68 @@
 <script>
   import { onMount } from "svelte";
+  import { writable } from "svelte/store";
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
 
-  // export let data;
-  let user_id = 2;
+  let user = writable(null);
+  let user_id = null; // 初始设为空
+  $: if ($user) {
+    user_id = $user.id; // 当 user 数据更新时，user_id 也会自动更新
+  }
+
   let articles = [];
 
-  /** Fetch articles by user ID */
+  /** 获取用户信息 */
+  async function fetchUser() {
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+        method: "GET",
+        credentials: "include"
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        user.set(userData); // 更新 store
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  }
+
+  /** 根据用户 ID 获取文章 */
   async function fetchMyArticles() {
-    let apiURL = `${PUBLIC_API_BASE_URL}/articles?userId=${user_id}`; // Correct API URL
-    console.log("Requesting:", apiURL); // Debugging
+    if (!user_id) return; // 确保 user_id 存在再请求数据
+    let apiURL = `${PUBLIC_API_BASE_URL}/articles?userId=${user_id}`;
+    console.log("Requesting:", apiURL);
 
     try {
       const response = await fetch(apiURL);
       if (!response.ok) {
         throw new Error(`Server returned ${response.status}`);
       }
-
       const data = await response.json();
-      console.log("Fetched articles:", data); // Debugging
-      articles = [...data]; // Spread syntax ensures reactivity
+      console.log("Fetched articles:", data);
+      articles = [...data]; // 触发 Svelte 反应性更新
     } catch (error) {
       console.error("Error fetching articles:", error);
     }
   }
 
-  /** Delete an article */
+  /** 删除文章 */
   async function deleteArticle(id) {
     if (!confirm("Are you sure you want to delete this article?")) {
       return;
     }
-
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ userId: user_id })
+        body: JSON.stringify({ userId: user_id }) // 这里传递 userId
       });
 
       if (response.ok) {
-        articles = articles.filter((article) => article.id !== id); // Update UI
+        articles = articles.filter((article) => article.id !== id);
       } else {
         console.error("Failed to delete article");
       }
@@ -51,7 +71,11 @@
     }
   }
 
-  onMount(fetchMyArticles);
+  // 组件加载时先获取用户信息，再获取文章
+  onMount(async () => {
+    await fetchUser();
+    $user && fetchMyArticles(); // 当 user 数据更新后自动获取文章
+  });
 </script>
 
 <svelte:head>
@@ -62,12 +86,10 @@
 
 {#if articles.length > 0}
   <p>Found {articles.length} articles.</p>
-  <!-- Debugging message -->
   <div class="articles">
     {#each articles as article}
       <div class="article">
         <p>Article ID: {article.id}</p>
-        <!-- Debugging: Show article ID -->
         <a href={`/articles/${article.id}`}>
           <div>
             <div>
