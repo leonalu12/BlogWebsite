@@ -4,46 +4,49 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { page } from "$app/stores";
-
-  import { get } from "svelte/store"; // 订阅 store 以获取 articleId
-  import AlertWindow from "../../../../lib/components/utils/alertWindow.svelte";
-
+  import { get } from "svelte/store";
   import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
-
 
   let title = "";
   let content = "";
   let image = null;
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
+  let errorMessage = "";
+  let articleId = ""; 
+  let user = writable(null); // ✅ 存储用户信息
 
-  let articleId = ""; // 存储文章 ID
-  let showUpdateWindow=false;
-  let updateMessage = "Article edited successfully!"
-  let showErrorWindow = false;
-  let errorWindowMessage = "something went wrong, please try again!"
+  // ✅ 获取用户信息
+  async function fetchUser() {
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+        method: "GET",
+        credentials: "include"
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        user.set(userData); // ✅ 存储用户信息
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  }
 
-  let conf = {
-    toolbar:
-      "undo redo | formatselect | bold italic underline | bullist numlist| alignleft aligncenter alignright alignjustify | table",
-    menubar: false,
-    plugins: "lists table",
-    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
-  };
- 
+  // ✅ 获取文章数据
+  async function fetchArticle() {
+    try {
+      articleId = get(page).params.id; 
+      console.log("编辑文章 ID:", articleId);
 
-  // 正确获取 articleId
-  onMount(async () => {
-    articleId = get(page).params.id; // 订阅 $page，获取 ID
-    console.log("editing article id:", articleId);
-
-    const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
-    if (response.ok) {
-      const article = await response.json();
-      title = article.title || "";//确保不为 undefined
-      content = article.content || "";
-    } else {
-      showErrorWindow=true;
-
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
+      if (response.ok) {
+        const article = await response.json();
+        title = article.title || "";
+        content = article.content || "";
+      } else {
+        errorMessage = "无法加载文章数据，请稍后重试。";
+      }
+    } catch (error) {
+      errorMessage = "加载文章失败，请检查网络连接。";
     }
   }
 
@@ -52,11 +55,10 @@
     await fetchArticle(); // ✅ 再获取文章
   });
 
-  // 发送更新请求
+  // ✅ 发送更新请求
   async function handleSubmit() {
-    if (!title || !content) {
-      errorWindowMessage = "Title and content are required.";
-      showErrorWindow = true;
+    if (!title.trim() || !content.trim()) {
+      errorMessage = "Title and content are required.";
       return;
     }
 
@@ -73,36 +75,44 @@
     });
 
     if (res.ok) {
-
-      showUpdateWindow = true;
-
+      alert("Article updated successfully!");
+      goto(`/articles/${articleId}`);
+    } else if (res.status === 403) {
+      errorMessage = "Unauthorized: You can only edit your own articles.";
     } else {
-      showErrorWindow = true;
+      errorMessage = "Something went wrong. Please try again.";
     }
-  }
-
-  function handleUpdateConfirm(){
-    showUpdateWindow = false;
-    goto(`/articles/${articleId}`)
-    
-  }
-
-  function handleErrorConfirm() {
-    showErrorWindow = false;
   }
 </script>
 
 <div class="article-form">
   <h1>Edit your article</h1>
 
- 
+  <!-- Error Message -->
+  {#if errorMessage}
+    <p class="error">{errorMessage}</p>
+  {/if}
 
   <!-- Article Title -->
   <label for="title">Title:</label>
   <input type="text" id="title" bind:value={title} placeholder="Enter article title" required />
 
   <!-- WYSIWYG Editor -->
-  <TinyMCE {apiKey} bind:value={content} {conf} />
+  <TinyMCE
+    {apiKey}
+    bind:value={content}
+    init={{
+      selector: "textarea",
+      height: 300,
+      menubar: false,
+      plugins: "lists advlist",
+      toolbar: "undo redo | bold italic underline | bullist numlist",
+      menu: { tools: { title: "Tools", items: "listprops" } },
+      lists_indent_on_tab: false,
+      content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
+    }}
+  />
+
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
   <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
@@ -110,12 +120,7 @@
   <!-- Submit Button -->
   <button on:click={handleSubmit}>Update</button>
 </div>
-{#if showUpdateWindow}
-<AlertWindow message = {updateMessage} on:confirm={handleUpdateConfirm} />
-{/if}
-{#if showErrorWindow}
-<AlertWindow message = {errorWindowMessage} on:confirm={handleErrorConfirm} />
-{/if}
+
 <style>
   .article-form {
     max-width: 600px;
