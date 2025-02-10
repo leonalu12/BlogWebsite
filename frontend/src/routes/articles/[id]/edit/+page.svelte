@@ -4,20 +4,33 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { page } from "$app/stores";
-  import { get } from "svelte/store"; // ✅ 订阅 store 以获取 articleId
+  import { get } from "svelte/store"; // 订阅 store 以获取 articleId
+  import AlertWindow from "../../../../lib/components/utils/alertWindow.svelte";
 
   let title = "";
   let content = "";
   let image = null;
   let userId = 2; // Replace with dynamic authentication in the future
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
-  let errorMessage = "";
-  let articleId = ""; // ✅ 存储文章 ID
+  let articleId = ""; // 存储文章 ID
+  let showUpdateWindow=false;
+  let updateMessage = "Article edited successfully!"
+  let showErrorWindow = false;
+  let errorWindowMessage = "something went wrong, please try again!"
 
-  // ✅ 正确获取 articleId
+  let conf = {
+    toolbar:
+      "undo redo | formatselect | bold italic underline | bullist numlist| alignleft aligncenter alignright alignjustify | table",
+    menubar: false,
+    plugins: "lists table",
+    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
+  };
+ 
+
+  // 正确获取 articleId
   onMount(async () => {
-    articleId = get(page).params.id; // ✅ 订阅 $page，获取 ID
-    console.log("编辑文章 ID:", articleId);
+    articleId = get(page).params.id; // 订阅 $page，获取 ID
+    console.log("editing article id:", articleId);
 
     const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
     if (response.ok) {
@@ -25,14 +38,15 @@
       title = article.title || "";//确保不为 undefined
       content = article.content || "";
     } else {
-      errorMessage = "无法加载文章数据，请稍后重试。";
+      showErrorWindow=true;
     }
   });
 
-  // ✅ 发送更新请求
+  // 发送更新请求
   async function handleSubmit() {
-    if (!title.trim() || !content.trim()) {
-      errorMessage = "Title and content are required.";
+    if (!title || !content) {
+      errorWindowMessage = "Title and content are required.";
+      showErrorWindow = true;
       return;
     }
     const formData = new FormData();
@@ -48,42 +62,34 @@
     });
 
     if (res.ok) {
-      alert("Article updated successfully!");
-      goto(`/articles/${articleId}`); // ✅ 更新成功后跳转回文章详情页
+      showUpdateWindow = true;
     } else {
-      errorMessage = "Something went wrong. Please try again.";
+      showErrorWindow = true;
     }
+  }
+
+  function handleUpdateConfirm(){
+    showUpdateWindow = false;
+    goto(`/articles/${articleId}`)
+    
+  }
+
+  function handleErrorConfirm() {
+    showErrorWindow = false;
   }
 </script>
 
 <div class="article-form">
   <h1>Edit your article</h1>
 
-  <!-- Error Message -->
-  {#if errorMessage}
-    <p class="error">{errorMessage}</p>
-  {/if}
+ 
 
   <!-- Article Title -->
   <label for="title">Title:</label>
   <input type="text" id="title" bind:value={title} placeholder="Enter article title" required />
 
   <!-- WYSIWYG Editor -->
-  <TinyMCE
-    {apiKey}
-    bind:value={content}
-    init={{
-      selector: "textarea",
-      height: 300,
-      menubar: false,
-      plugins: "lists advlist",
-      toolbar: "undo redo | bold italic underline | bullist numlist",
-      menu: { tools: { title: "Tools", items: "listprops" } },
-      lists_indent_on_tab: false,
-      content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
-    }}
-  />
-
+  <TinyMCE {apiKey} bind:value={content} {conf} />
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
   <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
@@ -91,7 +97,12 @@
   <!-- Submit Button -->
   <button on:click={handleSubmit}>Update</button>
 </div>
-
+{#if showUpdateWindow}
+<AlertWindow message = {updateMessage} on:confirm={handleUpdateConfirm} />
+{/if}
+{#if showErrorWindow}
+<AlertWindow message = {errorWindowMessage} on:confirm={handleErrorConfirm} />
+{/if}
 <style>
   .article-form {
     max-width: 600px;

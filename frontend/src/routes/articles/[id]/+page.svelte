@@ -1,7 +1,7 @@
 <script>
-    import { ArrowLeftCircleIcon, Heart, MessageCircle } from "lucide-svelte";
+    import { Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
-    import { goto } from '$app/navigation'; // ✅ 引入 SvelteKit 的页面跳转函数
+    import { goto } from '$app/navigation'; //引入 SvelteKit 的页面跳转函数
     import Comments from './Comments/Comments.svelte';  // 直接导入组件
     export let data;
     const { article } = data;
@@ -10,7 +10,7 @@
     //存储用户是否已点赞该文章。如果 article.isLiked 为 undefined 或 null，则默认值为 false
     let isLiked = article.isLiked || false;
 
-    const userId = 3; // 假设当前用户 ID
+    const userId = 2; // 假设当前用户 ID
 
     async function toggleLike(event) {
         event.stopPropagation();//阻止事件冒泡，避免触发其他点击事件
@@ -21,7 +21,7 @@
 
         try {
             const method = newLikeStatus ? "POST" : "DELETE";
-            console.log(`🔹 发送请求: ${method} ${PUBLIC_API_BASE_URL}/articles/${article.id}/like`);
+            console.log(`发送请求: ${method} ${PUBLIC_API_BASE_URL}/articles/${article.id}/like`);
 
             const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${article.id}/like`, {
                 method,
@@ -32,7 +32,7 @@
             if (!response.ok) throw new Error("API 请求失败");
 
             const data = await response.json();
-            console.log("🔹 API 返回的数据:", data);
+            console.log("API 返回的数据:", data);
 
             isLiked = newLikeStatus;
             likeCount = data.like_count; // ✅ 确保点赞数从 API 更新

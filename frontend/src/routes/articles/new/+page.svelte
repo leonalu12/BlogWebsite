@@ -1,6 +1,5 @@
 <script>
   import TinyMCE from "@tinymce/tinymce-svelte";
-  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
@@ -9,14 +8,12 @@
   let title = "";
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
   let userId = 2; // Replace with dynamic authentication in the future
-  let errorMessage = "";
   let content = "";
   let image = null;
   let showWindow = false;
   let windowMessage = "";
   let showErrorWindow = false;
   let errorWindowMessage="";
-
   let conf = {
     toolbar:
       "undo redo | formatselect | bold italic underline | bullist numlist| alignleft aligncenter alignright alignjustify | table",
@@ -54,9 +51,6 @@
       errorWindowMessage = "Article title and content cannot be empty!"
       showErrorWindow = true;
     }
-  
- 
-  
   }
 
   function handleConfirm(){
@@ -79,7 +73,6 @@
   <!-- WYSIWYG Editor -->
   <label for="content">Content:</label>
   <TinyMCE {apiKey} bind:value={content} {conf} />
-
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
   <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
@@ -121,11 +114,6 @@
     border-radius: 4px;
     font-size: 16px;
     width: 100%;
-  }
-
-  .error {
-    color: red;
-    font-size: 14px;
   }
 
   button {
