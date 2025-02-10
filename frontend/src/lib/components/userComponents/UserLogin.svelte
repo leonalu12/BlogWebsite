@@ -96,7 +96,7 @@
 
 {#if displayUserPopUpwindow}
   <button class="overlay" on:click={closeUserPopUpwindow}>
-    <button on:click|stopPropagation>
+    <button on:click|stopPropagation style="background-color: transparent; border: none;">
       {#if displayloginFailed}
         <AlertWindow message="login failed" on:confirm={() => (displayloginFailed = false)} />
         <!-- pass the message prop to the alertWindow component -->
@@ -192,7 +192,7 @@
   }
   
   .login-container {
-    width: 60%;
+    width: 30%;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;

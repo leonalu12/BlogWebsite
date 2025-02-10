@@ -23,7 +23,6 @@
   let displayEditfailAlert = false;
   let displayUserPopUpwindow = true;
 
-
   function closeUserPopUpwindow() {
     displayUserPopUpwindow = false;
     displayEdit.set(false);
@@ -66,7 +65,6 @@
       alertMessage = "username already exists";
       return;
     }
-    // 这里可以添加提交表单的逻辑，例如通过 API 保存用户信息
     try {
       console.log("发送用户数据:", user);
       const formData = new FormData();
@@ -79,7 +77,6 @@
 
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
         method: "PATCH",
-
         body: formData,
         credentials: "include"
       });
@@ -162,60 +159,73 @@
   }
 </script>
 
-<button class="overlay" on:click={closeUserPopUpwindow}>
-  <button on:click|stopPropagation>
-  <div class="form-container">
-    <h2>editing user information</h2>
-    {#if loading}
-      <p>loading...</p>
-    {:else}
-      <form on:submit={handleSubmit}>
-        <div class="form-group">
-          <label for="username">username</label>
-          <input
-            type="text"
-            id="username"
-            bind:value={user.username}
-            on:input={checkUsername}
-            required
-          />
+{#if displayUserPopUpwindow}
+  <button class="overlay" on:click={closeUserPopUpwindow}>
+    <button on:click|stopPropagation>
+      <div class="edit-container">
+        <div class="edit-header">
+          <p class="EditTitle">Edit User Information</p>
         </div>
-        {#if !isUniqueUsername}
-          <p style="color: red;">username already existed</p>
+        {#if loading}
+          <p>loading...</p>
+        {:else}
+          <form on:submit={handleSubmit}>
+            <div class="userInput">
+              <div class="form-group input-container">
+                <input
+                  type="text"
+                  id="username"
+                  bind:value={user.username}
+                  on:input={checkUsername}
+                  placeholder=" "
+                  required
+                />
+                <label for="username">username</label>
+              </div>
+              {#if !isUniqueUsername}
+                <p style="color: red;">username already existed</p>
+              {/if}
+              <div class="form-group input-container">
+                <input type="text" id="fname" bind:value={user.fname} placeholder=" " required />
+                <label for="fname">first name</label>
+              </div>
+              <div class="form-group input-container">
+                <input type="text" id="lname" bind:value={user.lname} placeholder=" " required />
+                <label for="lname">last name</label>
+              </div>
+              <div class="form-group input-container">
+                <input
+                  type="text"
+                  id="description"
+                  bind:value={user.description}
+                  placeholder=" "
+                  required
+                />
+                <label for="description">description</label>
+              </div>
+              <div class="form-group input-container">
+                <input type="date" id="dob" bind:value={user.dob} placeholder=" " required />
+                <label for="dob">date of birth</label>
+              </div>
+              <div class="form-group input-container">
+                <input
+                  type="file"
+                  id="icon"
+                  accept="image/*"
+                  on:change={(e) => (iconImage = e.target.files[0])}
+                />
+                <label for="icon">icon</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="editBtn">save</button>
+            </div>
+          </form>
         {/if}
-        <div class="form-group">
-          <label for="fname">first name</label>
-          <input type="text" id="fname" bind:value={user.fname} required />
-        </div>
-        <div class="form-group">
-          <label for="lname">last name</label>
-          <input type="text" id="lname" bind:value={user.lname} required />
-        </div>
-        <div class="form-group">
-          <label for="description">description</label>
-          <input type="text" id="description" bind:value={user.description} required />
-        </div>
-        <div class="form-group">
-          <label for="dob">date of birth</label>
-          <input type="date" id="dob" bind:value={user.dob} required />
-        </div>
-        <div class="form-group">
-          <label for="icon">icon</label>
-          <input
-            type="file"
-            id="icon"
-            accept="image/*"
-            on:change={(e) => (iconImage = e.target.files[0])}
-          />
-        </div>
-        <div class="form-group">
-          <button type="submit">save</button>
-        </div>
-      </form>
-    {/if}
-  </div>
-</button>
-</button>
+      </div>
+    </button>
+  </button>
+{/if}
 
 {#if displayEditfailAlert}
   <AlertWindow message={alertMessage} on:confirm={() => (displayEditfailAlert = false)} />
@@ -234,19 +244,44 @@
     background-color: rgba(0, 0, 0, 0.5); /* half transparent */
     z-index: 1000; /* make sure it's on top of everything */
   }
-  .form-container {
-    z-index: 1000;
-    width: 65%;
-    height: 70%;
+
+  .edit-container {
+    width: 60%;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
-    position: fixed;
+    background: lightpink;
+    transition: background 5s ease;
+    opacity: 0.9;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 1001;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .EditTitle {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-family: "Arial", sans-serif;
+    text-align: center;
+    border-bottom: #9c9b9b 1px solid;
+    padding-bottom: 10px;
+    margin: 0;
+  }
+
+  .userInput {
+    border-radius: 10px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    outline: rgb(130, 130, 130) 1px solid;
+    padding-top: 17px;
   }
 
   .form-group {
@@ -264,17 +299,45 @@
     box-sizing: border-box;
   }
 
-  .form-group button {
+  .input-container {
+    position: relative;
+  }
+
+  .input-container label {
+    top: 2px;
+    left: 10px;
+    transition: all 0.3s;
+    color: #575656;
+    position: absolute;
+    font-size: 17px;
+  }
+
+  .input-container input:focus + label,
+  .input-container input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 15px;
+  }
+
+  input {
     width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #000;
+    background-color: transparent;
+    margin-top: 3px;
+    margin-bottom: 0;
+  }
+
+  .editBtn {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
-
-  .form-group button:hover {
-    background-color: #0056b3;
+    padding: 10px;
+    background: linear-gradient(90deg, pink, #FFE4E1);
+    transition: background 5s ease;
+    height: 50px;
+    font-size: 16px;
+    opacity: 1;
   }
 </style>
