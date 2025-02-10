@@ -26,7 +26,9 @@ export async function load({ params, fetch }) {
       },
     };
   } catch (err) {
-    console.error("❌ 加载文章或点赞状态失败:", err);
-    return { article: null };
+
+    console.error("加载文章或点赞状态失败:", err);
+    return { article: null }; // 返回空数据防止页面崩溃
+
   }
 }

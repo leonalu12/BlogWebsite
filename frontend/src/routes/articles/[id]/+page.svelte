@@ -1,6 +1,7 @@
 <script>
-    import { ArrowLeftCircleIcon, Heart, MessageCircle } from "lucide-svelte";
+    import { Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
+
     import { goto } from '$app/navigation';
     import Comments from './Comments/Comments.svelte';
     import { onMount } from "svelte";
@@ -15,6 +16,9 @@
     let showComments = false; // ✅ 控制评论区是否展开
     
     let user = writable(null); // ✅ 存储用户信息
+
+
+    const userId = 2; // 假设当前用户 ID
 
     // ✅ 获取用户信息
     async function fetchUser() {
@@ -39,6 +43,7 @@
 
     onMount(fetchUser); // ✅ 页面加载时获取用户信息
 
+
     async function toggleLike(event) {
         event.stopPropagation();
 
@@ -59,6 +64,9 @@
         try {
             const method = newLikeStatus ? "POST" : "DELETE";
 
+            console.log(`发送请求: ${method} ${PUBLIC_API_BASE_URL}/articles/${article.id}/like`);
+
+
             const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${article.id}/like`, {
                 method,
                 headers: { "Content-Type": "application/json" },
@@ -68,6 +76,10 @@
             if (!response.ok) throw new Error("API 请求失败");
 
             const data = await response.json();
+
+            console.log("API 返回的数据:", data);
+
+
             isLiked = newLikeStatus;
             likeCount = data.like_count;
         } catch (error) {

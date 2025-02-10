@@ -1,12 +1,15 @@
 <script>
   import TinyMCE from "@tinymce/tinymce-svelte";
-  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
   import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
 
   let title = "";
+
+  let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
+  let userId = 2; // Replace with dynamic authentication in the future
+
   let content = "";
   let image = null;
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
@@ -14,9 +17,8 @@
   let showWindow = false;
   let windowMessage = "";
   let showErrorWindow = false;
-  let errorWindowMessage = "";
 
-  let user = writable(null); // ✅ 存储用户信息
+  let errorWindowMessage="";
 
   let conf = {
     toolbar:
@@ -108,7 +110,6 @@
   <!-- WYSIWYG Editor -->
   <label for="content">Content:</label>
   <TinyMCE {apiKey} bind:value={content} {conf} />
-
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
   <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
@@ -150,11 +151,6 @@
     border-radius: 4px;
     font-size: 16px;
     width: 100%;
-  }
-
-  .error {
-    color: red;
-    font-size: 14px;
   }
 
   button {

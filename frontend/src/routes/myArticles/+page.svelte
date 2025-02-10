@@ -3,6 +3,7 @@
   import { writable } from "svelte/store";
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import AlertWindow from "../../lib/components/utils/alertWindow.svelte"
 
   let user = writable(null);
   let user_id = null; // 初始设为空
@@ -11,6 +12,11 @@
   }
 
   let articles = [];
+  let showDeleteWindow = false;
+  let showErrorWindow = false;
+  let confirmMessage = "Are you sure you want to delete this article?"
+  let errorWindowMessage = "Something went wrong. Please try again."
+  let articleToDelete = null;
 
   /** 获取用户信息 */
   async function fetchUser() {
@@ -43,13 +49,24 @@
       console.log("Fetched articles:", data);
       articles = [...data]; // 触发 Svelte 反应性更新
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      errorWindowMessage = "Error fetching articles.";
+      showErrorWindow = true;
     }
   }
 
-  /** 删除文章 */
+  function confirmDeleteArticle(id){
+    articleToDelete = id;
+    showDeleteWindow=true;
+  }
+
+  function handleErrorConfirm(){
+    showErrorWindow = false;
+  }
+
+  /** Delete an article */
+
   async function deleteArticle(id) {
-    if (!confirm("Are you sure you want to delete this article?")) {
+    if (!articleToDelete) {
       return;
     }
     try {
@@ -62,12 +79,20 @@
       });
 
       if (response.ok) {
-        articles = articles.filter((article) => article.id !== id);
+
+        articles = articles.filter((article) => article.id !== articleToDelete); // Update UI
+
       } else {
-        console.error("Failed to delete article");
+        errorWindowMessage = "Failed to delete article.";
+        showErrorWindow = true;
       }
     } catch (error) {
-      console.error("Error deleting article:", error);
+      errorWindowMessage = "Error deleting article.";
+      showErrorWindow = true;
+    }
+    finally{
+      showDeleteWindow=false;
+      articleToDelete = null;
     }
   }
 
@@ -103,7 +128,7 @@
             <div>{@html article.content}</div>
           </div>
         </a>
-        <button class="delete-button" on:click={() => deleteArticle(article.id)}>Delete</button>
+        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>Delete</button>
       </div>
     {/each}
   </div>
@@ -111,6 +136,13 @@
   <p>No articles found.</p>
 {/if}
 
+{#if showDeleteWindow}
+<AlertWindow message = {confirmMessage} on:confirm={deleteArticle(articleToDelete)} />
+{/if}
+
+{#if showErrorWindow}
+<AlertWindow message = {errorWindowMessage} on:confirm={handleErrorConfirm} />
+{/if}
 <style>
   .articles {
     display: grid;
