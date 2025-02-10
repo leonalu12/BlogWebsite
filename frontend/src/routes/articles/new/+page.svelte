@@ -4,18 +4,19 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
+  import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
 
- 
   let title = "";
-  let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
-  let userId = 2; // Replace with dynamic authentication in the future
-  let errorMessage = "";
   let content = "";
   let image = null;
+  let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
+  let errorMessage = "";
   let showWindow = false;
   let windowMessage = "";
   let showErrorWindow = false;
-  let errorWindowMessage="";
+  let errorWindowMessage = "";
+
+  let user = writable(null); // ✅ 存储用户信息
 
   let conf = {
     toolbar:
@@ -25,9 +26,31 @@
     content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
   };
 
-  console.log("Editor Content Before Submit:", content);
+  // ✅ 获取当前用户
+  async function fetchUser() {
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+        method: "GET",
+        credentials: "include" // ✅ 让请求带上 session
+      });
 
-  // Function to handle form submission
+      if (res.ok) {
+        const userData = await res.json();
+        user.set(userData); // ✅ 存储用户信息
+        console.log("✅ Fetched user:", userData);
+      } else if (res.status === 401) {
+        errorMessage = "Unauthorized: Please log in first.";
+        console.error("❌ User is not logged in. Redirecting...");
+        goto("/login"); // ✅ 让用户重新登录
+      }
+    } catch (error) {
+      console.error("❌ Error fetching user:", error);
+    }
+  }
+
+  onMount(fetchUser); // ✅ 页面加载时获取用户信息
+
+  // ✅ 提交文章
   async function handleSubmit() {
     if (!title.trim() || !content.trim()) {
       errorWindowMessage = "Title and content are required.";
@@ -35,36 +58,42 @@
       return;
     }
 
+    let currentUser;
+    user.subscribe(value => currentUser = value)(); // ✅ 获取 user
+
+    if (!currentUser) {
+      errorMessage = "You must be logged in to submit an article.";
+      goto("/login"); // ✅ 让用户重新登录
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    formData.append("userId", userId);
-
-    if (image) formData.append("image", image);
     
+    if (image) formData.append("image", image);
+
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/new`, {
       method: "POST",
-      body: formData
+      body: formData,
+      credentials: "include" // ✅ 让 session 传递到后端
     });
 
     if (res.ok) {
-      windowMessage = ("Article created successfully!");
+      windowMessage = "Article created successfully!";
       showWindow = true;
     } else {
-      errorWindowMessage = "Article title and content cannot be empty!"
+      errorWindowMessage = "Failed to create article. Please try again.";
       showErrorWindow = true;
     }
-  
- 
-  
   }
 
-  function handleConfirm(){
+  function handleConfirm() {
     showWindow = false;
     goto("/");
   }
 
-  function handleErrorSubmit(){
+  function handleErrorSubmit() {
     showErrorWindow = false;
   }
 </script>
@@ -89,11 +118,11 @@
 </div>
 
 {#if showWindow}
-<AlertWindow message = {windowMessage} on:confirm={handleConfirm} />
+  <AlertWindow message={windowMessage} on:confirm={handleConfirm} />
 {/if}
 
 {#if showErrorWindow}
-<AlertWindow message = {errorWindowMessage} on:confirm = {handleErrorSubmit} />
+  <AlertWindow message={errorWindowMessage} on:confirm={handleErrorSubmit} />
 {/if}
 
 <style>

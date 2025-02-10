@@ -90,7 +90,7 @@ export async function getAllArticles(
 export async function getArticleById(id) {
   const db = await getDatabase();
   let article = await db.get(`
-    SELECT a.id, a.title, a.content, a.date_time, user_id,u.username, u.icon,
+    SELECT a.id, a.title, a.content, a.date_time, user_id, u.username, u.icon,
            (SELECT COUNT(*) FROM like_a WHERE article_id = a.id) AS like_count,
            (SELECT path FROM imgs WHERE article_id = a.id LIMIT 1) AS image_path
     FROM articles a
@@ -104,6 +104,7 @@ export async function getArticleById(id) {
 
   return article;
 }
+
 
 
 /**

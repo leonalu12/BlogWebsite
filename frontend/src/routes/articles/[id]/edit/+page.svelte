@@ -4,29 +4,55 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { page } from "$app/stores";
-  import { get } from "svelte/store"; // ✅ 订阅 store 以获取 articleId
+  import { get } from "svelte/store";
+  import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
 
   let title = "";
   let content = "";
   let image = null;
-  let userId = 2; // Replace with dynamic authentication in the future
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
   let errorMessage = "";
-  let articleId = ""; // ✅ 存储文章 ID
+  let articleId = ""; 
+  let user = writable(null); // ✅ 存储用户信息
 
-  // ✅ 正确获取 articleId
-  onMount(async () => {
-    articleId = get(page).params.id; // ✅ 订阅 $page，获取 ID
-    console.log("编辑文章 ID:", articleId);
-
-    const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
-    if (response.ok) {
-      const article = await response.json();
-      title = article.title || "";//确保不为 undefined
-      content = article.content || "";
-    } else {
-      errorMessage = "无法加载文章数据，请稍后重试。";
+  // ✅ 获取用户信息
+  async function fetchUser() {
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+        method: "GET",
+        credentials: "include"
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        user.set(userData); // ✅ 存储用户信息
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
     }
+  }
+
+  // ✅ 获取文章数据
+  async function fetchArticle() {
+    try {
+      articleId = get(page).params.id; 
+      console.log("编辑文章 ID:", articleId);
+
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
+      if (response.ok) {
+        const article = await response.json();
+        title = article.title || "";
+        content = article.content || "";
+      } else {
+        errorMessage = "无法加载文章数据，请稍后重试。";
+      }
+    } catch (error) {
+      errorMessage = "加载文章失败，请检查网络连接。";
+    }
+  }
+
+  onMount(async () => {
+    await fetchUser(); // ✅ 先获取用户
+    await fetchArticle(); // ✅ 再获取文章
   });
 
   // ✅ 发送更新请求
@@ -35,21 +61,24 @@
       errorMessage = "Title and content are required.";
       return;
     }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    formData.append("userId", userId);
 
     if (image) formData.append("image", image);
 
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}/edit`, {
       method: "PUT",
-      body: formData
+      body: formData,
+      credentials: "include" // ✅ 让请求带上 session
     });
 
     if (res.ok) {
       alert("Article updated successfully!");
-      goto(`/articles/${articleId}`); // ✅ 更新成功后跳转回文章详情页
+      goto(`/articles/${articleId}`);
+    } else if (res.status === 403) {
+      errorMessage = "Unauthorized: You can only edit your own articles.";
     } else {
       errorMessage = "Something went wrong. Please try again.";
     }

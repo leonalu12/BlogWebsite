@@ -2,13 +2,12 @@ import { PUBLIC_API_BASE_URL } from "$env/static/public";
 
 export async function load({ params, fetch }) {
   const ARTICLE_URL = `${PUBLIC_API_BASE_URL}/articles/${params.id}`;
-  const LIKE_CHECK_URL = `${PUBLIC_API_BASE_URL}/articles/${params.id}/like/check?userId=2`; // 假设用户 ID 为 2
+  const LIKE_CHECK_URL = `${PUBLIC_API_BASE_URL}/articles/${params.id}/like/check`;
 
   try {
-    // 同时请求文章数据和点赞状态
     const [articleResponse, likeResponse] = await Promise.all([
-      fetch(ARTICLE_URL),
-      fetch(LIKE_CHECK_URL),
+      fetch(ARTICLE_URL, { credentials: "include" }),
+      fetch(LIKE_CHECK_URL, { credentials: "include" })
     ]);
 
     if (!articleResponse.ok || !likeResponse.ok) {
@@ -21,12 +20,13 @@ export async function load({ params, fetch }) {
     return {
       article: {
         ...article,
-        like_count: likeData.like_count, // 合并点赞数
-        isLiked: likeData.isLiked, // 合并点赞状态
+        like_count: likeData.like_count, // ✅ 确保点赞数正确
+        isLiked: likeData.isLiked, // ✅ 确保用户点赞状态正确
+        comment_count: article.comment_count ?? 0, // ✅ 确保前端有评论数量
       },
     };
   } catch (err) {
     console.error("❌ 加载文章或点赞状态失败:", err);
-    return { article: null }; // 返回空数据防止页面崩溃
+    return { article: null };
   }
 }
