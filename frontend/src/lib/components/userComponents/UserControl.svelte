@@ -156,9 +156,16 @@
   }
 
   .menu {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     color: #343434;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
   }
 
   .icon {
@@ -167,6 +174,9 @@
     border-radius: 50%;
     background-color: #929292;
     color: #fff;
+    border: none;
+    padding: 0;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
