@@ -1,12 +1,26 @@
 package pccit.finalproject.javaclient.utils;
 
+import pccit.finalproject.javaclient.model.User;
+
+import javax.imageio.ImageIO;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
-public class HttpUtils{
+public class HttpUtils {
     private static final String BASE_URL = "http://localhost:3000"; // 修改为你的服务器地址
     private static final HttpClient client = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)
@@ -25,5 +39,88 @@ public class HttpUtils{
                 HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
         return response.body();
+    }
+
+    public static String sendGetRequestWithBody(String endpoint, String jsonBody) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .header("Content-Type", "application/json")
+                .method("GET", HttpRequest.BodyPublishers.ofString(jsonBody))
+                .timeout(Duration.ofSeconds(10))
+                .build();
+
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+        return response.body();
+    }
+
+    // 获取所有用户数据
+    public static List<User> getUsersFromBackend() {
+        List<User> users = new ArrayList<>();
+        try {
+            String response = sendGetRequestWithBody("/api/admins", "");
+            JsonReader jsonReader = Json.createReader(new StringReader(response));
+            JsonArray jsonArray = jsonReader.readArray();
+            for (JsonObject jsonObject : jsonArray.getValuesAs(JsonObject.class)) {
+                User user = new User();
+                user.setId(jsonObject.getInt("id"));
+                user.setUsername(jsonObject.getString("username"));
+                user.setFname(jsonObject.getString("fname"));
+                user.setLname(jsonObject.getString("lname"));
+                user.setDescription(jsonObject.getString("description"));
+                user.setDob(jsonObject.get("dob").toString()); // 将 dob 作为字符串处理
+                user.setIcon(jsonObject.getString("icon"));
+                user.setPwd(jsonObject.getString("pwd"));
+                users.add(user);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    // 获取用户头像
+    public static ImageIcon getUserIcon(User user) {
+        ImageIcon icon = null;
+        try {
+            String iconPath = user.getIcon();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:3000/images/" + iconPath)) // 使用用户对象中的头像路径
+                    .timeout(Duration.ofSeconds(10))
+                    .build();
+
+            HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+
+            if (response.statusCode() == 200) {
+                Image image = ImageIO.read(response.body());
+
+                // 确保图片不为空
+                if (image != null) {
+                    // 缩小到 50x50
+                    Image scaledImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+                    // 创建 BufferedImage
+                    BufferedImage bufferedImage = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g2 = bufferedImage.createGraphics();
+
+                    // 开启抗锯齿
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                    // 画一个圆形的剪裁区域
+                    g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 50, 50));
+                    g2.drawImage(scaledImage, 0, 0, null);
+                    g2.dispose();
+
+                    // 使用处理后的 BufferedImage
+                    icon = new ImageIcon(bufferedImage);
+                }
+            } else {
+                System.err.println("Failed to fetch user icon: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return icon;
     }
 }
