@@ -4,6 +4,7 @@
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../lib/components/utils/alertWindow.svelte";
+  import DeleteConfirmWindow from "../../lib/components/utils/DeleteConfirmWindow.svelte";
   import { displayLogin } from "../../lib/store/userStore";
   import { logedIn } from "../../lib/store/userStore";
   import { iconName } from "../../lib/store/userStore";
@@ -95,7 +96,13 @@
       articleToDelete = null;
     }
   }
-  function handleErrorConfirm() {
+
+  function cancelDelete(){
+    showDeleteWindow = false;
+    articleToDelete = null;
+  }
+
+  function handleErrorConfirm(){
     showErrorWindow = false;
   }
 
@@ -174,7 +181,7 @@
 {/if}
 
 {#if showDeleteWindow}
-  <AlertWindow message={confirmMessage} on:confirm={deleteArticle} />
+  <DeleteConfirmWindow message = {confirmMessage} on:confirm = {deleteArticle} on:cancel = {cancelDelete} />
 {/if}
 
 {#if showErrorWindow}

@@ -4,6 +4,7 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
+  import DeleteConfirmWindow from "../../../lib/components/utils/DeleteConfirmWindow.svelte";
   import { writable } from "svelte/store"; 
   import UserLogin from "../../../lib/components/userComponents/UserLogin.svelte";
   import {displayLogin} from "../../../lib/store/userStore";
@@ -20,6 +21,7 @@
   let errorWindowMessage = "";
   let showDeleteImageWindow = false;
   let deleteImageMessage = "Are you sure you want to delete this image?";
+  let imageToDelete = null;
 
   let user = writable(null); // ✅ 存储用户信息
 
@@ -136,10 +138,15 @@
 
   function deleteImage() {
     if (image) content = content.replace(/<img[^>]+>/g, "");
-    image = null;
+    imageToDelete = null;
     showDeleteImageWindow = false;
     document.getElementById("image").value = "";
   }
+   
+   function cancelDeleteImage (){
+    showDeleteImageWindow = false;
+    imageToDelete = null;
+   }
 </script>
 
 
@@ -177,7 +184,7 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <AlertWindow message={deleteImageMessage} on:confirm={deleteImage} />
+  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={deleteImage} on:cancel={cancelDeleteImage} />
 {/if}
 
 {#if $displayLogin}
