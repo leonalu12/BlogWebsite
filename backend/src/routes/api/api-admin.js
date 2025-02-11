@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateAdmin} from "../../data/admin-dao.js";
-import { getUsers } from "../../data/user-dao.js";
+import { getUsers, deleteUser } from "../../data/user-dao.js";
 import { deleteAdmin } from "../../data/admin-dao.js";
 const router = express.Router();
 
@@ -29,5 +29,23 @@ router.delete("/",async(req,res)=>{
     return res.sendStatus(204);
 
 })
+
+//delete user
+//delete
+router.delete("/:id", async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  try {
+    const result = await deleteUser(userId);
+    if (result) {
+      return res.status(200).send('success');
+    } else {
+      return res.status(404).send('User not found');
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
 
 export default router;

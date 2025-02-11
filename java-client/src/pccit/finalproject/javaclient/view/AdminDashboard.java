@@ -1,19 +1,22 @@
 package pccit.finalproject.javaclient.view;
 
+import pccit.finalproject.javaclient.controller.AdminController;
+import pccit.finalproject.javaclient.model.UserTableModel;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import pccit.finalproject.javaclient.controller.AdminController;
-import pccit.finalproject.javaclient.model.UserTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class AdminDashboard extends JFrame {
     private JTable userTable;
     private JLabel usernameLabel;
     private JLabel iconLabel;
     private LoginPanel loginPanel;
+    private JButton deleteUserButton;
     private AdminController controller;
 
     public AdminDashboard() {
@@ -39,16 +42,21 @@ public class AdminDashboard extends JFrame {
 
         usernameLabel = new JLabel();
         iconLabel = new JLabel();
+        deleteUserButton = new JButton("Delete User");
+        deleteUserButton.setVisible(false); // 初始化时隐藏
 
         // 设置组件居中显示
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteUserButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // 将用户名和头像添加到面板中
         userInfoPanel.add(Box.createVerticalStrut(30)); // 增加顶部间距
         userInfoPanel.add(usernameLabel);
         userInfoPanel.add(Box.createVerticalStrut(10)); // 给头像和用户名之间添加间距
         userInfoPanel.add(iconLabel);
+        userInfoPanel.add(Box.createVerticalStrut(10)); // 给头像和删除按钮之间添加间距
+        userInfoPanel.add(deleteUserButton);
         userInfoPanel.add(Box.createVerticalStrut(30)); // 增加底部间距
 
         // 将用户信息面板添加到JFrame的SOUTH位置
@@ -66,6 +74,28 @@ public class AdminDashboard extends JFrame {
                     System.out.println("Selected row: " + selectedRow); // 调试输出
                     if (controller != null) {
                         controller.displayUserInfo(selectedRow);
+                        deleteUserButton.setVisible(true); // 显示删除按钮
+                    }
+                } else {
+                    deleteUserButton.setVisible(false); // 隐藏删除按钮
+                }
+            }
+        });
+
+        // 设置删除按钮监听器
+        deleteUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow();
+                if (selectedRow >= 0 && controller != null) {
+                    int confirmation = JOptionPane.showConfirmDialog(AdminDashboard.this,
+                            "Are you sure you want to delete this user?",
+                            "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (confirmation == JOptionPane.YES_OPTION) {
+                        controller.deleteUser(selectedRow);
+                        deleteUserButton.setVisible(false); // 删除用户后隐藏删除按钮
                     }
                 }
             }
@@ -84,9 +114,7 @@ public class AdminDashboard extends JFrame {
         iconLabel.setIcon(icon);
         System.out.println("Username: " + username); // 调试输出
         System.out.println("Icon: " + icon); // 调试输出
-
     }
-
 
     public LoginPanel getLoginPanel() {
         return loginPanel;
@@ -96,7 +124,6 @@ public class AdminDashboard extends JFrame {
         return userTable;
     }
 
-
     public void clearUserTable() {
         // 清空表格数据
         userTable.setModel(new DefaultTableModel()); // 清空表格
@@ -105,9 +132,8 @@ public class AdminDashboard extends JFrame {
         // 隐藏用户信息面板
         usernameLabel.setText(""); // 清空用户名
         iconLabel.setIcon(null);    // 清空头像
-//        usernameLabel.setVisible(false); // 隐藏用户名标签
-//        iconLabel.setVisible(false);    // 隐藏头像标签
+
+        // 隐藏删除按钮
+        deleteUserButton.setVisible(false);
     }
-
-
 }

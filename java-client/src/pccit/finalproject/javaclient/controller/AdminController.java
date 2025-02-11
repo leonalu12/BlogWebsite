@@ -69,7 +69,11 @@ public class AdminController {
 
             if (response.equals("null")) {
                 JOptionPane.showMessageDialog(dashboard, "Access denied.");
-                logout();
+                //logout();
+                // 清除登录面板
+                username = loginPanel.getUsername();
+                loginPanel.setLoggedInState(false, username);
+                loginPanel.clearFields();
             } else {
                 loginPanel.setLoggedInState(true, username);
                 JOptionPane.showMessageDialog(dashboard, "Login successful!");
@@ -123,6 +127,29 @@ public class AdminController {
         ImageIcon icon = HttpUtils.getUserIcon(user);
         System.out.println("Icon loaded: " + (icon != null));
         dashboard.setUserInfo(user.getUsername(), icon);
+    }
+
+    public void deleteUser(int rowIndex) {
+        User user = userTableModel.getUsers().get(rowIndex);
+        int userId = user.getId();
+
+        try {
+            // 删除数据库中的用户
+            String response = HttpUtils.deleteUserFromBackend(userId);
+            if ("success".equals(response)) {
+                // 从列表中移除用户
+                userTableModel.getUsers().remove(rowIndex);
+                userTableModel.fireTableDataChanged(); // 通知表格数据已更新
+
+                // 清空用户信息面板
+                dashboard.setUserInfo("", null);
+                JOptionPane.showMessageDialog(dashboard, "User deleted successfully.");
+            } else {
+                JOptionPane.showMessageDialog(dashboard, "Failed to delete user: " + response);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(dashboard, "Error: " + e.getMessage());
+        }
     }
 }
 
