@@ -1,6 +1,7 @@
 import express from "express";
 import { authenticateAdmin} from "../../data/admin-dao.js";
 import { getUsers } from "../../data/user-dao.js";
+import { deleteAdmin } from "../../data/admin-dao.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -19,5 +20,14 @@ router.get("/", async (req, res) => {
       return res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
+
+//delete admin
+router.delete("/",async(req,res)=>{
+
+    const {username} = req.body;
+    await deleteAdmin(username);
+    return res.sendStatus(204);
+
+})
 
 export default router;
