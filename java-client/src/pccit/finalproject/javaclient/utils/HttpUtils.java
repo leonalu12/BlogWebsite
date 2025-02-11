@@ -13,17 +13,17 @@ public class HttpUtils{
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    public static String sendGetRequestWithBody(String endpoint, String jsonBody) throws Exception {
+    public static String sendPostRequestWithBody(String endpoint, String jsonBody) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + endpoint))
                 .header("Content-Type", "application/json")
-                .method("GET", HttpRequest.BodyPublishers.ofString(jsonBody))
+                .method("POST", HttpRequest.BodyPublishers.ofString(jsonBody))
                 .timeout(Duration.ofSeconds(10))
                 .build();
 
         HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
-
+        System.out.println(response.body());
         return response.body();
     }
 }

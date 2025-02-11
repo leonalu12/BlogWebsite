@@ -8,6 +8,7 @@ export async function authenticateAdmin(username, pwd) {
     }
 
     if (pwd !== admin.pwd) {
+
         return null;
     }
     return admin;

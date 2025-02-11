@@ -107,6 +107,7 @@ INSERT INTO like_a (user_id, article_id) VALUES
 
 -- Insert data into admins table
 INSERT INTO admins (username, pwd) VALUES
+('admin', 'admin'),
 ('admin1', 'admin1'),
 ('admin2', 'admin2'),
 ('admin3', 'admin3'),

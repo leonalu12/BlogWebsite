@@ -37,19 +37,18 @@ public class AdminController {
         String password = LoginPanel.getPassword();
 
         try {
-            String requestBody= "{\"username\":\""+username+"\",\"password\":\""+password+"\"}";
+            String requestBody= "{\"username\":\""+username+"\",\"pwd\":\""+password+"\"}";
 
-            String response = HttpUtils.sendGetRequestWithBody("/api/admins", requestBody);
+            String response = HttpUtils.sendPostRequestWithBody("/api/admins", requestBody);
+            System.out.println("res:"+response);
 
-            // 简单检查响应是否返回非空
-            if (response != null) {
-                loginPanel.setLoggedInState(true);
-                JOptionPane.showMessageDialog(dashboard, "Login successful!");
-                //display table
-
-            } else {
+            if (response.equals("null") ) {
                 JOptionPane.showMessageDialog(dashboard, "Access denied.");
                 logout();
+            } else {
+                loginPanel.setLoggedInState(true,username);
+                JOptionPane.showMessageDialog(dashboard, "Login successful!");
+                // display table
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(dashboard, "Login failed: " + ex.getMessage());
@@ -58,7 +57,8 @@ public class AdminController {
     }
 
     private void logout() {
-        loginPanel.setLoggedInState(false);
+        String username = LoginPanel.getUsername();
+        loginPanel.setLoggedInState(false, username);
         loginPanel.clearFields();
         //later implement clear user table method and call here
         JOptionPane.showMessageDialog(dashboard, "Logged out.");

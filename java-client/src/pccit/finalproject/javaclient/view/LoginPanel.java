@@ -17,11 +17,11 @@ public class LoginPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         add(new JLabel("Username:"));
-        usernameField = new JTextField(15);
+        usernameField = new JTextField(10);
         add(usernameField);
 
         add(new JLabel("Password:"));
-        passwordField = new JPasswordField(15);
+        passwordField = new JPasswordField(10);
         add(passwordField);
 
         loginButton = new JButton("Login");
@@ -41,14 +41,15 @@ public class LoginPanel extends JPanel {
     public void setLoginAction(ActionListener action) { loginButton.addActionListener(action); }
     public void setLogoutAction(ActionListener action) { logoutButton.addActionListener(action); }
     public void setDeleteAction(ActionListener listener) {deleteButton.addActionListener(listener);}
-    public void setLoggedInState(boolean loggedIn) {
+    public void setLoggedInState(boolean loggedIn,String username) {
         this.isLoggedIn = loggedIn;
-        updateUIState(loggedIn);
+        updateUIState(loggedIn, username);
     }
-    private void updateUIState(boolean loggedIn) {
+    private void updateUIState(boolean loggedIn, String username) {
         loginButton.setEnabled(!loggedIn);
         logoutButton.setEnabled(loggedIn);
-        deleteButton.setEnabled(loggedIn);
+        // Only enable deleteButton if logged in AND username is NOT "admin0"
+        deleteButton.setEnabled(loggedIn && !"admin".equals(username));
         usernameField.setEnabled(!loggedIn);
         passwordField.setEnabled(!loggedIn);
     }
