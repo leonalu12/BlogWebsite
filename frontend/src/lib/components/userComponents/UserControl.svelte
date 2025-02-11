@@ -48,6 +48,7 @@
       displayEdit.set(false);
       showLogoutAlert = true;
       toggleDropdown();
+      goto("/");
     } catch (error) {
       console.error("log out error:", error);
     }

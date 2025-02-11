@@ -2,6 +2,8 @@
   import { logedIn } from "../../store/userStore.js";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../utils/AlertWindow.svelte";
+  import UserAvatarRegister from "./UserAvatarRegister.svelte";
+  import { goto } from "$app/navigation";
 
   let user = {
     username: "",
@@ -19,13 +21,34 @@
     password: user.pwd
   };
 
+  let showAvatarSelection = true;
+  let selectedAvatar = null;
   let loading = false;
   let diapalyAlert = false;
   let comfirmPwd = "";
   let isUniqueUsername = true;
   let alertMessage = "";
   let displayUserPopUpwindow = true;
+  let dobDisplayControl = false;
 
+  function toggleDobDisplay() {
+    dobDisplayControl = !dobDisplayControl;
+  }
+
+  function handleAvatarSelect(event) {
+    const { avatar, type } = event.detail;
+    selectedAvatar = avatar;
+    console.log("selected avatar:", avatar);
+    if (type === "predefined") {
+      iconImage = avatar;
+    } else {
+      iconImage = avatar;
+    }
+  }
+
+  function handleNext() {
+    showAvatarSelection = false;
+  }
   async function handleRegister(event) {
     event.preventDefault();
     loading = true;
@@ -80,7 +103,8 @@
         throw new Error("login failed");
       } else {
         const logedInData = await loginResponse.json();
-        console.log("登录成功:", logedInData);
+        console.log("login successful:", logedInData);
+        goto("/");
       }
     } catch (error) {
       console.error("注册错误:", error);
@@ -114,85 +138,101 @@
   }
 </script>
 
-<div class="register-container">
-  <div class="register-header">
-    <p class="RegisterTitle">Register</p>
-  </div>
-  <p class="welcomeMsg">Welcome to Pinkbook</p>
-  <form on:submit={handleRegister}>
-    <div class="userInput">
-      <div class="form-group input-container">
-        <input
-          type="text"
-          id="username"
-          bind:value={user.username}
-          placeholder=" "
-          on:input={checkUsername}
-          required
-        />
-        <label for="username">username</label>
-      </div>
-      {#if !isUniqueUsername}
-        <p style="color: red;">username already exists</p>
-      {/if}
-      <div class="form-group input-container">
-        <input type="text" id="fname" bind:value={user.fname} placeholder=" " required />
-        <label for="fname">first name</label>
-      </div>
-      <div class="form-group input-container">
-        <input type="text" id="lname" bind:value={user.lname} placeholder=" " required />
-        <label for="lname">last name</label>
-      </div>
-      <div class="form-group input-container">
-        <input type="text" id="description" bind:value={user.description} placeholder=" " required />
-        <label for="description">description</label>
-      </div>
-      <div class="form-group input-container">
-        <input type="date" id="dob" bind:value={user.dob} placeholder=" " required />
-        <label for="dob">date of birth</label>
-      </div>
-      <div class="form-group input-container">
-        <input type="password" id="pwd" bind:value={user.pwd} placeholder=" " required />
-        <label for="pwd">password</label>
-      </div>
-      <div class="form-group input-container">
-        <input type="password" id="comfirmPwd" bind:value={comfirmPwd} placeholder=" " required />
-        <label for="comfirmPwd">confirm password</label>
-      </div>
-      {#if user.pwd !== comfirmPwd}
-        {#if user.pwd && comfirmPwd}
-          <p style="color: red;">passwords do not match</p>
+{#if showAvatarSelection}
+  <UserAvatarRegister on:select={handleAvatarSelect} on:next={handleNext} />
+{:else}
+  <div class="register-container">
+    <div class="register-header">
+      <p class="RegisterTitle">Register</p>
+    </div>
+    <p class="welcomeMsg">Welcome to Pinkbook</p>
+    <form on:submit={handleRegister}>
+      <div class="userInput">
+        <div class="form-group input-container">
+          <input
+            type="text"
+            id="username"
+            bind:value={user.username}
+            placeholder=" "
+            on:input={checkUsername}
+            required
+          />
+          <label for="username">username</label>
+        </div>
+        {#if !isUniqueUsername}
+          <p style="color: red;">username already exists</p>
         {/if}
-      {/if}
-      <div class="form-group input-container">
-        <input
-          type="file"
-          id="icon"
-          accept="image/*"
-          on:change={(e) => (iconImage = e.target.files[0])}
-        />
-        <label for="icon">icon</label>
-      </div>
-    </div>
-    <div class="form-group">
-      <button type="submit" class="registerBtn">finish</button>
-    </div>
-  </form>
-</div>
+        <div class="form-group input-container">
+          <input type="text" id="fname" bind:value={user.fname} placeholder=" " required />
+          <label for="fname">first name</label>
+        </div>
+        <div class="form-group input-container">
+          <input type="text" id="lname" bind:value={user.lname} placeholder=" " required />
+          <label for="lname">last name</label>
+        </div>
+        <div class="form-group input-container">
+          <input type="password" id="pwd" bind:value={user.pwd} placeholder=" " required />
+          <label for="pwd">password</label>
+        </div>
+        
+        <div class="form-group input-container password-container">
+          <div >
+            <input type="password" id="comfirmPwd" bind:value={comfirmPwd} placeholder=" " required />
+            <label for="comfirmPwd" id="comfirmPwdLabel">confirm password</label>
+          </div>
+          {#if user.pwd !== comfirmPwd && user.pwd && comfirmPwd}
+              <span class="pwd-error">passwords do not match</span>
+            {/if}
+        </div>
+        
+       
 
-{#if diapalyAlert}
-  <AlertWindow message={alertMessage} on:confirm={() => (diapalyAlert = false)} />
-{/if}
-
-{#if loading}
-  <div class="loading-overlay">
-    <div class="loading-content">
-      <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
+        <div class="form-group input-container">
+          {#if !dobDisplayControl}
+            <input
+              type="text"
+              id="dob"
+              bind:value={user.dob}
+              on:click={toggleDobDisplay}
+              placeholder=" "
+              required
+            />
+          {:else}
+            <input type="date" id="dob" bind:value={user.dob} placeholder=" " required />
+          {/if}
+          <label for="dob">date of birth</label>
+        </div>
+        <div class="form-group input-container input-container-description">
+  
+            <textarea
+            id="description"
+            bind:value={user.description}
+            placeholder=" "
+            required
+            ></textarea>
+            <label for="description">description</label>
+        </div>
       </div>
-      <p>loading...</p>
-    </div>
+      <div class="form-group">
+        <button type="submit" class="registerBtn">finish</button>
+      </div>
+    </form>
   </div>
+
+  {#if diapalyAlert}
+    <AlertWindow message={alertMessage} on:confirm={() => (diapalyAlert = false)} />
+  {/if}
+
+  {#if loading}
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p>loading...</p>
+      </div>
+    </div>
+  {/if}
 {/if}
 
 <style>
@@ -245,6 +285,7 @@
 
   .form-group {
     margin-bottom: 15px;
+    border-bottom: 1px solid #aaa;
   }
 
   .form-group label {
@@ -277,7 +318,23 @@
     font-size: 15px;
   }
 
+  .input-container textarea:focus + label,
+  .input-container textarea:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 15px;
+  }
+
   input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #000;
+    background-color: transparent;
+    margin-top: 3px;
+    margin-bottom: 0;
+  }
+  textarea {
     width: 100%;
     border: none;
     outline: none;
@@ -293,7 +350,7 @@
     border-radius: 4px;
     cursor: pointer;
     padding: 10px;
-    background: linear-gradient(90deg, pink, #FFE4E1);
+    background: linear-gradient(90deg, pink, #ffe4e1);
     transition: background 5s ease;
     height: 50px;
     font-size: 16px;
@@ -322,5 +379,37 @@
 
   .loading-content p {
     margin-left: 10px;
+  }
+
+  .input-container-description {
+    border-bottom: none;
+  }
+
+  #comfirmPwd{
+    display: inline;
+  }
+
+  #description {
+    height: 100px;
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+
+  #comfirmPwdLabel {
+    display: inline;
+  }
+
+  .password-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .pwd-error {
+    color: rgba(248, 86, 86, 0.758);
+    font-size: 14px;
+    white-space: nowrap;
+    margin-bottom: 13px;
   }
 </style>

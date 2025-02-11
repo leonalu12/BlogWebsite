@@ -5,21 +5,6 @@
   
   import { onMount } from "svelte";
 
-  // import flatpickr from "flatpickr";
-  // import "flatpickr/dist/flatpickr.min.css";
-
-  // let dateInput; // 用于绑定输入框
-
-// // 初始化日期选择器
-// onMount(() => {
-//   if (dateInput) {
-//     flatpickr(dateInput, {
-//       locale: "en", // 强制设置为英文
-//       dateFormat: "Y-m-d"
-//     });
-//   }
-// });
-
 let searchQuery = ""; // 搜索输入框的值
 let filterBy = "title"; // 过滤字段
 let sortBy = "date_time"; // 排序字段
@@ -98,9 +83,6 @@ async function fetchArticles() {
   <title>Home</title>
 </svelte:head>
 
-<h1>home page test</h1>
-<a href={`/myArticles`} class="my-articles-btn">My Articles</a>
-
 <div class="search-container">
   <div class="search-bar">
     <input type="text" bind:value={searchQuery} placeholder="Search..." />
@@ -108,8 +90,8 @@ async function fetchArticles() {
   </div>
 
   <div class="filter-bar">
-    <label>Filter by:</label>
-    <select bind:value={filterBy} on:change={handleFilterChange}> <!-- **新增：搜索类型选择框** -->
+    <label for="sortType">Filter by:</label>
+    <select id="sortType" bind:value={filterBy} on:change={handleFilterChange}> <!-- **新增：搜索类型选择框** -->
       <option value="title">Title</option>
       <option value="username">Username</option>
       <option value="date_time">Date</option>
@@ -118,15 +100,15 @@ async function fetchArticles() {
 
   {#if filterBy === "date_time"}
   <div class="date-filter">
-    <label>Pick a date:</label>
-    <input type="date" bind:value={exactDate} on:change={handleSearch} />
+    <label for="date">Pick a date:</label>
+    <input id="date" type="date" bind:value={exactDate} on:change={handleSearch} />
   </div>
 {/if}
 </div>
 
 <div class="sort-bar">
-  <label>Sort by:</label>
-  <select bind:value={sortBy} on:change={handleSort}>
+  <label for="sortBy">Sort by:</label>
+  <select id="sortBy" bind:value={sortBy} on:change={handleSort}>
     <option value="date_time">Date</option>
     <option value="title">Title</option>
     <option value="username">Username</option>
@@ -217,5 +199,6 @@ img {
   font-size: 14px;
   line-height: 1.4;
 }
+
 
 </style>

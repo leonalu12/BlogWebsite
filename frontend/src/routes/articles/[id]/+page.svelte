@@ -36,9 +36,6 @@
             } else if (res.status === 401) {
                 console.error("❌ User is not logged in. Redirecting...");
 
-               errorWindowMessage = "unauthorized: please log in first."
-               showErrorWindow = true;
-                goto("/login");
             }
         } catch {
             errorWindowMessage = "Error fetching user.";
