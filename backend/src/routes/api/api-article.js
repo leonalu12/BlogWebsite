@@ -176,7 +176,7 @@ router.delete("/:id/like", requiresAuthentication, async (req, res) => {
   }
 });
 
-// 获取文章点赞状态（是否已点赞 & 总点赞数）
+// 获取文章点赞状态（是否已点赞 ）
 router.get("/:id/like/check", requiresAuthentication, async (req, res) => {
   try {
     if (!req.user) {
@@ -189,11 +189,7 @@ router.get("/:id/like/check", requiresAuthentication, async (req, res) => {
 
     console.log(`🔍 检查文章 ${articleId} 是否被用户 ${userId} 点赞`);
 
-    // 获取总点赞数
-    const likeCountResult = await db.get(
-      "SELECT COUNT(*) AS like_count FROM like_a WHERE article_id = ?",
-      [articleId]
-    );
+   
 
     // 检查用户是否已点赞
     const userLiked = await db.get(
@@ -202,13 +198,29 @@ router.get("/:id/like/check", requiresAuthentication, async (req, res) => {
     );
 
     res.json({
-      like_count: likeCountResult ? likeCountResult.like_count : 0,
       isLiked: !!userLiked // `!!userLiked` 确保返回 `true/false`
     });
   } catch (err) {
     console.error("❌ 点赞检查 API 出错:", err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+router.get("/:id/likesAmount", async (req, res) => {
+  try {
+    const articleId = req.params.id;
+    const db = await getDatabase();
+    const likeCountResult = await db.get(
+      "SELECT COUNT(*) AS like_count FROM like_a WHERE article_id = ?",
+      [articleId]
+    );
+    res.json({ like_count: likeCountResult ? likeCountResult.like_count : 0 });
+  
+  } catch (err) {
+    console.error("❌ 获取点赞数失败:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+
 });
 
 export default router;

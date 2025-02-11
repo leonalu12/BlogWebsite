@@ -80,6 +80,7 @@
             const data = await response.json();
             iconName.set(data);
             console.log("获取用户头像成功:", data);
+            goto("/");
           }
         } catch (error) {
           console.error("获取用户头像失败:", error);
