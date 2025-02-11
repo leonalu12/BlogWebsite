@@ -188,7 +188,7 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5); /* half transparent */
-    z-index: 10; /* make sure it's on top of everything */
+    z-index: 1000; /* make sure it's on top of everything */
   }
   
   .login-container {

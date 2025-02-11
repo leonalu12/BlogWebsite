@@ -246,29 +246,81 @@
 
 <style>
   .comments-container {
-    max-width: 800px;
-    margin: 0 auto;
+    padding: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .new-comment {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
   }
 
   .comment-box {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    flex: 1;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .comment-box:focus {
+    outline: none;
+    border-color: pink;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .comment-btn {
-    background: blue;
-    color: white;
+    padding: 8px 16px;
     border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
+    border-radius: 20px;
+    background: linear-gradient(90deg, pink, #FFE4E1);
+    color: white;
     cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .comment-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .comment-btn:disabled {
-    background: gray;
+    opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  .comments-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .comments-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .comments-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .comments-list::-webkit-scrollbar-thumb {
+    background: #FFE4E1;
+    border-radius: 3px;
+  }
+
+  @media (max-width: 768px) {
+    .comments-container {
+      padding: 10px;
+    }
+
+    .comment-box {
+      padding: 10px;
+    }
   }
 </style>
