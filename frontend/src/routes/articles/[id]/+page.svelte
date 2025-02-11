@@ -10,16 +10,18 @@
     const article = data?.article || {}; // ✅ 避免 `null`
     
     let likeCount = article?.like_count ?? 0;
-    let isLiked = article?.isLiked ?? false;
+    let isLiked = false;
 
     let showComments = false; // ✅ 控制评论区是否展开
     
     let user = writable(null); // ✅ 存储用户信息
+    
 
     // ✅ 获取用户信息
     async function fetchUser() {
+        
         try {
-            const res = await fetch(`${PUBLIC_API_BASE_URL}/users/withoutAuth`, {
+            const res = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
                 method: "GET",
                 credentials: "include" // ✅ 让请求带上 session
             });
@@ -30,14 +32,38 @@
                 console.log("✅ Fetched user:", userData);
             } else if (res.status === 401) {
                 console.error("❌ User is not logged in. Redirecting...");
-                goto("/login");
             }
         } catch (error) {
             console.error("❌ Error fetching user:", error);
         }
     }
 
-    onMount(fetchUser); // ✅ 页面加载时获取用户信息
+    async function fetchIsLiked() {
+        try {
+            const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${article.id}/like/check`, {
+                method: "GET",
+                credentials: "include" // ✅ 让请求带上 session
+            });
+        
+            if (res.ok) {
+                const data = await res.json();
+                isLiked = data.isLiked;
+                console.log("✅ Fetched like status:", data);
+            } else {
+                console.error("❌ Error fetching like status:", res.status);
+            }   
+        } catch (error) {
+            console.error("❌ Error fetching like status:", error);
+        }
+    }
+
+    onMount(() => {
+    fetchUser();
+    fetchIsLiked();
+    });
+
+
+
 
     async function toggleLike(event) {
         event.stopPropagation();

@@ -214,3 +214,5 @@ export async function getArticleLikes(articleId) {
   return result ? result.like_count : 0;
 }
 
+
+
