@@ -10,11 +10,12 @@
   let content = "";
   let image = null;
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
-  let errorMessage = "";
   let showWindow = false;
   let windowMessage = "";
   let showErrorWindow = false;
   let errorWindowMessage = "";
+  let showDeleteImageWindow = false;
+  let deleteImageMessage = "Are you sure you want to delete this image?";
 
   let user = writable(null); // ✅ 存储用户信息
 
@@ -39,12 +40,14 @@
         user.set(userData); // ✅ 存储用户信息
         console.log("✅ Fetched user:", userData);
       } else if (res.status === 401) {
-        errorMessage = "Unauthorized: Please log in first.";
         console.error("❌ User is not logged in. Redirecting...");
+        errorWindowMessage = "unauthorized: please log in first."
+        showErrorWindow = true;
         goto("/login"); // ✅ 让用户重新登录
       }
     } catch (error) {
-      console.error("❌ Error fetching user:", error);
+      errorWindowMessage="Error fetching user."
+      showErrorWindow = true;
     }
   }
 
@@ -59,10 +62,9 @@
     }
 
     let currentUser;
-    user.subscribe(value => currentUser = value)(); // ✅ 获取 user
+    user.subscribe((value) => (currentUser = value))(); // ✅ 获取 user
 
     if (!currentUser) {
-      errorMessage = "You must be logged in to submit an article.";
       goto("/login"); // ✅ 让用户重新登录
       return;
     }
@@ -70,7 +72,6 @@
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    
     if (image) formData.append("image", image);
 
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/new`, {
@@ -96,6 +97,17 @@
   function handleErrorSubmit() {
     showErrorWindow = false;
   }
+
+  function confirmDeleteImage() {
+    showDeleteImageWindow = true;
+  }
+
+  function deleteImage() {
+    if (image) content = content.replace(/<img[^>]+>/g, "");
+    image = null;
+    showDeleteImageWindow = false;
+    document.getElementById("image").value = "";
+  }
 </script>
 
 <div class="article-form">
@@ -112,7 +124,9 @@
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
   <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
-
+  {#if image}
+    <button class="delete-image-button" on:click={confirmDeleteImage}>Delete Image</button>
+  {/if}
   <!-- Submit Button -->
   <button on:click={handleSubmit}>Publish</button>
 </div>
@@ -123,6 +137,10 @@
 
 {#if showErrorWindow}
   <AlertWindow message={errorWindowMessage} on:confirm={handleErrorSubmit} />
+{/if}
+
+{#if showDeleteImageWindow}
+  <AlertWindow message={deleteImageMessage} on:confirm={deleteImage} />
 {/if}
 
 <style>
