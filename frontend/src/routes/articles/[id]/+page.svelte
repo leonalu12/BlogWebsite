@@ -2,7 +2,7 @@
     import { ArrowLeftCircleIcon, Heart, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
     import { goto } from '$app/navigation';
-    import Comments from './Comments/Comments.svelte';
+    import Comments from '../../../lib/components/Comments.svelte';
     import { onMount } from "svelte";
     import { writable } from "svelte/store"; // ✅ 存储用户信息
 
