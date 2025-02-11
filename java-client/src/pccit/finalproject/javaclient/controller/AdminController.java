@@ -12,10 +12,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class AdminController {
     private AdminDashboard dashboard;
     private LoginPanel loginPanel;
     private UserTableModel userTableModel;
+    private String adminName = "";
 
     public AdminController(AdminDashboard dashboard) {
         this.dashboard = dashboard;
@@ -34,9 +36,28 @@ public class AdminController {
                 logout();
             }
         });
+
+        loginPanel.setDeleteAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    deleteAdmin(adminName);
+                    // 清空用户信息（头像和用户名）并隐藏
+                    dashboard.clearUserTable();
+
+                    // 清除登录面板
+                    String username = loginPanel.getUsername();
+                    loginPanel.setLoggedInState(false, username);
+                    loginPanel.clearFields();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            }
+        });
     }
 
-    private void login() {
+    private String login() {
         String username = loginPanel.getUsername();
         String password = loginPanel.getPassword();
 
@@ -56,11 +77,13 @@ public class AdminController {
                 // 通过 dashboard 获取 userTable，并设置其可见性
                 dashboard.getUserTable().setVisible(true); // 恢复表格的显示
                 loadUsers();
+                adminName = username;
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(dashboard, "Login failed: " + ex.getMessage());
             logout();
         }
+        return adminName;
     }
 
 
@@ -76,6 +99,17 @@ public class AdminController {
         JOptionPane.showMessageDialog(dashboard, "Logged out.");
     }
 
+    private void deleteAdmin(String adminName) throws Exception {
+        String requestBody = "{\"username\":\"" + adminName + "\"}";
+        try {
+            HttpUtils.sendDeleteRequestWithBody("/api/admins", requestBody);
+            JOptionPane.showMessageDialog(dashboard, "Delete admin successful!");
+
+        }catch (Exception ex){
+            JOptionPane.showMessageDialog(dashboard, "Delete failed: " + ex.getMessage());
+        }
+
+    }
 
     private void loadUsers() {
         List<User> users = HttpUtils.getUsersFromBackend();

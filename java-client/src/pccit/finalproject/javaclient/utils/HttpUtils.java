@@ -40,6 +40,20 @@ public class HttpUtils {
         System.out.println(response.body());
         return response.body();
     }
+    public static String sendDeleteRequestWithBody(String endpoint, String jsonBody) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .header("Content-Type", "application/json")
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(jsonBody))
+                .timeout(Duration.ofSeconds(10))
+                .build();
+
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+        return response.body();
+    }
+
 
     public static String sendGetRequestWithBody(String endpoint, String jsonBody) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()

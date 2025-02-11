@@ -38,9 +38,12 @@ public class LoginPanel extends JPanel {
 
     public static String getUsername() { return usernameField.getText(); }
     public static String getPassword() { return new String(passwordField.getPassword()); }
-    public void setLoginAction(ActionListener action) { loginButton.addActionListener(action); }
-    public void setLogoutAction(ActionListener action) { logoutButton.addActionListener(action); }
-    public void setDeleteAction(ActionListener listener) {deleteButton.addActionListener(listener);}
+    public void setLoginAction(ActionListener action) {
+        loginButton.addActionListener(action); }
+    public void setLogoutAction(ActionListener action) {
+        logoutButton.addActionListener(action); }
+    public void setDeleteAction(ActionListener listener) {
+        deleteButton.addActionListener(listener);}
     public void setLoggedInState(boolean loggedIn,String username) {
         this.isLoggedIn = loggedIn;
         updateUIState(loggedIn, username);
@@ -48,7 +51,8 @@ public class LoginPanel extends JPanel {
     private void updateUIState(boolean loggedIn, String username) {
         loginButton.setEnabled(!loggedIn);
         logoutButton.setEnabled(loggedIn);
-        // Only enable deleteButton if logged in AND username is NOT "admin0"
+
+        // Only enable deleteButton if logged in AND username is NOT "admin"
         deleteButton.setEnabled(loggedIn && !"admin".equals(username));
         usernameField.setEnabled(!loggedIn);
         passwordField.setEnabled(!loggedIn);

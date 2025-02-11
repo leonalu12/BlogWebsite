@@ -13,4 +13,9 @@ export async function authenticateAdmin(username, pwd) {
     }
     return admin;
 }
+/* delete admin */
+export async function deleteAdmin(username) {
+    const db = await getDatabase();
+    return await db.run("DELETE FROM admins WHERE username = ?",[username]);
 
+}
