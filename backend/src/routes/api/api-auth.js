@@ -56,6 +56,14 @@ router.delete("/", (req, res) => {  //清除 authToken，让 requiresAuthenticat
 
   });
 
+router.get("/check", (req, res) => {  //检查是否有 authToken
+  if (req.cookies.authToken) {
+    return res.sendStatus(200);
+  } else {
+    return res.sendStatus(401);
+  }
+});
+
 
 
 export default router;

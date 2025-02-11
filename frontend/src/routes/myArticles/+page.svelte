@@ -7,7 +7,7 @@
   import { displayLogin } from "../../lib/store/userStore";
   import { logedIn } from "../../lib/store/userStore";
   import UserLogin from "../../lib/components/userComponents/UserLogin.svelte";
-
+  import { iconName } from "../../lib/store/userStore";
   let user = writable(null);
   let user_id = null; // 初始设为空
   $: if ($user) {
@@ -104,6 +104,37 @@
   onMount(async () => {
     await fetchUser();
     $user && fetchMyArticles(); // 当 user 数据更新后自动获取文章
+  });
+
+  onMount(async () => {
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/check`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      if (response.ok){
+        const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include"
+        });
+        if (!response.ok) {
+          throw new Error("获取用户头像失败");
+        } else {
+          const data = await response.json();
+          iconName.set(data);
+          console.log("get img successful:", data);
+          logedIn.set(true);
+        }
+      }
+    } catch (error) {
+      console.error("获取用户头像失败:", error);
+    } 
   });
 </script>
 

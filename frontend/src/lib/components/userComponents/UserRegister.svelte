@@ -106,7 +106,25 @@
       } else {
         const logedInData = await loginResponse.json();
         console.log("login successful:", logedInData);
-        goto("/");
+        try {
+          const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            credentials: "include"
+          });
+          if (!response.ok) {
+            throw new Error("获取用户头像失败");
+          } else {
+            const data = await response.json();
+            iconName.set(data);
+            console.log("获取用户头像成功:", data);
+            goto("/");
+          }
+        } catch (error) {
+          console.error("获取用户头像失败:", error);
+        }
       }
     } catch (error) {
       console.error("注册错误:", error);

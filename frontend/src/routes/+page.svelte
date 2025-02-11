@@ -3,6 +3,7 @@
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { logedIn } from "../lib/store/userStore";
   import { onMount } from "svelte";
+  import { iconName } from "../lib/store/userStore";
 
   let searchQuery = ""; // 搜索输入框的值
   let filterBy = "title"; // 过滤字段
@@ -35,7 +36,37 @@
 
   // 组件加载时获取文章
   onMount(fetchArticles);
-
+  onMount(async () => {
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/check`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      if (response.ok){
+        const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include"
+        });
+        if (!response.ok) {
+          throw new Error("获取用户头像失败");
+        } else {
+          const data = await response.json();
+          iconName.set(data);
+          console.log("get img successful:", data);
+          logedIn.set(true);
+        }
+      }
+    } catch (error) {
+      console.error("获取用户头像失败:", error);
+    } 
+  });
+      
 
   function handleSearch() {
     if (filterBy === "date_time" && exactDate) {
