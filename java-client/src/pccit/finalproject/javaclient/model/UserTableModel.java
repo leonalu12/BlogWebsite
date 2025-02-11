@@ -5,7 +5,7 @@ import java.util.List;
 
 public class UserTableModel extends AbstractTableModel {
     private final List<User> users;
-    private final String[] columnNames = {"ID", "Username", "First Name", "Last Name", "Description", "DOB", "Icon", "Password"};
+    private final String[] columnNames = {"ID", "Username", "First Name", "Last Name", "Description", "Password"};
 
     public UserTableModel(List<User> users) {
         this.users = users;
@@ -30,9 +30,7 @@ public class UserTableModel extends AbstractTableModel {
             case 2: return user.getFname();
             case 3: return user.getLname();
             case 4: return user.getDescription();
-            case 5: return user.getDob();
-            case 6: return user.getIcon();
-            case 7: return user.getPwd();
+            case 5: return user.getPwd();
             default: return null;
         }
     }

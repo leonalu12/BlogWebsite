@@ -87,10 +87,6 @@ public class AdminDashboard extends JFrame {
 
     }
 
-    public void clearUserInfo() {
-        usernameLabel.setText(""); // 清空用户名
-        iconLabel.setIcon(null);    // 清空头像
-    }
 
     public LoginPanel getLoginPanel() {
         return loginPanel;
