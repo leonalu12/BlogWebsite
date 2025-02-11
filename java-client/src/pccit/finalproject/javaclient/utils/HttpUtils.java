@@ -137,4 +137,16 @@ public class HttpUtils {
         }
         return icon;
     }
+
+    public static String deleteUserFromBackend(int userId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/admins/" + userId)) // 确保路径正确
+                .header("Content-Type", "application/json")
+                .method("DELETE", HttpRequest.BodyPublishers.noBody())
+                .timeout(Duration.ofSeconds(10))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
 }
