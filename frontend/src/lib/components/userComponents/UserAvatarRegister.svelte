@@ -47,13 +47,15 @@
   
   <div class="avatars-grid">
     {#each predefinedAvatars as avatar}
-      <div 
+      <button 
+        type="button"
         class="avatar-option" 
         class:selected={selectedAvatar === avatar}
         on:click={() => handleAvatarSelect(avatar)}
+        on:keydown={(e) => e.key === 'Enter' && handleAvatarSelect(avatar)}
       >
         <img src={`${PUBLIC_IMAGES_URL}/${avatar}`} alt="Avatar option"/>
-      </div>
+      </button>
     {/each}
     
     <div class="avatar-option upload-option">

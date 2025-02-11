@@ -4,6 +4,9 @@
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../lib/components/utils/alertWindow.svelte";
+  import { displayLogin } from "../../lib/store/userStore";
+  import { logedIn } from "../../lib/store/userStore";
+  import UserLogin from "../../lib/components/userComponents/UserLogin.svelte";
 
   let user = writable(null);
   let user_id = null; // 初始设为空
@@ -29,8 +32,8 @@
         const userData = await res.json();
         user.set(userData); // 更新 store
       } else {
-        errorWindowMessage = "Error fetching user data.";
-        showErrorWindow = true;
+        console.error("User is not logged in. Redirecting...");
+        displayLogin.set(true);
       }
     } catch {
       errorWindowMessage = "Error fetching user.";
@@ -75,7 +78,7 @@
           "Content-Type": "application/json"
         },
         credentials: "include",
-        
+
         body: JSON.stringify({ userId: user_id }) // 这里传递 userId
       });
 
@@ -108,8 +111,6 @@
   <title>My Articles</title>
 </svelte:head>
 
-<h1>My Articles</h1>
-
 {#if articles.length > 0}
   <p>Found {articles.length} articles.</p>
   <div class="articles">
@@ -129,12 +130,16 @@
             <div>{@html article.content}</div>
           </div>
         </a>
-        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>Delete</button>
+        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}
+          >Delete</button
+        >
       </div>
     {/each}
   </div>
-{:else}
+{:else if $logedIn}
   <p>No articles found.</p>
+{:else}
+  <p>Please log in to view your articles.</p>
 {/if}
 
 {#if showDeleteWindow}
@@ -143,6 +148,10 @@
 
 {#if showErrorWindow}
   <AlertWindow message={errorWindowMessage} on:confirm={handleErrorConfirm} />
+{/if}
+
+{#if $displayLogin}
+  <UserLogin />
 {/if}
 
 <style>

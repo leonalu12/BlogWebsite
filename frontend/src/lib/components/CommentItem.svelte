@@ -2,7 +2,7 @@
   import { writable } from "svelte/store";
   // import CommentItem from "../components/CommentItem.svelte"-->
   import DeleteConfirmWindow from "../components/utils/DeleteConfirmWindow.svelte";
-  import UserLogin from "./userComponents/UserLogin.svelte";
+  import { displayLogin } from "../store/userStore";
   import { tick } from "svelte";
   export let comment={};
   export let replyContent;
@@ -11,7 +11,6 @@
   export let toggleReplyBox;
   export let startReply;
   export let article;
-  let showLogin = false; // 控制是否显示登录组件
   let showDeleteConfirm = false; // 控制删除确认框的显示
   let replyInput; // 用于存储回复框的 DOM 参考
   let user_id = null; // 设定默认值
@@ -40,7 +39,7 @@
   // 点赞 / 取消点赞
   async function toggleLike() {
     if (!$user) {
-      showLogin = true;
+      displayLogin.set(true);
       return;
     }
     const res = await fetch(`http://localhost:3000/api/comments/${comment.id}/like`, {
@@ -152,10 +151,7 @@
       on:cancel={cancelDelete}
     />
   {/if}
-  <!-- Any login function called when no user data, call login window -->
-  {#if showLogin}
-     <UserLogin />
-  {/if}
+  
 </div>
 {/if}
   

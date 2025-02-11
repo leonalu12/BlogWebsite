@@ -1,28 +1,24 @@
 <script>
-  
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
-  
+  import { logedIn } from "../lib/store/userStore";
   import { onMount } from "svelte";
 
-let searchQuery = ""; // 搜索输入框的值
-let filterBy = "title"; // 过滤字段
-let sortBy = "date_time"; // 排序字段
-let exactDate = ""; 
-let order = "DESC"; // 排序方式
-let articles = []; // 文章列表
+  let searchQuery = ""; // 搜索输入框的值
+  let filterBy = "title"; // 过滤字段
+  let sortBy = "date_time"; // 排序字段
+  let exactDate = "";
+  let order = "DESC"; // 排序方式
+  let articles = []; // 文章列表
 
-
-
-
-// 获取文章的方法
-async function fetchArticles() {
+  // 获取文章的方法
+  async function fetchArticles() {
     const queryParams = new URLSearchParams({
       search: searchQuery,
       filterBy,
       sortBy,
       order,
-      ...(filterBy === "date_time" && exactDate ? { exactDate } : {}) 
+      ...(filterBy === "date_time" && exactDate ? { exactDate } : {})
     });
 
     console.log("🛠 发送的 API 请求:", `${PUBLIC_API_BASE_URL}/articles?${queryParams}`);
@@ -35,27 +31,27 @@ async function fetchArticles() {
     } catch (error) {
       console.error(" 获取文章失败:", error);
     }
-}
-
+  }
 
   // 组件加载时获取文章
   onMount(fetchArticles);
 
+
   function handleSearch() {
-  if (filterBy === "date_time" && exactDate) {
-    let formattedDate = new Date(exactDate).toISOString().split("T")[0]; 
-    console.log("📅 传递到后端的日期:", formattedDate);
-    exactDate = formattedDate;
-  } else {
-    console.log("🔎 不是日期筛选，正常查询");
+    if (filterBy === "date_time" && exactDate) {
+      let formattedDate = new Date(exactDate).toISOString().split("T")[0];
+      console.log("📅 传递到后端的日期:", formattedDate);
+      exactDate = formattedDate;
+    } else {
+      console.log("🔎 不是日期筛选，正常查询");
+    }
+
+    // ✅ **去除 Unicode 引号，防止错误字符**
+    searchQuery = searchQuery.replace(/[“”„‟❝❞＂]/g, '"').trim();
+
+    fetchArticles();
   }
 
-  // ✅ **去除 Unicode 引号，防止错误字符**
-  searchQuery = searchQuery.replace(/[“”„‟❝❞＂]/g, '"').trim();
-
-  fetchArticles();
-}
-  
   // **新增：支持动态切换搜索类型（title, username, date_time）**
   function handleFilterChange(event) {
     filterBy = event.target.value;
@@ -78,7 +74,6 @@ async function fetchArticles() {
   }
 </script>
 
-
 <svelte:head>
   <title>Home</title>
 </svelte:head>
@@ -91,7 +86,8 @@ async function fetchArticles() {
 
   <div class="filter-bar">
     <label for="sortType">Filter by:</label>
-    <select id="sortType" bind:value={filterBy} on:change={handleFilterChange}> <!-- **新增：搜索类型选择框** -->
+    <select id="sortType" bind:value={filterBy} on:change={handleFilterChange}>
+      <!-- **新增：搜索类型选择框** -->
       <option value="title">Title</option>
       <option value="username">Username</option>
       <option value="date_time">Date</option>
@@ -99,11 +95,11 @@ async function fetchArticles() {
   </div>
 
   {#if filterBy === "date_time"}
-  <div class="date-filter">
-    <label for="date">Pick a date:</label>
-    <input id="date" type="date" bind:value={exactDate} on:change={handleSearch} />
-  </div>
-{/if}
+    <div class="date-filter">
+      <label for="date">Pick a date:</label>
+      <input id="date" type="date" bind:value={exactDate} on:change={handleSearch} />
+    </div>
+  {/if}
 </div>
 
 <div class="sort-bar">
@@ -119,11 +115,7 @@ async function fetchArticles() {
   </button>
 </div>
 
-
-
 <h2>Articles</h2>
-
-
 
 <h2>Articles</h2>
 <div class="articles">
@@ -131,74 +123,73 @@ async function fetchArticles() {
     <span class="article">
       <a href={`/articles/${article.id}`}>
         <div>
-
-          <div><img src="{ PUBLIC_IMAGES_URL }/{article.image_url}" alt="{article.title}" /></div>
-          <div> {article.title}</div>
-         <div>By: {article.username}</div> <!-- ✅ **新增：显示作者用户名** -->
-          <div>Published on: {article.date_time}</div> <!-- ✅ **新增：显示发布时间** -->
-          <div> {@html article.content}</div>
-
+          <div><img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} /></div>
+          <div>{article.title}</div>
+          <div>By: {article.username}</div>
+          <!-- ✅ **新增：显示作者用户名** -->
+          <div>Published on: {article.date_time}</div>
+          <!-- ✅ **新增：显示发布时间** -->
+          <div>{@html article.content}</div>
         </div>
       </a>
     </span>
   {/each}
 </div>
 
-
 <style>
+  .search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
 
-.search-container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
+  .search-bar,
+  .filter-bar,
+  .date-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-.search-bar, .filter-bar, .date-filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  .date-filter input {
+    /*  **新增：日期选择框样式** */
+    padding: 8px;
+  }
 
-.date-filter input { /*  **新增：日期选择框样式** */
-  padding: 8px;
-}
+  .articles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 自适应列 */
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+  }
 
- .articles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 自适应列 */
-  gap: 20px;
-  padding: 20px;
-  justify-content: center;
-}
+  .article {
+    height: auto;
+    width: 100%;
+    max-width: 350px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: white;
+    transition: transform 0.3s ease-in-out;
+  }
 
-.article {
-  height: auto;
-  width: 100%; 
-  max-width: 350px; 
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  background: white;
-  transition: transform 0.3s ease-in-out;
-}
+  .article:hover {
+    transform: translateY(-5px);
+  }
 
-.article:hover {
-  transform: translateY(-5px);
-}
+  img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+  }
 
-img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-bottom: 1px solid #ddd;
-}
-
-.article div {
-  padding: 10px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-
+  .article div {
+    padding: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
 </style>

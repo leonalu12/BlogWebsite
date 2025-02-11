@@ -3,12 +3,11 @@
   import { writable } from "svelte/store";
   import CommentItem from "./CommentItem.svelte";
   import { PUBLIC_API_BASE_URL} from "$env/static/public";
-  import UserLogin from "./userComponents/UserLogin.svelte";
+  import { displayLogin } from "../store/userStore";
   export let article;
   let article_id = article.id;
   export let user = writable(null);
   const comments = writable([]);
-  let showLogin = false; // 控制是否显示登录组件
 
   let user_id = null; // 设定默认值
   $: if ($user) {
@@ -113,7 +112,7 @@
 //add comment to article
   async function addComment() {
     if (!$user) {
-      showLogin = true; // need to show login
+      displayLogin.set(true);
       return;
     }
     if (!content.trim()) return;
@@ -206,7 +205,7 @@
 
   function toggleReplyBox(comment) {
     if (!$user) {
-      showLogin = true; // need to show login
+      displayLogin.set(true);
       return;
     }
     replyBoxVisible[comment.id] = !replyBoxVisible[comment.id]; // 切换输入框的显示状态
@@ -227,9 +226,6 @@
     <button class="comment-btn" on:click={addComment} disabled={!content.trim()}>
       Post
     </button>
-    {#if showLogin}
-      <UserLogin />
-    {/if}
   </div>
 
   <div class="comments-list">

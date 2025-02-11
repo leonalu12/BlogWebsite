@@ -4,6 +4,8 @@
   import AlertWindow from "../utils/AlertWindow.svelte";
   import UserAvatarRegister from "./UserAvatarRegister.svelte";
   import { goto } from "$app/navigation";
+  import { iconName } from "../../store/userStore.js";
+  import { onMount } from "svelte";
 
   let user = {
     username: "",
@@ -193,7 +195,7 @@
               type="text"
               id="dob"
               bind:value={user.dob}
-              on:click={toggleDobDisplay}
+              on:focus={toggleDobDisplay}
               placeholder=" "
               required
             />

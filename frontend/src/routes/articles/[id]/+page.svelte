@@ -1,11 +1,12 @@
 <script>
-    import { ArrowLeftCircleIcon, Heart, MessageCircle } from "lucide-svelte";
+    import { ArrowLeftCircleIcon, Heart, LogIn, MessageCircle } from "lucide-svelte";
     import { PUBLIC_API_BASE_URL } from "$env/static/public";
     import { goto } from '$app/navigation';
     import Comments from '../../../lib/components/Comments.svelte';
     import { onMount } from "svelte";
     import { writable } from "svelte/store"; // ✅ 存储用户信息
-    import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
+    import AlertWindow from "../../../lib/components/utils/AlertWindow.svelte";
+    import { displayLogin } from "../../../lib/store/userStore";
 
     export let data;
     const article = data?.article || {}; // ✅ 避免 `null`
@@ -84,7 +85,7 @@
 
         if (!currentUser) {
             errorWindowMessage = "User is not logged in.";
-            showErrorWindow = true;
+            displayLogin.set(true); 
             return;
         }
 
@@ -162,6 +163,10 @@
 {/if}
 {#if showErrorWindow}
     <AlertWindow message={errorWindowMessage} on:confirm={handleErrorConfirm} />
+{/if}
+
+{#if $displayLogin}
+    <LogIn />
 {/if}
 
 
