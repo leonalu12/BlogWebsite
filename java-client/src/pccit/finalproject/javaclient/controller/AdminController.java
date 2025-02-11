@@ -41,14 +41,22 @@ public class AdminController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    deleteAdmin(adminName);
-                    // 清空用户信息（头像和用户名）并隐藏
-                    dashboard.clearUserTable();
+                    int confirm = JOptionPane.showConfirmDialog(
+                            dashboard,
+                            "Are you sure you want to delete this admin?",
+                            "Confirm Deletion",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                    if (confirm == JOptionPane.YES_OPTION){
+                        deleteAdmin(adminName);
+                        // 清空用户信息（头像和用户名）并隐藏
+                        dashboard.clearUserTable();
+                        // 清除登录面板
+                        String username = loginPanel.getUsername();
+                        loginPanel.setLoggedInState(false, username);
+                        loginPanel.clearFields();
+                    }
 
-                    // 清除登录面板
-                    String username = loginPanel.getUsername();
-                    loginPanel.setLoggedInState(false, username);
-                    loginPanel.clearFields();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
