@@ -19,6 +19,16 @@ router.get("/", requiresAuthentication, async (req, res) => {
   return res.json(user);
 });
 
+router.get("/withoutAuth", async (req, res) => {
+  const username = getUsernameFromJWT(req.cookies.authToken);
+  if (!username) {
+    const users = await getUsers();
+    return res.json(users);
+  }
+  const user = await getUsersByUsername(username);
+  return res.json(user);
+});
+
 router.post("/register",uploadIcon, async (req, res) => {
   try {
     console.log("request body:", req.body);    

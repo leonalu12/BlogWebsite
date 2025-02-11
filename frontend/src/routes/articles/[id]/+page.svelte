@@ -19,7 +19,7 @@
     // ✅ 获取用户信息
     async function fetchUser() {
         try {
-            const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
+            const res = await fetch(`${PUBLIC_API_BASE_URL}/users/withoutAuth`, {
                 method: "GET",
                 credentials: "include" // ✅ 让请求带上 session
             });
