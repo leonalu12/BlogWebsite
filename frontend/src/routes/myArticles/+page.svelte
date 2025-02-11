@@ -3,6 +3,7 @@
   import { writable } from "svelte/store";
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import AlertWindow from "../../lib/components/utils/alertWindow.svelte";
 
   let user = writable(null);
   let user_id = null; // 初始设为空
@@ -11,6 +12,11 @@
   }
 
   let articles = [];
+  let showDeleteWindow = false;
+  let showErrorWindow = false;
+  let confirmMessage = "Are you sure you want to delete this article?";
+  let errorWindowMessage = "";
+  let articleToDelete = null;
 
   /** 获取用户信息 */
   async function fetchUser() {
@@ -22,9 +28,13 @@
       if (res.ok) {
         const userData = await res.json();
         user.set(userData); // 更新 store
+      } else {
+        errorWindowMessage = "Error fetching user data.";
+        showErrorWindow = true;
       }
-    } catch (error) {
-      console.error("Error fetching user:", error);
+    } catch {
+      errorWindowMessage = "Error fetching user.";
+      showErrorWindow = true;
     }
   }
 
@@ -42,33 +52,49 @@
       const data = await response.json();
       console.log("Fetched articles:", data);
       articles = [...data]; // 触发 Svelte 反应性更新
-    } catch (error) {
-      console.error("Error fetching articles:", error);
+    } catch {
+      errorWindowMessage = "Error fetching articles.";
+      showErrorWindow = true;
     }
   }
 
   /** 删除文章 */
+  function confirmDeleteArticle(id) {
+    articleToDelete = id;
+    showDeleteWindow = true;
+  }
+
   async function deleteArticle(id) {
-    if (!confirm("Are you sure you want to delete this article?")) {
+    if (!articleToDelete) {
       return;
     }
     try {
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${id}`, {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleToDelete}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
+        
         body: JSON.stringify({ userId: user_id }) // 这里传递 userId
       });
 
       if (response.ok) {
-        articles = articles.filter((article) => article.id !== id);
+        articles = articles.filter((article) => article.id !== articleToDelete);
       } else {
-        console.error("Failed to delete article");
+        errorWindowMessage = "Failed to delete article.";
+        showErrorWindow = true;
       }
-    } catch (error) {
-      console.error("Error deleting article:", error);
+    } catch {
+      errorWindowMessage = "Error deleting article.";
+      showErrorWindow = true;
+    } finally {
+      showDeleteWindow = false;
+      articleToDelete = null;
     }
+  }
+  function handleErrorConfirm() {
+    showErrorWindow = false;
   }
 
   // 组件加载时先获取用户信息，再获取文章
@@ -103,12 +129,20 @@
             <div>{@html article.content}</div>
           </div>
         </a>
-        <button class="delete-button" on:click={() => deleteArticle(article.id)}>Delete</button>
+        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>Delete</button>
       </div>
     {/each}
   </div>
 {:else}
   <p>No articles found.</p>
+{/if}
+
+{#if showDeleteWindow}
+  <AlertWindow message={confirmMessage} on:confirm={deleteArticle} />
+{/if}
+
+{#if showErrorWindow}
+  <AlertWindow message={errorWindowMessage} on:confirm={handleErrorConfirm} />
 {/if}
 
 <style>

@@ -5,6 +5,7 @@
     import Comments from '../../../lib/components/Comments.svelte';
     import { onMount } from "svelte";
     import { writable } from "svelte/store"; // ✅ 存储用户信息
+    import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
 
     export let data;
     const article = data?.article || {}; // ✅ 避免 `null`
@@ -16,6 +17,8 @@
     
     let user = writable(null); // ✅ 存储用户信息
     
+    let showErrorWindow = false;
+    let errorWindowMessage = "";
 
     // ✅ 获取用户信息
     async function fetchUser() {
@@ -32,9 +35,14 @@
                 console.log("✅ Fetched user:", userData);
             } else if (res.status === 401) {
                 console.error("❌ User is not logged in. Redirecting...");
+
+               errorWindowMessage = "unauthorized: please log in first."
+               showErrorWindow = true;
+                goto("/login");
             }
-        } catch (error) {
-            console.error("❌ Error fetching user:", error);
+        } catch {
+            errorWindowMessage = "Error fetching user.";
+            showErrorWindow = true;
         }
     }
 
@@ -69,7 +77,8 @@
         event.stopPropagation();
 
         if (!article?.id) {
-            console.error("❌ Error: Article ID is undefined. Cannot like.");
+            errorWindowMessage = "Error: Article ID is undefined. Cannot like.";
+            showErrorWindow = true;
             return;
         }
 
@@ -77,7 +86,8 @@
         user.subscribe(value => currentUser = value)();
 
         if (!currentUser) {
-            console.error("❌ User is not logged in.");
+            errorWindowMessage = "User is not logged in.";
+            showErrorWindow = true;
             return;
         }
 
@@ -97,12 +107,17 @@
             isLiked = newLikeStatus;
             likeCount = data.like_count;
         } catch (error) {
-            console.error("❌ 点赞失败:", error);
+            errorWindowMessage = "Failed to like article.";
+            showErrorWindow = true;
         }
     }
 
     function toggleComments() {
         showComments = !showComments; // ✅ 切换评论区的展开/收起状态
+    }
+
+    function handleErrorConfirm() {
+        showErrorWindow = false;
     }
 
     console.log("文章数据:", article);
@@ -148,7 +163,9 @@
 {:else}
 <p>Loading article...</p>
 {/if}
-
+{#if showErrorWindow}
+    <AlertWindow message={errorWindowMessage} on:confirm={handleErrorConfirm} />
+{/if}
 
 
 <style>
