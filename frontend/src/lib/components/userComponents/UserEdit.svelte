@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { logedIn } from "../../store/userStore.js";
-  import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import { PUBLIC_API_BASE_URL, PUBLIC_IMAGES_URL } from "$env/static/public";
   import { displayEdit } from "../../store/userStore.js";
   import { displayEditSuccessAlert } from "../../store/userStore.js";
   import AlertWindow from "../utils/AlertWindow.svelte";
@@ -22,10 +22,23 @@
   let isUniqueUsername = true;
   let displayEditfailAlert = false;
   let displayUserPopUpwindow = true;
+  let imagePreview = null;
 
   function closeUserPopUpwindow() {
     displayUserPopUpwindow = false;
     displayEdit.set(false);
+  }
+
+  function handleImageChange(event) {
+    const file = event.target.files[0];
+    iconImage = file;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   // 在组件挂载时获取数据
@@ -36,24 +49,30 @@
         credentials: "include"
       });
       if (!response.ok) {
-        throw new Error("网络响应问题");
+        throw new Error("Network error");
       }
       const data = await response.json();
+      const formattedDate = new Date(data.dob).toISOString().split("T")[0];
+
+      // Create image preview if icon exists
+      if (data.icon) {
+        imagePreview = `${PUBLIC_IMAGES_URL}/${data.icon}`;
+      }
+
       user = {
         username: data.username,
         fname: data.fname,
         lname: data.lname,
         description: data.description,
-        dob: data.dob,
+        dob: formattedDate,
         icon: data.icon
       };
       tempUsername = user.username;
     } catch (error) {
-      console.error("获取数据失败:", error);
+      console.error("Data fetch failed:", error);
     } finally {
       loading = false;
     }
-    console.log("User Information:", user);
   });
 
   // 提交表单的处理函数
@@ -169,8 +188,25 @@
         {#if loading}
           <p>loading...</p>
         {:else}
+        <p></p>
           <form on:submit={handleSubmit}>
             <div class="userInput">
+              <div class="form-group">
+                <div class="image-upload">
+                  <img
+                    src={imagePreview || `${PUBLIC_IMAGES_URL}/default.png`}
+                    alt="Profile"
+                    class="profile-image"
+                  />
+                  <input
+                    type="file"
+                    id="icon"
+                    accept="image/*"
+                    on:change={handleImageChange}
+                    class="file-input"
+                  />
+                </div>
+              </div>
               <div class="form-group input-container">
                 <input
                   type="text"
@@ -185,6 +221,7 @@
               {#if !isUniqueUsername}
                 <p style="color: red;">username already existed</p>
               {/if}
+
               <div class="form-group input-container">
                 <input type="text" id="fname" bind:value={user.fname} placeholder=" " required />
                 <label for="fname">first name</label>
@@ -206,15 +243,6 @@
               <div class="form-group input-container">
                 <input type="date" id="dob" bind:value={user.dob} placeholder=" " required />
                 <label for="dob">date of birth</label>
-              </div>
-              <div class="form-group input-container">
-                <input
-                  type="file"
-                  id="icon"
-                  accept="image/*"
-                  on:change={(e) => (iconImage = e.target.files[0])}
-                />
-                <label for="icon">icon</label>
               </div>
             </div>
             <div class="form-group">
@@ -334,10 +362,35 @@
     border-radius: 4px;
     cursor: pointer;
     padding: 10px;
-    background: linear-gradient(90deg, pink, #FFE4E1);
+    background: linear-gradient(90deg, pink, #ffe4e1);
     transition: background 5s ease;
     height: 50px;
     font-size: 16px;
     opacity: 1;
+  }
+
+  .image-upload {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+
+  .profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
   }
 </style>

@@ -4,7 +4,9 @@
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../lib/components/utils/alertWindow.svelte";
-
+  import { displayLogin } from "../../lib/store/userStore";
+  import { logedIn } from "../../lib/store/userStore";
+  import { iconName } from "../../lib/store/userStore";
   let user = writable(null);
   let user_id = null; // 初始设为空
   $: if ($user) {
@@ -29,8 +31,8 @@
         const userData = await res.json();
         user.set(userData); // 更新 store
       } else {
-        errorWindowMessage = "Error fetching user data.";
-        showErrorWindow = true;
+        console.error("User is not logged in. Redirecting...");
+        displayLogin.set(true);
       }
     } catch {
       errorWindowMessage = "Error fetching user.";
@@ -75,7 +77,7 @@
           "Content-Type": "application/json"
         },
         credentials: "include",
-        
+
         body: JSON.stringify({ userId: user_id }) // 这里传递 userId
       });
 
@@ -102,39 +104,73 @@
     await fetchUser();
     $user && fetchMyArticles(); // 当 user 数据更新后自动获取文章
   });
+
+  onMount(async () => {
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/check`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      if (response.ok){
+        const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include"
+        });
+        if (!response.ok) {
+          throw new Error("获取用户头像失败");
+        } else {
+          const data = await response.json();
+          iconName.set(data);
+          console.log("get img successful:", data);
+          logedIn.set(true);
+        }
+      }
+    } catch (error) {
+      console.error("获取用户头像失败:", error);
+    } 
+  });
 </script>
 
 <svelte:head>
   <title>My Articles</title>
 </svelte:head>
 
-<h1>My Articles</h1>
-
 {#if articles.length > 0}
-  <p>Found {articles.length} articles.</p>
-  <div class="articles">
-    {#each articles as article}
-      <div class="article">
-        <p>Article ID: {article.id}</p>
-        <a href={`/articles/${article.id}`}>
-          <div>
-            <div>
-              {#if article.image_url}
-                <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
-              {:else}
-                <p>No Image</p>
-              {/if}
-            </div>
-            <div>{article.title}</div>
-            <div>{@html article.content}</div>
+<div class="articles">
+  {#each articles as article}
+    <div class="article">
+      <a href={`/articles/${article.id}`}>
+        <div class="article-content">
+          {#if article.image_url}
+            <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
+          {:else}
+            <div class="no-image">No Image</div>
+          {/if}
+          <h2 class="article-title">{article.title}</h2>
+          <div class="article-meta">
+            <span>Published on: {article.date_time}</span>
           </div>
-        </a>
-        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>Delete</button>
+          <div class="article-preview">{@html article.content}</div>
+        </div>
+      </a>
+      <div class="button-container">
+        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>
+          Delete
+        </button>
       </div>
-    {/each}
-  </div>
-{:else}
+    </div>
+  {/each}
+</div>
+{:else if $logedIn}
   <p>No articles found.</p>
+{:else}
+  <p>Please log in to view your articles.</p>
 {/if}
 
 {#if showDeleteWindow}
@@ -145,59 +181,97 @@
   <AlertWindow message={errorWindowMessage} on:confirm={handleErrorConfirm} />
 {/if}
 
+
+
 <style>
   .articles {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
-    justify-content: center;
+    margin-top: 95px;
   }
 
   .article {
-    height: auto;
-    width: 100%;
-    max-width: 350px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     background: white;
-    transition: transform 0.3s ease-in-out;
-    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column; /* 使内容垂直排列 */
   }
 
   .article:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02) rotate(0.5deg);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    z-index: 30;
   }
 
-  img {
+  .article img {
     width: 100%;
-    height: 200px;
+    height: 250px;
     object-fit: cover;
-    border-bottom: 1px solid #ddd;
   }
 
-  .article div {
-    padding: 10px;
-    font-size: 14px;
-    line-height: 1.4;
+  .article-content {
+    padding: 15px;
+    flex: 1; /* 让内容区域占据剩余空间 */
+  }
+
+  .article h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 15px;
+    margin-bottom: 10px;
+  }
+
+  .article-meta {
+    margin-left: 15px;
+    margin-right: 15px;
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  .article-preview {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding: 0 15px;
+  }
+
+  .button-container {
+    padding: 15px;
+    padding-top: 0;
+    text-align: right; /* 按钮靠右 */
+    margin-top: auto; /* 将按钮推到容器底部 */
   }
 
   .delete-button {
-    background: red;
-    color: white;
+    background: linear-gradient(90deg, pink, #FFE4E1);
     border: none;
-    padding: 5px 10px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
     cursor: pointer;
-    font-size: 14px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border-radius: 5px;
+    transition: transform 0.2s ease;
   }
 
   .delete-button:hover {
-    background: darkred;
+    transform: scale(1.05);
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  @media (max-width: 768px) {
+    .articles {
+      padding: 10px;
+    }
   }
 </style>

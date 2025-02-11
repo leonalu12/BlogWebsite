@@ -2,7 +2,7 @@
   import { writable } from "svelte/store";
   // import CommentItem from "../components/CommentItem.svelte"-->
   import DeleteConfirmWindow from "../components/utils/DeleteConfirmWindow.svelte";
-  import UserLogin from "./userComponents/UserLogin.svelte";
+  import { displayLogin } from "../store/userStore";
   import { tick } from "svelte";
   export let comment={};
   export let replyContent;
@@ -11,7 +11,6 @@
   export let toggleReplyBox;
   export let startReply;
   export let article;
-  let showLogin = false; // 控制是否显示登录组件
   let showDeleteConfirm = false; // 控制删除确认框的显示
   let replyInput; // 用于存储回复框的 DOM 参考
   let user_id = null; // 设定默认值
@@ -40,7 +39,7 @@
   // 点赞 / 取消点赞
   async function toggleLike() {
     if (!$user) {
-      showLogin = true;
+      displayLogin.set(true);
       return;
     }
     const res = await fetch(`http://localhost:3000/api/comments/${comment.id}/like`, {
@@ -112,15 +111,19 @@
       </div>
       
       {#if replyBoxVisible[comment.id]}
+      
         <div class="reply-box">
           <input 
             type="text" 
+            class="reply-input"
             bind:this={replyInput} 
             bind:value={replyContent[comment.id]} 
             placeholder="Write a reply..."
             on:keydown={(event) => handleKeyDown(event, comment)} 
           />
-          <button on:click={() => startReply(comment)}>Post</button>
+          <button 
+          class="reply-submit"
+          on:click={() => startReply(comment)}>Post</button>
         </div>
       {/if}
     </div>
@@ -152,107 +155,150 @@
       on:cancel={cancelDelete}
     />
   {/if}
-  <!-- Any login function called when no user data, call login window -->
-  {#if showLogin}
-     <UserLogin />
-  {/if}
+  
 </div>
 {/if}
   
-  <style>
+    <style>
     .comment-item {
-      border-left: 2px solid #ddd;
-      margin-top: 8px;
-      
+      border-left: 2px solid #FFE4E1;
+      margin: 12px 0;
+      padding-left: 5px;
     }
+  
     .comment-content {
-    background: #f9f9f9;
-    padding: 12px;
-    border-radius: 8px;
-  }
-  .comment-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .reply-box {
-    margin-top: 8px;
-  }
-
-  /* .nested-comment {
-    background: #f5f5f5;
-    padding: 8px;
-    margin-top: 8px;
-    border-radius: 6px;
-  } */
-
-  .user-info {
-    display: flex;
-    align-items: center;
-  }
-
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  .username {
-    font-weight: bold;
-  }
-
-  .comment-time {
-    font-size: 0.9rem;
-    color: gray;
-    margin-left: 10px;
-  }
-
-  .reply-to {
-    font-size: 0.9rem;
-    color: gray;
-    margin-bottom: 4px;
-  }
-  .reply-username {
-    font-weight: bold;
-    color: #007bff;
-  }
-
-  button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 6px 8px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 16px;
-  }
-
-  .icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
-
-  .icon-btn svg {
-    transition: transform 0.2s ease, fill 0.2s ease;
-  }
-
-  /* 按钮的悬停效果 */
-  .icon-btn:hover {
-    color: #007bff;  /* 悬停时改变按钮文字颜色 */
+      background: white;
+      padding: 10px 15px;
+      border-radius: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease;
+    }
+  
+    .comment-content:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+  
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    .username {
+      font-weight: 600;
+      color: #333;
+    }
+  
+    .comment-time {
+      font-size: 0.9rem;
+      color: #666;
+      margin-left: 10px;
+    }
+  
+    .comment-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
+  
+    .reply-box {
+      margin-top: 12px;
+    }
+  
+    .reply-to {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0;
+    }
+  
+    .reply-username {
+      font-weight: 600;
+      color: pink;
+    }
+  
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(90deg, pink, #FFE4E1);
+      color: white;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+  
+    .icon-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    .icon-btn svg {
+      transition: transform 0.2s ease;
+    }
+  
+    @media (max-width: 768px) {
+      .comment-content {
+        padding: 12px;
+      }
+  
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+      }
+    }
+    .reply-box {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+    }
     
-  }
-
-  .icon-btn:hover svg {
-    fill: #007bff;  /* 悬停时改变 SVG 图标颜色 */
-  }
-
+    .reply-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.2s ease;
+    }
+    
+    .reply-input:focus {
+      outline: none;
+      border-color: pink;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+    
+    .reply-submit {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(90deg, pink, #FFE4E1);
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .reply-submit:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .reply-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
