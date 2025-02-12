@@ -47,25 +47,25 @@ public class AdminController {
                             "Confirm Deletion",
                             JOptionPane.YES_NO_OPTION
                     );
-                    if (confirm == JOptionPane.YES_OPTION){
+                    if (confirm == JOptionPane.YES_OPTION) {
                         deleteAdmin(adminName);
-                        // 清空用户信息（头像和用户名）并隐藏
-                        dashboard.clearUserTable();
-                        // 清除登录面板
-                        String username = loginPanel.getUsername();
-                        loginPanel.setLoggedInState(false, username);
-                        loginPanel.clearFields();
+                        loginPanel.setLoggedInState(false, adminName);
+//                        // 清空用户信息（头像和用户名）并隐藏
+//                        dashboard.clearUserTable();
+//                        // 清除登录面板
+//                        String username = loginPanel.getUsername();
+//                        loginPanel.setLoggedInState(false, username);
+//                        loginPanel.clearFields();
                     }
 
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
-
             }
         });
     }
 
-    private String login() {
+    private void login() {
         String username = loginPanel.getUsername();
         String password = loginPanel.getPassword();
 
@@ -81,34 +81,30 @@ public class AdminController {
                 // 清除登录面板
                 username = loginPanel.getUsername();
                 loginPanel.setLoggedInState(false, username);
-                loginPanel.clearFields();
+//                loginPanel.clearFields();
             } else {
                 loginPanel.setLoggedInState(true, username);
-                JOptionPane.showMessageDialog(dashboard, "Login successful!");
-
-                // 通过 dashboard 获取 userTable，并设置其可见性
-                dashboard.getUserTable().setVisible(true); // 恢复表格的显示
-                loadUsers();
-                adminName = username;
+                adminName= username;
+//                JOptionPane.showMessageDialog(dashboard, "Login successful!");
+//                // 通过 dashboard 获取 userTable，并设置其可见性
+//                dashboard.getUserTable().setVisible(true); // 恢复表格的显示
+//                loadUsers();
+//                adminName = username;
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(dashboard, "Login failed: " + ex.getMessage());
             logout();
         }
-        return adminName;
     }
-
-
     private void logout() {
-        // 清空用户信息（头像和用户名）并隐藏
-        dashboard.clearUserTable();
-
+//        // 清空用户信息（头像和用户名）并隐藏
+//        dashboard.clearUserTable();
+        JOptionPane.showMessageDialog(dashboard, "Logged out.");
         // 清除登录面板
         String username = loginPanel.getUsername();
         loginPanel.setLoggedInState(false, username);
-        loginPanel.clearFields();
-
-        JOptionPane.showMessageDialog(dashboard, "Logged out.");
+//        loginPanel.clearFields();
+//        JOptionPane.showMessageDialog(dashboard, "Logged out.");
     }
 
     private void deleteAdmin(String adminName) throws Exception {
@@ -117,13 +113,13 @@ public class AdminController {
             HttpUtils.sendDeleteRequestWithBody("/api/admins", requestBody);
             JOptionPane.showMessageDialog(dashboard, "Delete admin successful!");
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(dashboard, "Delete failed: " + ex.getMessage());
         }
 
     }
 
-    private void loadUsers() {
+    public void loadUsers() {
         List<User> users = HttpUtils.getUsersFromBackend();
         userTableModel = new UserTableModel(users);
         dashboard.setTableModel(userTableModel);

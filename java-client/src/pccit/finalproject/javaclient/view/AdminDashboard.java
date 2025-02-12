@@ -11,13 +11,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AdminDashboard extends JFrame {
+public class AdminDashboard extends JFrame implements LoginStateObserver {
     private JTable userTable;
     private JLabel usernameLabel;
     private JLabel iconLabel;
     private LoginPanel loginPanel;
     private JButton deleteUserButton;
     private AdminController controller;
+    private DefaultTableModel tableModel;
 
     public AdminDashboard() {
         // 设置JFrame属性
@@ -28,6 +29,7 @@ public class AdminDashboard extends JFrame {
         // 创建并添加登录面板
         loginPanel = new LoginPanel();
         add(loginPanel, BorderLayout.NORTH);
+        loginPanel.addObserver(this);
 
         // 创建JTable
         userTable = new JTable();
@@ -123,7 +125,20 @@ public class AdminDashboard extends JFrame {
     public JTable getUserTable() {
         return userTable;
     }
-
+    //Update UI according to state
+    @Override
+    public void onLoginStateChanged(boolean isLoggedIn, String username) {
+        if (isLoggedIn) {
+            getUserTable().setVisible(true);
+            JOptionPane.showMessageDialog(this, "Login successful!");
+            controller.loadUsers();
+            loginPanel.setButtonState(false, true, !"admin".equals(username));
+        } else {
+            clearUserTable();
+            loginPanel.setButtonState(true, false, false);
+            loginPanel.clearFields();
+        }
+    }
     public void clearUserTable() {
         // 清空表格数据
         userTable.setModel(new DefaultTableModel()); // 清空表格
@@ -136,4 +151,6 @@ public class AdminDashboard extends JFrame {
         // 隐藏删除按钮
         deleteUserButton.setVisible(false);
     }
+
+
 }

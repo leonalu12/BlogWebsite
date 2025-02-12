@@ -4,10 +4,18 @@ import { getUsers, deleteUser } from "../../data/user-dao.js";
 import { deleteAdmin } from "../../data/admin-dao.js";
 const router = express.Router();
 
+// authenticate admin
 router.post("/", async (req, res) => {
-    const { username, pwd} = req.body;
-  const admin = await authenticateAdmin(username,pwd);
-  return res.json(admin); //null or admin
+
+  try {
+      const { username, pwd} = req.body;
+      const admin = await authenticateAdmin(username,pwd);
+      if(!admin){return res.status(404).json(admin)};
+      return res.status(200).json(admin); //null or admin
+  } catch (error) {
+      return res.status(401).json({ error: 'Failed to authenticate admin' })
+  }
+
 });
 
 //users
@@ -15,7 +23,9 @@ router.get("/", async (req, res) => {
   try {
       const users = await getUsers();
       return res.json(users); 
-      // Return user data
+
+     //  Return user data
+
   } catch (error) {
       console.error('Error fetching users:', error);
       return res.status(500).json({ error: 'Failed to fetch users' });
@@ -24,10 +34,14 @@ router.get("/", async (req, res) => {
 
 //delete admin
 router.delete("/",async(req,res)=>{
-
+try {
     const {username} = req.body;
     await deleteAdmin(username);
     return res.sendStatus(204);
+} catch (error) {
+  
+}
+
 
 })
 

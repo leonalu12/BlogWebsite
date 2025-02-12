@@ -8,6 +8,7 @@
   // Use store to store user information
   import { writable } from "svelte/store"; 
   import AlertWindow from "../../../../lib/components/utils/alertWindow.svelte";
+  import DeleteConfirmWindow from "../../../../lib/components/utils/DeleteConfirmWindow.svelte";
 
   let title = "";
   let content = "";
@@ -26,6 +27,7 @@
   let windowMessage = "Article updated successfully!"
   let errorWindowMessage = "";
   let deleteImageMessage = "Are you sure you want to delete this image?";
+  let imageToDelete = null;
 
   let conf = {
     toolbar:
@@ -135,12 +137,16 @@
     showDeleteImageWindow = true;
   }
 
-
   function deleteImage() {
-    image = null;
+    imageToDelete = null;
     existingImage = null;
     showDeleteImageWindow = false;
     document.getElementById("image").value = "";
+  }
+
+  function cancelDeleteImage(){
+    showDeleteImageWindow = false;
+    imageToDelete = nunll;
   }
 </script>
 
@@ -175,7 +181,7 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <AlertWindow message={deleteImageMessage} on:confirm={deleteImage} />
+  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={deleteImage} on:cancel={cancelDeleteImage} />
 {/if}
 
 <style>
