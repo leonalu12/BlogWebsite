@@ -1,13 +1,16 @@
 import express from "express";
 import multer from "multer";
+import fs from "fs";
 import path from "path";
 import { getDatabase } from "../../data/database.js";
 import {
-  addArticle, updateArticle, deleteArticle, getAllArticles, getArticleById, likeArticle, unlikeArticle, getArticleLikes
+  addArticle, updateArticle, deleteArticle, getAllArticles, getArticleById, likeArticle, unlikeArticle, getArticleLikes,deleteArticleImage
 } from "../../data/article-dao.js";
 import { requiresAuthentication } from "../../middleware/auth-middleware.js";
 
 const router = express.Router();
+
+
 
 // Configure Multer to handle image uploads
 const storage = multer.diskStorage({
@@ -166,6 +169,35 @@ router.post("/:id/like", requiresAuthentication, async (req, res) => {
   }
 });
 
+//delete an image from the article:
+router.delete("/:id/delete-image", async (req, res) => {
+  try {
+    console.log("🗑️ Received request to delete image for article ID:", req.params.id);
+
+    const article = await getArticleById(req.params.id);
+    if (!article || !article.image_url) {
+      return res.status(404).json({ error: "No image found." });
+    }
+
+
+
+
+
+
+
+    const imagePath = path.join("public/images", path.basename(article.image_url));
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+      console.log("✅ Image deleted from storage:", imagePath);
+    }
+
+    await deleteArticleImage(req.params.id);
+
+    res.status(200).json({ message: "Image deleted." });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 // Unlike (login required)
@@ -231,5 +263,9 @@ router.get("/:id/likesAmount", async (req, res) => {
   }
 
 });
-
+router.stack.forEach((route) => {
+  if (route.route) {
+    console.log(`🛠 Registered Route: ${Object.keys(route.route.methods).join(", ").toUpperCase()} ${route.route.path}`);
+  }
+});
 export default router;

@@ -141,7 +141,10 @@
   }
 
   function deleteImage() {
-    if (image) content = content.replace(/<img[^>]+>/g, "");
+    if (image){
+      content = content.replace(/<img[^>]+>/g, "");
+      image=null;
+    } 
     imageToDelete = null;
     showDeleteImageWindow = false;
     document.getElementById("image").value = "";

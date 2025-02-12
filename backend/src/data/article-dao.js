@@ -2,7 +2,10 @@
 
 import { getDatabase } from "./database.js";
 import { updateDatabase } from "./util.js";
+import fs from "fs";
+import path from "path";
 const PUBLIC_IMAGES_URL = process.env.PUBLIC_IMAGES_URL || "http://localhost:3000/images";
+const PUBLIC_IMAGES_PATH = path.join(process.cwd(), "public/images");
 /**
  * GET All Articles(search&sort)
  * @param {string} search 
@@ -38,33 +41,33 @@ export async function getAllArticles(
 
   if (search.startsWith('"') && search.endsWith('"')) {
     // Remove quotes and trim spaces
-    search = search.slice(1, -1).trim();  
+    search = search.slice(1, -1).trim();
 
     if (filterBy === "title") {
       // Precisely match whole words
       query += ` AND LOWER(' ' || a.title || ' ') LIKE LOWER(?)`;
       // Ensure the search matches whole words
-      params.push(`% ${search} %`); 
+      params.push(`% ${search} %`);
     } else if (filterBy === "username") {
       // Let SQLite replace _ with and ensure whole word matching
       query += ` AND LOWER(' ' || REPLACE(u.username, '_', ' ') || ' ') LIKE LOWER(?)`;
-      params.push(`% ${search} %`); 
+      params.push(`% ${search} %`);
     }
-  } 
- // Handle fuzzy search (still replace _ with )
+  }
+  // Handle fuzzy search (still replace _ with )
   else if (filterBy === "username") {
-    query += ` AND LOWER(REPLACE(u.username, '_', ' ')) LIKE LOWER(?)`;  
+    query += ` AND LOWER(REPLACE(u.username, '_', ' ')) LIKE LOWER(?)`;
     params.push(`%${search}%`);
-  } 
+  }
   else {
-    query += ` AND LOWER(a.title) LIKE LOWER(?)`;  
+    query += ` AND LOWER(a.title) LIKE LOWER(?)`;
     params.push(`%${search}%`);
   }
 
 
   if (filterBy === "date_time" && exactDate && exactDate !== "null") {
-    console.log("📌 Filtering dates:", exactDate); 
-    query += " AND strftime('%Y-%m-%d', a.date_time) = ?";  
+    console.log("📌 Filtering dates:", exactDate);
+    query += " AND strftime('%Y-%m-%d', a.date_time) = ?";
     params.push(exactDate);
   }
 
@@ -77,10 +80,10 @@ export async function getAllArticles(
   query += ` ORDER BY ${sortBy === "username" ? "u.username" : `a.${sortBy}`} ${order};`;
 
   console.log("🔍 Generated SQL Query:", query);
-  console.log("📝 Query Params:", params); 
+  console.log("📝 Query Params:", params);
 
-  return await db.all(query, params); 
-} 
+  return await db.all(query, params);
+}
 
 
 
@@ -216,5 +219,10 @@ export async function getArticleLikes(articleId) {
   return result ? result.like_count : 0;
 }
 
+
+export async function deleteArticleImage(articleId) {
+  const db = await getDatabase();
+  await db.run("DELETE FROM imgs WHERE article_id = ?", [articleId]);
+}
 
 
