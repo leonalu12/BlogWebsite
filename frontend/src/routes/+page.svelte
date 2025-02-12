@@ -173,19 +173,35 @@
 
 <div class="articles">
   {#each articles as article}
-    <div class="article">
-      <a href={`/articles/${article.id}`}>
-        <div class="article-content">
-          <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
-          <h2>{article.title}</h2>
-          <div class="article-meta">
-            <div>By: {article.username}</div>
-            <div>Published on: {article.date_time}</div>
-          </div>
-          <div class="article-preview">{@html article.content}</div>
+  {#if !article.image_url}
+  <div class="article">
+    <a href={`/articles/${article.id}`}>
+      <div class="article-content">
+        <h2>{article.title}</h2>
+        <div class="article-meta">
+          <div>By: {article.username}</div>
+          <div>Published on: {article.date_time}</div>
         </div>
-      </a>
-    </div>
+        <div class="articleWithoutImg">{@html article.content}</div>
+      </div>
+    </a>
+  </div>
+  {:else}
+  <div class="article">
+    <a href={`/articles/${article.id}`}>
+      <div class="article-content">
+        <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
+        <h2>{article.title}</h2>
+        <div class="article-meta">
+          <div>By: {article.username}</div>
+          <div>Published on: {article.date_time}</div>
+        </div>
+        <div class="article-preview">{@html article.content}</div>
+      </div>
+    </a>
+  </div>
+  {/if}
+    
   {/each}
 </div>
 
@@ -193,7 +209,7 @@
   .search-container {
     padding: 10px 0;
     transition: all 0.3s ease;
-    z-index: 20;
+    z-index: 31;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -231,7 +247,6 @@
     gap: 10px;
     padding: 10px 20px;
     background: white;
-    opacity: 80%;
     border-radius: 30px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     height: 50px;
@@ -330,6 +345,16 @@
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding: 0 15px;
+    margin-bottom: 10px;
+  }
+
+  .articleWithoutImg{
+    display: -webkit-box;
+    -webkit-line-clamp: 15;
+    line-clamp: 10;
     -webkit-box-orient: vertical;
     overflow: hidden;
     padding: 0 15px;

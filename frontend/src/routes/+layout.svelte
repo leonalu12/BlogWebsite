@@ -18,6 +18,7 @@
   import { goto } from "$app/navigation";
 
   $: path = $page.url.pathname;
+  $: isEditPage = path.includes('edit');
 </script>
 
 <div class="page">
@@ -26,6 +27,7 @@
       <nav>
         <span class="nav-links">
           <a href="/" class:active={path === "/"} class="nav-option">Explore</a>
+          <a href="/articles/new" class:active={path === "/articles/new"} class="nav-option">New</a>
           <a href="/myArticles" class:active={path === "/myArticles"} class="nav-option">ME</a>
         </span>
 
@@ -44,9 +46,12 @@
     </div>
   </div>
 
-  <div class="add-button-container">
-    <AddButton />
-  </div>
+  {#if !isEditPage}
+    <div class="add-button-container">
+      <AddButton />
+    </div>
+  {/if}
+
   {#if !$logedIn}
     {#if $displayLogin}
       <UserLogin />
@@ -122,6 +127,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
+    z-index: 30;
   }
 
   nav {
@@ -130,6 +136,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: 20;
   }
 
   .nav-links {

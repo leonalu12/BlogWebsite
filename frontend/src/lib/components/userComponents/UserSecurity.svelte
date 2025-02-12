@@ -147,7 +147,7 @@
 
 {#if displayUserPopUpwindow}
   <button class="overlay" on:click={closeUserPopUpwindow}>
-    <button on:click|stopPropagation>
+    <button on:click|stopPropagation style="background-color: transparent; border: none;">
       <div class="security-container">
         <div class="security-header">
           <p class="SecurityTitle">Change Password</p>
