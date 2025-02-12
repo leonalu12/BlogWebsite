@@ -1,9 +1,8 @@
 <script>
-  import { writable } from "svelte/store";
-  // import CommentItem from "../components/CommentItem.svelte"-->
   import DeleteConfirmWindow from "../components/utils/DeleteConfirmWindow.svelte";
   import { displayLogin } from "../store/userStore";
   import { tick } from "svelte";
+  import { commentAmount } from "../store/commentStore";
   export let comment={};
   export let replyContent;
   export let replyBoxVisible;
@@ -130,7 +129,10 @@
           />
           <button 
           class="reply-submit"
-          on:click={() => startReply(comment)}>Post</button>
+          on:click={() => {startReply(comment);
+         
+          }
+          }>Post</button>
         </div>
       {/if}
     </div>

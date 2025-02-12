@@ -68,6 +68,7 @@
         icon: data.icon
       };
       tempUsername = user.username;
+      iconImage = data.icon;
     } catch (error) {
       console.error("Data fetch failed:", error);
     } finally {
@@ -188,7 +189,7 @@
         {#if loading}
           <p>loading...</p>
         {:else}
-        <p></p>
+          <p></p>
           <form on:submit={handleSubmit}>
             <div class="userInput">
               <div class="form-group">
@@ -202,6 +203,7 @@
                     type="file"
                     id="icon"
                     accept="image/*"
+                    bind:value={iconImage}
                     on:change={handleImageChange}
                     class="file-input"
                   />
@@ -230,21 +232,18 @@
                 <input type="text" id="lname" bind:value={user.lname} placeholder=" " required />
                 <label for="lname">last name</label>
               </div>
-              <div class="form-group input-container">
-                <input
-                  type="text"
-                  id="description"
-                  bind:value={user.description}
-                  placeholder=" "
-                  required
-                />
-                <label for="description">description</label>
-              </div>
+
               <div class="form-group input-container">
                 <input type="date" id="dob" bind:value={user.dob} placeholder=" " required />
                 <label for="dob">date of birth</label>
               </div>
+              <div class="form-group input-container input-container-description">
+                <textarea id="description" bind:value={user.description} placeholder=" " required
+                ></textarea>
+                <label for="description">description</label>
+              </div>
             </div>
+
             <div class="form-group">
               <button type="submit" class="editBtn">save</button>
             </div>
@@ -392,5 +391,22 @@
     height: 100%;
     opacity: 0;
     cursor: pointer;
+  }
+
+  textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #000;
+    background-color: transparent;
+    margin-top: 3px;
+    margin-bottom: 0;
+  }
+
+  #description {
+    height: 70px;
+    margin-left: 7px;
+    margin-top: 25px;
   }
 </style>

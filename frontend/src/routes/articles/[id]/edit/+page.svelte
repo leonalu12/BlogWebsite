@@ -213,6 +213,7 @@
     {#if displayOriginalImg}
       <p>Original Image: <img src={existingImage} alt="Existing Image" width="100" /></p>
     {/if}
+
     <button class="delete-image-button" on:click={confirmDeleteImage}>Delete Image</button>
   {/if}
   <!-- Submit Button -->

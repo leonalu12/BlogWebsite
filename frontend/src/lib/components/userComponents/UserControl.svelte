@@ -9,9 +9,9 @@
   import AlertWindow from "../utils/AlertWindow.svelte";
   import { displayEdit, displaySecurity, displayEditSuccessAlert, displayChangePwdAlert, deleteUserSuccess, displayLogin, iconName } from "../../store/userStore.js";
   import { goto } from "$app/navigation";
+  import { displayLogoutSuccess } from "../../store/userStore.js";
 
  
-  let showLogoutAlert = false;
   let isOpen = false;
   let dropdownRef; // 用于引用下拉框的 DOM 元素
   let triggerRef; // 用于引用触发按钮的 DOM 元素
@@ -47,7 +47,7 @@
       logedIn.set(false);
       displayLogin.set(false);
       displayEdit.set(false);
-      showLogoutAlert = true;
+      displayLogoutSuccess.set(true);
       toggleDropdown();
       goto("/");
     } catch (error) {
@@ -80,12 +80,8 @@
     <span class="icon"><User /></span>
   </button>
 
-  {#if $displayLogin}
-    <UserLogin />
-  {/if}
-  {#if showLogoutAlert}
-    <AlertWindow message="Log out successfully" on:confirm={() => (showLogoutAlert = false)} />
-  {/if}
+  
+  
 {:else}
   <div class="dropdown">
     <button class="loggedIcon" on:click={toggleDropdown} bind:this={triggerRef}>
@@ -104,38 +100,12 @@
     </div>
   </div>
 
-  {#if $displaySecurity}
-    <UserSecurity />
-  {/if}
-
-  {#if $displayEdit}
-    <UserEdit />
-  {/if}
-
-  {#if $displayEditSuccessAlert}
-    <AlertWindow
-      message="User Information Updated"
-      on:confirm={() => displayEditSuccessAlert.set(false)}
-    />
-  {/if}
-
-  {#if $displayChangePwdAlert}
-    <AlertWindow message="Password changed" on:confirm={() => displayChangePwdAlert.set(false)} />
-  {/if}
 {/if}
+  
 
-{#if $deleteUserSuccess}
-  <AlertWindow
-    message="User deleted"
-    on:confirm={() => {
-      displayEdit.set(false);
-      displaySecurity.set(false);
-      logedIn.set(false);
-      deleteUserSuccess.set(false);
-      goto("/");
-    }}
-  />
-{/if}
+  
+
+
 
 <style>
   .userButton {
