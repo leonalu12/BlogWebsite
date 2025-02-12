@@ -273,7 +273,7 @@
   }
 
   .edit-container {
-    width: 60%;
+    width: 40%; /* Adjusted width */
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -362,10 +362,17 @@
     cursor: pointer;
     padding: 10px;
     background: linear-gradient(90deg, pink, #ffe4e1);
-    transition: background 5s ease;
+    transition: transform 0.2s ease;
     height: 50px;
     font-size: 16px;
     opacity: 1;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .editBtn:hover {
+    transform: translateY(-3px);
   }
 
   .image-upload {

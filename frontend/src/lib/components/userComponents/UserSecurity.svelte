@@ -150,13 +150,26 @@
     <button on:click|stopPropagation style="background-color: transparent; border: none;">
       <div class="security-container">
         <div class="security-header">
-          <p class="SecurityTitle">Change Password</p>
+          <p class="SecurityTitle">Security</p>
+          <button class="deleteUserBtn" on:click={toggleDisplayDeleteUserWindow}>delete user</button>
+          {#if comfirmDeleteUser}
+            <DeleteComfirmWindow
+              message="Are you sure to delete this user?"
+              on:confirm={deleteUser}
+              on:cancel={toggleDisplayDeleteUserWindow}
+            />
+          {/if}
         </div>
         {#if loading}
           <p>loading...</p>
         {:else}
           <form on:submit={handleSubmit}>
+
+            
             <div class="userInput">
+
+              <div class="changeName-header">
+                <p class="changeNameTitle">change password</p>
               <div class="form-group input-container">
                 <input type="password" id="pwd" bind:value={currentPwd} placeholder=" " required />
                 <label for="pwd">current password</label>
@@ -165,36 +178,31 @@
                 <input type="password" id="newPwd" bind:value={newPwd} placeholder=" " required />
                 <label for="newPwd">new password</label>
               </div>
-              <div class="form-group input-container">
-                <input
-                  type="password"
-                  id="confirmPwd"
-                  bind:value={confirmPwd}
-                  placeholder=" "
-                  required
-                />
-                <label for="confirmPwd">confirm password</label>
-              </div>
-              {#if newPwd && confirmPwd}
-                {#if newPwd !== confirmPwd}
-                  <p style="color: red;">passwords do not match</p>
+              <div class="form-group input-container passwordConfirm-container">
+                <div>
+                  <input
+                    type="password"
+                    id="confirmPwd"
+                    bind:value={confirmPwd}
+                    placeholder=" "
+                    required
+                  />
+                  <label for="confirmPwd">confirm password</label>
+                </div>
+                {#if newPwd && confirmPwd}
+                  {#if newPwd !== confirmPwd}
+                    <span class="password-error">passwords do not match</span>
+                  {/if}
                 {/if}
-              {/if}
-              <div class="form-group">
+              </div>
+
+              
+            </div>
+            <div class="form-group">
                 <button type="submit" class="securityBtn">submit</button>
               </div>
-            </div>
           </form>
-          <div>
-            <button class="deleteUserBtn" on:click={toggleDisplayDeleteUserWindow}>delete user</button>
-            {#if comfirmDeleteUser}
-              <DeleteComfirmWindow
-                message="Are you sure to delete this user?"
-                on:confirm={deleteUser}
-                on:cancel={toggleDisplayDeleteUserWindow}
-              />
-            {/if}
-          </div>
+          
         {/if}
       </div>
     </button>
@@ -226,7 +234,7 @@
   }
 
   .security-container {
-    width: 60%;
+    width: 40%; /* Adjusted width */
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -244,7 +252,23 @@
     flex-direction: column;
   }
 
+  .security-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .SecurityTitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-family: "Arial", sans-serif;
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  .changeNameTitle {
     font-size: 15px;
     font-weight: bold;
     margin-bottom: 20px;
@@ -253,6 +277,8 @@
     border-bottom: #9c9b9b 1px solid;
     padding-bottom: 10px;
     margin: 0;
+    width: 97%;
+    justify-self: center;
   }
 
   .userInput {
@@ -311,26 +337,52 @@
 
   .securityBtn {
     border: none;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
     padding: 10px;
-    background: linear-gradient(90deg, pink, #FFE4E1);
-    transition: background 5s ease;
+    background: linear-gradient(90deg, pink, #ffe4e1);
+    transition: transform 0.2s ease;
     height: 50px;
     font-size: 16px;
     opacity: 1;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .securityBtn:hover {
+    transform: translateY(-3px);
   }
 
   .deleteUserBtn {
+    position: absolute;
+    right: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     padding: 10px;
-    background: linear-gradient(90deg, pink, #FFE4E1);
-    transition: background 5s ease;
-    height: 50px;
-    font-size: 16px;
+    background: linear-gradient(90deg, pink, #ffe4e1);
+    transition: transform 0.2s ease;
+    height: 40px;
+    font-size: 12px;
     opacity: 1;
-    margin-top: 10px;
+  }
+
+  .deleteUserBtn:hover {
+    transform: translateY(-3px);
+  }
+
+  .password-error {
+    color: rgba(248, 86, 86, 0.758);
+    font-size: 14px;
+    white-space: nowrap;
+    margin-bottom: 14px;
+  }
+
+  .passwordConfirm-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
   }
 </style>

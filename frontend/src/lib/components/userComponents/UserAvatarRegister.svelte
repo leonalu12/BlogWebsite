@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
+  import { onMount } from "svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -16,11 +17,17 @@
   let customImage = null;
   let previewUrl = `${PUBLIC_IMAGES_URL}/${selectedAvatar}`;
 
+  onMount(() => {
+    dispatch("select", { avatar: selectedAvatar, type: "predefined" });
+  });
+
   function handleAvatarSelect(avatar) {
     selectedAvatar = avatar;
     previewUrl = `${PUBLIC_IMAGES_URL}/${avatar}`;
     dispatch("select", { avatar, type: "predefined" });
   }
+
+  
 
   function triggerFileInput() {
     document.getElementById("custom-avatar").click();
@@ -79,7 +86,7 @@
 
 <style>
   .avatar-container {
-    width: 35%;
+    width: 40%; /* Adjusted width */
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -169,8 +176,13 @@
     cursor: pointer;
     padding: 10px;
     background: linear-gradient(90deg, pink, #ffe4e1);
+    transition: transform 0.2s ease;
     height: 50px;
     font-size: 16px;
     margin-top: 20px;
+  }
+
+  .next-btn:hover {
+    transform: translateY(-3px);
   }
 </style>

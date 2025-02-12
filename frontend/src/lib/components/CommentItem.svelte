@@ -30,6 +30,8 @@
     if (res.ok) {
       comment.deleted = true; 
       // Mark as deleted and trigger Svelte update
+
+      
     }
     showDeleteConfirm = false;
   }
