@@ -4,6 +4,8 @@
   import CommentItem from "./CommentItem.svelte";
   import { PUBLIC_API_BASE_URL} from "$env/static/public";
   import { displayLogin } from "../store/userStore";
+  import { commentAmount } from "../store/commentStore";
+  
   export let article;
   let article_id = article.id;
   export let user = writable(null);
@@ -136,6 +138,9 @@
       body: JSON.stringify(newComment)
     });
     if (res.ok) {
+
+      commentAmount.update(n => n + 1); // Update the comment amount
+      console.log(commentAmount); // Log the updated comment amount
       const newCommentData = await res.json(); 
       // Get new comment data
       comments.update(current => {
@@ -213,6 +218,10 @@
       // Clear the input box content
       replyBoxVisible[parentComment.id] = false; 
       // Hide the reply box after submission
+      commentAmount.update(n => n + 1); // Update the comment amount
+      console.log(commentAmount); // Log the updated comment amount
+    } else {
+      console.error("Failed to reply to comment:", res.status);
     }
   }
 
