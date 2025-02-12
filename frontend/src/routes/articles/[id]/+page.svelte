@@ -168,9 +168,9 @@
   <div class="article-container">
     <div class="article-left-column">
       <div class="article-image">
-        {#if !article.image_url}
+        {#if article.image_url}
         <img
-          src={article.image_url}
+        src={article.image_url ? article.image_url : "/images/default-placeholder.jpg"}
           alt={article.title}
         />
         {/if}
