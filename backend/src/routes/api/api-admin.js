@@ -5,16 +5,18 @@ import { deleteAdmin } from "../../data/admin-dao.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-    const { username, pwd} = req.body;
+  const { username, pwd} = req.body;
   const admin = await authenticateAdmin(username,pwd);
-  return res.json(admin); //null or admin
+  return res.json(admin); 
+  //null or admin
 });
 
 //users
 router.get("/", async (req, res) => {
   try {
       const users = await getUsers();
-      return res.json(users); // 返回用户数据
+      return res.json(users); 
+      //  Return user data
   } catch (error) {
       console.error('Error fetching users:', error);
       return res.status(500).json({ error: 'Failed to fetch users' });
@@ -31,7 +33,6 @@ router.delete("/",async(req,res)=>{
 })
 
 //delete user
-//delete
 router.delete("/:id", async (req, res) => {
   const userId = parseInt(req.params.id, 10);
   try {

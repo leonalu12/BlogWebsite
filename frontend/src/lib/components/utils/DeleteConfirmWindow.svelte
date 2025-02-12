@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    export let message = "Are you sure?"; // 默认提示语句
+    export let message = "Are you sure?";
+    // Default prompt message
     const dispatch = createEventDispatcher();
      
     const confirmDelete = () => {
@@ -14,7 +15,8 @@
 
 <div class="overlay">
     <div class="modal">
-        <p class="message">{message}</p> <!-- 显示传入的提示语句 -->
+        <p class="message">{message}</p>
+        <!-- Display the provided prompt message -->
         <div class="actions">
             <button class="btn confirm" on:click={confirmDelete}>Confirm</button>
             <button class="btn cancel" on:click={cancelDelete}>Cancel</button>
@@ -23,7 +25,7 @@
 </div>
 
 <style>
-    /* 遮罩层 */
+    /* overlay */
     .overlay {
         position: fixed;
         top: 0;
@@ -37,7 +39,7 @@
         z-index: 1000; /* 确保弹窗显示在最上层 */
     }
     
-    /* 弹窗框 */
+    /* Dialog box */
     .modal {
         background-color: white;
         padding: 20px;
@@ -47,13 +49,13 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
-    /* 弹窗中的消息文本 */
+    /* Message text in the popup */
     .message {
         font-size: 16px;
         margin-bottom: 20px;
     }
     
-    /* 按钮的样式 */
+    /* Button styles */
     .actions {
         display: flex;
         justify-content: space-around;
@@ -68,9 +70,10 @@
         transition: background-color 0.3s ease;
     }
     
-    /* 确认按钮 */
+    /* Confirm button */
     .confirm {
-        background-color: #4CAF50; /* 绿色 */
+        background-color: #4CAF50; 
+        /* green */
         color: white;
     }
     
@@ -78,9 +81,10 @@
         background-color: #45a049;
     }
     
-    /* 取消按钮 */
+    /* Cancel button */
     .cancel {
-    background-color: #f44336; /* 红色 */
+    background-color: #f44336;
+    /* red */
     color: white;
     }
     

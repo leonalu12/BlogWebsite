@@ -7,11 +7,13 @@ export async function getCommentsWithArticleId(articleId) {
         SELECT 
             comments.*, 
             users.username, users.icon,
-            parent_users.username AS parent_username  -- 获取父评论的用户名
+            parent_users.username AS parent_username  
+            -- Get the parent comment's username
         FROM comments
         LEFT JOIN users ON comments.user_id = users.id
         LEFT JOIN comments AS parent_comments ON comments.parent_cid = parent_comments.id
-        LEFT JOIN users AS parent_users ON parent_comments.user_id = parent_users.id  -- 关联父评论的用户
+        LEFT JOIN users AS parent_users ON parent_comments.user_id = parent_users.id  
+        --  Associate the parent comment's user
         WHERE comments.article_id = ?`, 
         [articleId]
     );
@@ -40,7 +42,7 @@ export async function addComment(content, layer, date_time, user_id, article_id,
         [dbResult.lastID]
     );
 
-    // 获取该评论的点赞数
+    // Get the number of likes for this comment
     newComment.likes = await getCommentLikes(newComment.id);
     return newComment;
 }
