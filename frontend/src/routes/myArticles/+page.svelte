@@ -9,9 +9,11 @@
   import { logedIn } from "../../lib/store/userStore";
   import { iconName } from "../../lib/store/userStore";
   let user = writable(null);
-  let user_id = null; // 初始设为空
+  // Initially set to null
+  let user_id = null; 
   $: if ($user) {
-    user_id = $user.id; // 当 user 数据更新时，user_id 也会自动更新
+    //// When user data updates, user_id will automatically update
+    user_id = $user.id; 
   }
 
   let articles = [];
@@ -21,7 +23,7 @@
   let errorWindowMessage = "";
   let articleToDelete = null;
 
-  /** 获取用户信息 */
+/** Get user information */
   async function fetchUser() {
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
@@ -30,7 +32,8 @@
       });
       if (res.ok) {
         const userData = await res.json();
-        user.set(userData); // 更新 store
+        // Update store
+        user.set(userData); 
       } else {
         console.error("User is not logged in. Redirecting...");
         displayLogin.set(true);
@@ -41,9 +44,10 @@
     }
   }
 
-  /** 根据用户 ID 获取文章 */
+ /** Get articles by user ID */
   async function fetchMyArticles() {
-    if (!user_id) return; // 确保 user_id 存在再请求数据
+    // Ensure user_id exists before requesting data
+    if (!user_id) return; 
     let apiURL = `${PUBLIC_API_BASE_URL}/articles?userId=${user_id}`;
     console.log("Requesting:", apiURL);
 
@@ -54,14 +58,15 @@
       }
       const data = await response.json();
       console.log("Fetched articles:", data);
-      articles = [...data]; // 触发 Svelte 反应性更新
+      // Trigger Svelte reactivity update
+      articles = [...data]; 
     } catch {
       errorWindowMessage = "Error fetching articles.";
       showErrorWindow = true;
     }
   }
 
-  /** 删除文章 */
+  /** Delete article */
   function confirmDeleteArticle(id) {
     articleToDelete = id;
     showDeleteWindow = true;
@@ -78,8 +83,8 @@
           "Content-Type": "application/json"
         },
         credentials: "include",
-
-        body: JSON.stringify({ userId: user_id }) // 这里传递 userId
+       // Pass userId here
+        body: JSON.stringify({ userId: user_id }) 
       });
 
       if (response.ok) {
@@ -106,10 +111,11 @@
     showErrorWindow = false;
   }
 
-  // 组件加载时先获取用户信息，再获取文章
+  // Fetch user information first, then get articles when the component loads
   onMount(async () => {
     await fetchUser();
-    $user && fetchMyArticles(); // 当 user 数据更新后自动获取文章
+    // Automatically fetch articles when user data is updated
+    $user && fetchMyArticles(); 
   });
 
   onMount(async () => {
@@ -130,7 +136,7 @@
           credentials: "include"
         });
         if (!response.ok) {
-          throw new Error("获取用户头像失败");
+          throw new Error(" Failed to retrieve user avatar");
         } else {
           const data = await response.json();
           iconName.set(data);
@@ -139,7 +145,7 @@
         }
       }
     } catch (error) {
-      console.error("获取用户头像失败:", error);
+      console.error("Failed to retrieve user avatar:", error);
     } 
   });
 </script>
@@ -223,7 +229,7 @@
 
   .article-content {
     padding: 15px;
-    flex: 1; /* 让内容区域占据剩余空间 */
+    flex: 1; /* Make the content area occupy the remaining space */
   }
 
   .article h2 {
@@ -253,8 +259,8 @@
   .button-container {
     padding: 15px;
     padding-top: 0;
-    text-align: right; /* 按钮靠右 */
-    margin-top: auto; /* 将按钮推到容器底部 */
+    text-align: right; /* Align the button to the right */
+    margin-top: auto; /* Push the button to the bottom of the container */
   }
 
   .delete-button {

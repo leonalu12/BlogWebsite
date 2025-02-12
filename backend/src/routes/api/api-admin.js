@@ -23,7 +23,9 @@ router.get("/", async (req, res) => {
   try {
       const users = await getUsers();
       return res.json(users); 
-      //  Return user data
+
+     //  Return user data
+
   } catch (error) {
       console.error('Error fetching users:', error);
       return res.status(500).json({ error: 'Failed to fetch users' });
