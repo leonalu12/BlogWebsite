@@ -10,6 +10,7 @@
   import { displayLogin } from "../../../lib/store/userStore";
   import { logedIn } from "../../../lib/store/userStore";
   import { iconName } from "../../../lib/store/userStore";
+  import { commentAmount } from "../../../lib/store/commentStore";
 
   export let data;
   // ✅ Avoid `null`
@@ -195,7 +196,7 @@
         </button>
         <button class="comment-button" on:click={toggleComments}>
           <MessageCircle size={20} color={showComments ? "black" : "blue"} />
-          {article.comment_count ?? 0}
+          {$commentAmount}
         </button>
         {#if $user && $user.id === article.user_id}
           <button class="edit-button" on:click={() => goto(`/articles/${article.id}/edit`)}>

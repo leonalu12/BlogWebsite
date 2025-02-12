@@ -1,8 +1,10 @@
 import { PUBLIC_API_BASE_URL } from "$env/static/public";
+import { commentAmount } from "../../../lib/store/commentStore";
 
 export async function load({ params, fetch }) {
   const ARTICLE_URL = `${PUBLIC_API_BASE_URL}/articles/${params.id}`;
   const LIKE_AMOUNT_URL = `${PUBLIC_API_BASE_URL}/articles/${params.id}/likesAmount`;
+
 
   try {
     const [articleResponse, likeResponse] = await Promise.all([
@@ -16,7 +18,7 @@ export async function load({ params, fetch }) {
 
     const article = await articleResponse.json();
     const likeData = await likeResponse.json();
-
+    commentAmount.set(article.comment_count ?? 0);
     return {
       article: {
         ...article,
