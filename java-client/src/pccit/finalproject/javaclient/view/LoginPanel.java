@@ -3,6 +3,9 @@ package pccit.finalproject.javaclient.view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
 import pccit.finalproject.javaclient.utils.*;
 public class LoginPanel extends JPanel {
     private static JTextField usernameField;
@@ -11,6 +14,8 @@ public class LoginPanel extends JPanel {
     private JButton logoutButton;
     private JButton deleteButton;
     private boolean isLoggedIn = false;
+    private String username;
+    private List<LoginStateObserver> observers= new ArrayList<>();
 
     public LoginPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -44,21 +49,41 @@ public class LoginPanel extends JPanel {
         logoutButton.addActionListener(action); }
     public void setDeleteAction(ActionListener listener) {
         deleteButton.addActionListener(listener);}
-    public void setLoggedInState(boolean loggedIn,String username) {
-        this.isLoggedIn = loggedIn;
-        updateUIState(loggedIn, username);
-    }
-    private void updateUIState(boolean loggedIn, String username) {
-        loginButton.setEnabled(!loggedIn);
-        logoutButton.setEnabled(loggedIn);
+    public void setLoggedInState(boolean isLoggedIn,String username) {
+        this.isLoggedIn = isLoggedIn;
+//        updateUIState(loggedIn, username);
 
-        // Only enable deleteButton if logged in AND username is NOT "admin"
-        deleteButton.setEnabled(loggedIn && !"admin".equals(username));
-        usernameField.setEnabled(!loggedIn);
-        passwordField.setEnabled(!loggedIn);
+        this.username = username;
+        notifyObservers();
+    }
+//    private void updateUIState(boolean loggedIn, String username) {
+//        loginButton.setEnabled(!loggedIn);
+//        logoutButton.setEnabled(loggedIn);
+//
+//        // Only enable deleteButton if logged in AND username is NOT "admin"
+//        deleteButton.setEnabled(loggedIn && !"admin".equals(username));
+//        usernameField.setEnabled(!loggedIn);
+//        passwordField.setEnabled(!loggedIn);
+//    }
+    // Method to set the state of buttons
+    public void setButtonState(boolean loginEnabled, boolean logoutEnabled, boolean deleteEnabled) {
+        loginButton.setEnabled(loginEnabled);
+        logoutButton.setEnabled(logoutEnabled);
+        deleteButton.setEnabled(deleteEnabled);
     }
     public void clearFields() {
         usernameField.setText("");
         passwordField.setText("");
     }
+    public void addObserver(LoginStateObserver observer){
+        observers.add(observer);}
+    public void removeObserver(LoginStateObserver observer){
+        observers.remove(observer);
+    }
+    public void notifyObservers(){
+        for(LoginStateObserver observer: observers){
+            observer.onLoginStateChanged(isLoggedIn,username);
+        }
+    }
+
 }
