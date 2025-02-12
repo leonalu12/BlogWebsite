@@ -112,7 +112,7 @@
               <p class="LoginTitle">Log in</p>
             </div>
 
-            <p class="welcomeMsg">Wherecome to Pinkbook</p>
+            <p class="welcomeMsg">Welcome to Pinkbook</p>
             <form on:submit={handleLogin}>
               <div class="userInput">
                 <div class="form-group input-container input-username">
@@ -192,7 +192,7 @@
   }
   
   .login-container {
-    width: 30%;
+    width: 40%; /* Adjusted width */
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -321,11 +321,14 @@
   cursor: pointer;
   padding: 10px;
   background: linear-gradient(90deg, pink, #FFE4E1);
-  transition: background 5s ease;
+  transition: transform 0.2s ease;
   height: 50px;
   font-size: 16px;
   opacity: 1;
   }
 
+  .loginBtn:hover {
+    transform: translateY(-3px);
+  }
   
 </style>
