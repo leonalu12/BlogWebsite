@@ -20,8 +20,8 @@
   let errorWindowMessage = "";
   let showDeleteImageWindow = false;
   let deleteImageMessage = "Are you sure you want to delete this image?";
-
-  let user = writable(null); // ✅ 存储用户信息
+  // Store user information
+  let user = writable(null); 
 
   let conf = {
     toolbar:
@@ -31,17 +31,18 @@
     content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
   };
 
-  // ✅ 获取当前用户
+  //Get current user
   async function fetchUser() {
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
         method: "GET",
-        credentials: "include" // ✅ 让请求带上 session
+        credentials: "include" 
       });
 
       if (res.ok) {
         const userData = await res.json();
-        user.set(userData); // ✅ 存储用户信息
+        // Store user information
+        user.set(userData); 
         console.log(" Fetched user:", userData);
       } else if (res.status === 401) {
         console.error(" User is not logged in. Redirecting...");
@@ -72,7 +73,7 @@
           credentials: "include"
         });
         if (!response.ok) {
-          throw new Error("获取用户头像失败");
+          throw new Error(" Failed to retrieve user avatar");
         } else {
           const data = await response.json();
           iconName.set(data);
@@ -81,11 +82,11 @@
         }
       }
     } catch (error) {
-      console.error("获取用户头像失败:", error);
+      console.error("Failed to fetch user avatar:", error);
     } 
   });
 
-  // ✅ 提交文章
+  //Submit article
   async function handleSubmit() {
     if (!title.trim() || !content.trim()) {
       errorWindowMessage = "Title and content are required.";
@@ -94,7 +95,8 @@
     }
 
     let currentUser;
-    user.subscribe((value) => (currentUser = value))(); // ✅ 获取 user
+    //Get user
+    user.subscribe((value) => (currentUser = value))(); 
 
     if (!currentUser) {
       displayLogin.set(true);
@@ -109,7 +111,7 @@
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/new`, {
       method: "POST",
       body: formData,
-      credentials: "include" // ✅ 让 session 传递到后端
+      credentials: "include" 
     });
 
     if (res.ok) {

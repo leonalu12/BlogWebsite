@@ -11,7 +11,7 @@ export async function load({ params, fetch }) {
     ]);
 
     if (!articleResponse.ok || !likeResponse.ok) {
-      throw new Error("加载文章或点赞状态失败");
+      throw new Error("Failed to load article or like status");
     }
 
     const article = await articleResponse.json();
@@ -20,12 +20,14 @@ export async function load({ params, fetch }) {
     return {
       article: {
         ...article,
-        like_count: likeData.like_count, // ✅ 确保点赞数正确
-        comment_count: article.comment_count ?? 0, // ✅ 确保前端有评论数量
+        // Ensure the like count is correct
+        like_count: likeData.like_count, 
+        //Ensure the frontend has the comment count
+        comment_count: article.comment_count ?? 0, 
       },
     };
   } catch (err) {
-    console.error("❌ 加载文章或点赞状态失败:", err);
+    console.error("❌ Failed to load article or like status:", err);
     return { article: null };
   }
 }

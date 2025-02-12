@@ -5,13 +5,17 @@
   import { onMount } from "svelte";
   import { iconName } from "../lib/store/userStore";
   import { displayLogin } from "../lib/store/userStore";
-
-  let searchQuery = ""; // 搜索输入框的值
-  let filterBy = "title"; // 过滤字段
-  let sortBy = "date_time"; // 排序字段
+// Value of the search input field
+  let searchQuery = ""; 
+  // Filter field
+  let filterBy = "title"; 
+  // Sort field
+  let sortBy = "date_time"; 
   let exactDate = "";
-  let order = "DESC"; // 排序方式
-  let articles = []; // 文章列表
+  // Sort order
+  let order = "DESC"; 
+  // Article list
+  let articles = []; 
   let searchWrapper;
   let minScale = 0.85;
   let navbarHeight = 105;
@@ -49,19 +53,19 @@
       ...(filterBy === "date_time" && exactDate ? { exactDate } : {})
     });
 
-    console.log("🛠 发送的 API 请求:", `${PUBLIC_API_BASE_URL}/articles?${queryParams}`);
+    console.log("🛠  Sent API request:", `${PUBLIC_API_BASE_URL}/articles?${queryParams}`);
 
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles?${queryParams}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       articles = await response.json();
-      console.log(" 获取到的文章:", articles); // ✅ **调试**
+      console.log(" Retrieved articles:", articles); 
     } catch (error) {
-      console.error(" 获取文章失败:", error);
+      console.error(" Failed to retrieve article:", error);
     }
   }
 
-  // 组件加载时获取文章
+  // Fetch article when the component loads
   onMount(fetchArticles);
   onMount(async () => {
     try {
@@ -81,7 +85,7 @@
           credentials: "include"
         });
         if (!response.ok) {
-          throw new Error("获取用户头像失败");
+          throw new Error(" Failed to retrieve user avatar");
         } else {
           const data = await response.json();
           iconName.set(data);
@@ -90,7 +94,7 @@
         }
       }
     } catch (error) {
-      console.error("获取用户头像失败:", error);
+      console.error(" Failed to retrieve user avatar:", error);
     } 
   });
       
@@ -98,34 +102,35 @@
   function handleSearch() {
     if (filterBy === "date_time" && exactDate) {
       let formattedDate = new Date(exactDate).toISOString().split("T")[0];
-      console.log("📅 传递到后端的日期:", formattedDate);
+      console.log("📅 Date passed to the backend:", formattedDate);
       exactDate = formattedDate;
     } else {
-      console.log("🔎 不是日期筛选，正常查询");
+      console.log("🔎 Not date filtering, normal query");
     }
 
-    // ✅ **去除 Unicode 引号，防止错误字符**
+   //  **Remove Unicode quotes to prevent invalid characters**
     searchQuery = searchQuery.replace(/[“”„‟❝❞＂]/g, '"').trim();
 
     fetchArticles();
   }
 
-  // **新增：支持动态切换搜索类型（title, username, date_time）**
+ // ** Support dynamic switching of search types (title, username, date_time)**
   function handleFilterChange(event) {
     filterBy = event.target.value;
     if (filterBy !== "date_time") {
-      exactDate = ""; //  **如果不是按日期搜索，则清空日期选择**
+      // If not searching by date, clear the date selection
+      exactDate = ""; 
     }
     fetchArticles();
   }
 
-  // 处理排序
+  // Handle sorting
   function handleSort(event) {
     sortBy = event.target.value;
     fetchArticles();
   }
 
-  // 处理升降序切换
+  // Handle ascending/descending toggle
   function toggleOrder() {
     order = order === "ASC" ? "DESC" : "ASC";
     fetchArticles();
