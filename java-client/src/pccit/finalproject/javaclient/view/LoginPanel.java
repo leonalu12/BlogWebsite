@@ -51,20 +51,11 @@ public class LoginPanel extends JPanel {
         deleteButton.addActionListener(listener);}
     public void setLoggedInState(boolean isLoggedIn,String username) {
         this.isLoggedIn = isLoggedIn;
-//        updateUIState(loggedIn, username);
 
         this.username = username;
         notifyObservers();
     }
-//    private void updateUIState(boolean loggedIn, String username) {
-//        loginButton.setEnabled(!loggedIn);
-//        logoutButton.setEnabled(loggedIn);
-//
-//        // Only enable deleteButton if logged in AND username is NOT "admin"
-//        deleteButton.setEnabled(loggedIn && !"admin".equals(username));
-//        usernameField.setEnabled(!loggedIn);
-//        passwordField.setEnabled(!loggedIn);
-//    }
+
     // Method to set the state of buttons
     public void setButtonState(boolean loginEnabled, boolean logoutEnabled, boolean deleteEnabled) {
         loginButton.setEnabled(loginEnabled);
