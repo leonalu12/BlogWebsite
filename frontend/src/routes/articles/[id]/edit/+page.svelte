@@ -6,7 +6,7 @@
   import { page } from "$app/stores";
   import { get } from "svelte/store";
   // Use store to store user information
-  import { writable } from "svelte/store"; 
+  import { writable } from "svelte/store";
   import AlertWindow from "../../../../lib/components/utils/alertWindow.svelte";
   import DeleteConfirmWindow from "../../../../lib/components/utils/DeleteConfirmWindow.svelte";
 
@@ -14,20 +14,21 @@
   let content = "";
   let image = null;
   // Used to store existing article images
-  let existingImage = null; 
+  let existingImage = null;
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
 
-
-  let articleId = ""; 
+  let articleId = "";
   // Store user information
-  let user = writable(null); 
-  let showWindow=false;
+  let user = writable(null);
+  let showWindow = false;
   let showErrorWindow = false;
   let showDeleteImageWindow = false;
-  let windowMessage = "Article updated successfully!"
+  let windowMessage = "Article edited successfully!";
   let errorWindowMessage = "";
   let deleteImageMessage = "Are you sure you want to delete this image?";
   let imageToDelete = null;
+  let haveNewImg = true;
+  let displayOriginalImg = null;
 
   let conf = {
     toolbar:
@@ -37,7 +38,7 @@
     content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
   };
 
- //Get user information
+  //Get user information
   async function fetchUser() {
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
@@ -47,10 +48,9 @@
       if (res.ok) {
         const userData = await res.json();
         //Store user information
-        user.set(userData); 
-      }
-      else{
-        errorWindowMessage = "Unauthorized: Please log in first."
+        user.set(userData);
+      } else {
+        errorWindowMessage = "Unauthorized: Please log in first.";
         showErrorWindow = true;
       }
     } catch (error) {
@@ -62,7 +62,7 @@
   // Get article data
   async function fetchArticle() {
     try {
-      articleId = get(page).params.id; 
+      articleId = get(page).params.id;
       console.log("Edit article ID:", articleId);
 
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
@@ -71,7 +71,13 @@
         title = article.title || "";
         content = article.content || "";
         // Store image URLs in the article
-        existingImage = article.image_url || null; 
+        existingImage = article.image_url || null;
+        if (existingImage) {
+          haveNewImg=false;
+          displayOriginalImg = true;
+        } else {
+          displayOriginalImg = false;
+        }
       } else {
         errorWindowMessage = "Failed to fetch the article.";
         showErrorWindow = true;
@@ -84,9 +90,9 @@
 
   onMount(async () => {
     //First, get the user
-    await fetchUser(); 
+    await fetchUser();
     //Then, get the article
-    await fetchArticle(); 
+    await fetchArticle();
   });
 
   // Send update request
@@ -103,22 +109,28 @@
 
     if (image) {
       formData.append("image", image);
-    } else if (!existingImage) {
-      //Allow deleting existing images
-      formData.append("image", ""); 
+    } else if (existingImage === null) {
+      formData.append("image", ""); // ✅ Explicitly tell backend to remove image
+    }
+
+    console.log("🔍 Submitting formData:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]); // ✅ Log each key-value pair
     }
 
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}/edit`, {
       method: "PUT",
       body: formData,
       // Include session in the request
-      credentials: "include" 
+      credentials: "include"
     });
 
     if (res.ok) {
-      windowMessage = "Article created successfully!";
+      windowMessage = "Article edited successfully!";
       showWindow = true;
     } else {
+      const errorData = await res.json();
+      console.error("❌ Server Error:", errorData);
       errorWindowMessage = "Failed to create article. Please try again.";
       showErrorWindow = true;
     }
@@ -135,16 +147,40 @@
 
   function confirmDeleteImage() {
     showDeleteImageWindow = true;
+    displayOriginalImg = false;
   }
 
-  function deleteImage() {
-    imageToDelete = null;
-    existingImage = null;
+  async function deleteImage() {
+    if (!existingImage) return;
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}/delete-image`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (res.ok) {
+        existingImage = null; // ✅ Remove image preview
+        imageToDelete = null;
+        document.getElementById("image").value = ""; // ✅ Clear file input
+        haveNewImg=true;
+      } else {
+        errorWindowMessage = "Failed to delete image.";
+        showErrorWindow = true;
+      }
+    } catch (error) {
+      errorWindowMessage = "Network error. Try again later.";
+      showErrorWindow = true;
+    }
+
     showDeleteImageWindow = false;
-    document.getElementById("image").value = "";
   }
 
-  function cancelDeleteImage(){
+  function deleteTempImg(){
+    existingImage=null;
+  }
+
+
+  function cancelDeleteImage() {
     showDeleteImageWindow = false;
     imageToDelete = nunll;
   }
@@ -163,9 +199,21 @@
 
   <!-- Image Upload -->
   <label for="image">Upload Image (optional):</label>
-  <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
-  {#if existingImage}
-    <p>Original Image: <img src={existingImage} alt="Existing Img" width="100" /></p>
+  <input
+    type="file"
+    id="image"
+    accept="image/*"
+    on:change={(e) => {
+      image = e.target.files[0];
+      existingImage = image;
+      haveNewImg = true;
+    }}
+  />
+  {#if !haveNewImg}
+    {#if displayOriginalImg}
+      <p>Original Image: <img src={existingImage} alt="Existing Image" width="100" /></p>
+    {/if}
+
     <button class="delete-image-button" on:click={confirmDeleteImage}>Delete Image</button>
   {/if}
   <!-- Submit Button -->
@@ -181,7 +229,11 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={deleteImage} on:cancel={cancelDeleteImage} />
+  <DeleteConfirmWindow
+    message={deleteImageMessage}
+    on:confirm={deleteImage}
+    on:cancel={cancelDeleteImage}
+  />
 {/if}
 
 <style>
