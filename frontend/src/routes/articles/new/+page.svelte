@@ -14,6 +14,7 @@
   let title = "";
   let content = "";
   let image = null;
+  let previewUrl = ''; // 新增: 用于存储预览URL
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
   let showWindow = false;
   let windowMessage = "";
@@ -58,7 +59,16 @@
     }
   }
 
-  onMount(fetchUser); 
+  onMount(() => {
+    fetchUser();
+    // 清理预览URL
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  });
+
   onMount(async () => {
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/check`, {
@@ -136,24 +146,53 @@
     showErrorWindow = false;
   }
 
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) {
+      // 清理已存在的预览URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      image = file;
+      previewUrl = URL.createObjectURL(file);
+    }
+  }
+
+  function clearImageSelection() {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    image = null;
+    previewUrl = '';
+    document.getElementById('image').value = '';
+    showDeleteImageWindow = false;
+  }
+
   function confirmDeleteImage() {
     showDeleteImageWindow = true;
   }
 
   function deleteImage() {
-    if (image){
-      content = content.replace(/<img[^>]+>/g, "");
-      image=null;
-    } 
-    imageToDelete = null;
+    clearImageSelection();
     showDeleteImageWindow = false;
-    document.getElementById("image").value = "";
   }
-   
+
    function cancelDeleteImage (){
     showDeleteImageWindow = false;
     imageToDelete = null;
    }
+
+   function formatFileName(name) {
+    if (name.length > 20) {
+      return name.substring(0, 20) + '...';
+    }
+    return name;
+  }
+
+  function handleDeleteImage() {
+    clearImageSelection();
+    showDeleteImageWindow = false;
+  }
 </script>
 
 
@@ -169,12 +208,38 @@
   <label for="content">Content:</label>
   <TinyMCE {apiKey} bind:value={content} {conf} />
 
-  <!-- Image Upload -->
-  <label for="image">Upload Image (optional):</label>
-  <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
-  {#if image}
-    <button class="delete-image-button" on:click={confirmDeleteImage}>Delete Image</button>
-  {/if}
+  <div class="file-input-container">
+    <label for="image" class="file-input-label">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span>Choose an image to upload</span>
+    </label>
+    <input
+      type="file"
+      id="image"
+      accept="image/*"
+      on:change={handleFileSelect}
+      class="hidden-input"
+    />
+    
+    <!-- Preview Section -->
+    {#if previewUrl}
+      <div class="preview-container">
+        <div class="preview-header">
+          <h3>Image Preview:</h3>
+          <button class="delete-image-button" on:click={confirmDeleteImage}>
+            Delete
+          </button>
+        </div>
+        <div class="image-preview">
+          <img src={previewUrl} alt="Preview" />
+        </div>
+      </div>
+    {/if}
+  </div>
   <!-- Submit Button -->
   <button on:click={handleSubmit}>Publish</button>
 </div>
@@ -191,7 +256,7 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={deleteImage} on:cancel={cancelDeleteImage} />
+  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={handleDeleteImage} on:cancel={cancelDeleteImage} />
 {/if}
 
 {#if $displayLogin}
@@ -200,48 +265,235 @@
 
 <style>
   .article-form {
-    max-width: 600px;
-    margin: auto;
+    max-width: 800px;
+    margin: 95px auto 40px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    gap: 20px;
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 20;
+  }
+
+  h1 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
   }
 
   label {
-    font-weight: bold;
-    margin-top: 10px;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 1rem;
   }
 
-  input[type="text"],
+  input[type="text"] {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 1rem;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: pink;
+    box-shadow: 0 0 0 2px rgba(255, 192, 203, 0.2);
+  }
+
   input[type="file"] {
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
+    border: 2px dashed #ddd;
+    border-radius: 20px;
+    font-size: 0.9rem;
     width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
 
-  .error {
-    color: red;
-    font-size: 14px;
+  input[type="file"]:hover {
+    border-color: pink;
+    background: rgba(255, 192, 203, 0.05);
   }
 
   button {
-    background: #007bff;
-    color: white;
-    padding: 12px;
+    background: linear-gradient(90deg, rgba(255,192,203,0.8), rgba(255,228,225,0.8));
+    color: #333;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
+    font-size: 1rem;
+    margin-top: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   button:hover {
-    background: #0056b3;
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  .delete-image-button {
+    background: linear-gradient(90deg, rgba(255, 99, 71, 0.8), rgba(255, 127, 80, 0.8));
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+
+  /* Error message styling */
+  .error {
+    color: #ff4444;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Not logged in message styling */
+  p {
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    margin-top: 95px;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    .article-form {
+      margin: 75px 1rem 20px;
+      padding: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    button {
+      padding: 10px 20px;
+    }
+  }
+
+  
+  
+    .file-input-container {
+      position: relative;
+      margin-top: 1rem;
+    }
+  
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      background: linear-gradient(90deg, rgba(255,192,203,0.1), rgba(255,228,225,0.1));
+      border: 2px dashed rgba(255,192,203,0.5);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+  
+    .file-input-label:hover {
+      background: linear-gradient(90deg, rgba(255,192,203,0.2), rgba(255,228,225,0.2));
+      border-color: pink;
+    }
+  
+    .file-input-label span {
+      color: #666;
+      font-size: 1rem;
+    }
+  
+    input[type="file"] {
+      position: absolute;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+  
+    .file-preview {
+      margin-top: 1rem;
+      padding: 10px;
+      background: rgba(255,192,203,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+  
+    .file-name {
+      color: #666;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    .preview-container {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(255,192,203,0.1);
+      border-radius: 10px;
+    }
+  
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+  
+    .preview-header h3 {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0;
+    }
+  
+    .image-preview {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  
+    .image-preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+  
+    @media (max-width: 768px) {
+      .preview-container {
+        padding: 0.8rem;
+      }
+  
+      .preview-header {
+        margin-bottom: 0.6rem;
+      }
+  
+      .image-preview img {
+        max-height: 200px;
+      }
+    }
+    
 </style>

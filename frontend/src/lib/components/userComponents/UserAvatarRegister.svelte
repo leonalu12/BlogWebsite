@@ -5,11 +5,11 @@
   const dispatch = createEventDispatcher();
 
   const predefinedAvatars = [
-    "1739143411474.JPG",
-    "avatar2.png",
-    "avatar3.png",
-    "avatar4.png",
-    "avatar5.png"
+    "avatar1.jpg",
+    "avatar2.jpg",
+    "avatar3.jpg",
+    "avatar4.jpg",
+    "avatar5.jpg"
   ];
 
   let selectedAvatar = predefinedAvatars[0];
@@ -85,7 +85,6 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     background: lightpink;
-    opacity: 0.9;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -109,6 +108,7 @@
   .preview-container {
     text-align: center;
     margin: 20px 0;
+    opacity: 1;
   }
 
   .preview-avatar {
@@ -147,6 +147,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 1;
   }
 
   .upload-option {

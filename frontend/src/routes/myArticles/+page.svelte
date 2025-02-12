@@ -10,10 +10,10 @@
   import { iconName } from "../../lib/store/userStore";
   let user = writable(null);
   // Initially set to null
-  let user_id = null; 
+  let user_id = null;
   $: if ($user) {
     //// When user data updates, user_id will automatically update
-    user_id = $user.id; 
+    user_id = $user.id;
   }
 
   let articles = [];
@@ -23,7 +23,14 @@
   let errorWindowMessage = "";
   let articleToDelete = null;
 
-/** Get user information */
+  // Add sorting and filtering functionality
+  let searchQuery = "";
+  let filterBy = "title";
+  let sortBy = "date_time";
+  let order = "DESC";
+  let exactDate = "";
+
+  /** Get user information */
   async function fetchUser() {
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
@@ -33,7 +40,7 @@
       if (res.ok) {
         const userData = await res.json();
         // Update store
-        user.set(userData); 
+        user.set(userData);
       } else {
         console.error("User is not logged in. Redirecting...");
         displayLogin.set(true);
@@ -44,12 +51,20 @@
     }
   }
 
- /** Get articles by user ID */
+  /** Get articles by user ID */
   async function fetchMyArticles() {
-    // Ensure user_id exists before requesting data
-    if (!user_id) return; 
-    let apiURL = `${PUBLIC_API_BASE_URL}/articles?userId=${user_id}`;
-    console.log("Requesting:", apiURL);
+    if (!user_id) return;
+
+    const queryParams = new URLSearchParams({
+      userId: user_id,
+      search: searchQuery,
+      filterBy,
+      sortBy,
+      order,
+      ...(filterBy === "date_time" && exactDate ? { exactDate } : {})
+    });
+
+    let apiURL = `${PUBLIC_API_BASE_URL}/articles?${queryParams}`;
 
     try {
       const response = await fetch(apiURL);
@@ -57,13 +72,38 @@
         throw new Error(`Server returned ${response.status}`);
       }
       const data = await response.json();
-      console.log("Fetched articles:", data);
-      // Trigger Svelte reactivity update
-      articles = [...data]; 
+      articles = [...data];
     } catch {
       errorWindowMessage = "Error fetching articles.";
       showErrorWindow = true;
     }
+  }
+
+  function handleSearch() {
+    if (filterBy === "date_time" && exactDate) {
+      let formattedDate = new Date(exactDate).toISOString().split("T")[0];
+      exactDate = formattedDate;
+    }
+    searchQuery = searchQuery.replace(/[""„‟❝❞＂]/g, '"').trim();
+    fetchMyArticles();
+  }
+
+  function handleFilterChange(event) {
+    filterBy = event.target.value;
+    if (filterBy !== "date_time") {
+      exactDate = "";
+    }
+    fetchMyArticles();
+  }
+
+  function handleSort(event) {
+    sortBy = event.target.value;
+    fetchMyArticles();
+  }
+
+  function toggleOrder() {
+    order = order === "ASC" ? "DESC" : "ASC";
+    fetchMyArticles();
   }
 
   /** Delete article */
@@ -83,8 +123,8 @@
           "Content-Type": "application/json"
         },
         credentials: "include",
-       // Pass userId here
-        body: JSON.stringify({ userId: user_id }) 
+        // Pass userId here
+        body: JSON.stringify({ userId: user_id })
       });
 
       if (response.ok) {
@@ -102,12 +142,12 @@
     }
   }
 
-  function cancelDelete(){
+  function cancelDelete() {
     showDeleteWindow = false;
     articleToDelete = null;
   }
 
-  function handleErrorConfirm(){
+  function handleErrorConfirm() {
     showErrorWindow = false;
   }
 
@@ -115,7 +155,7 @@
   onMount(async () => {
     await fetchUser();
     // Automatically fetch articles when user data is updated
-    $user && fetchMyArticles(); 
+    $user && fetchMyArticles();
   });
 
   onMount(async () => {
@@ -127,7 +167,7 @@
         },
         credentials: "include"
       });
-      if (response.ok){
+      if (response.ok) {
         const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
           method: "GET",
           headers: {
@@ -146,7 +186,7 @@
       }
     } catch (error) {
       console.error("Failed to retrieve user avatar:", error);
-    } 
+    }
   });
 </script>
 
@@ -154,55 +194,201 @@
   <title>My Articles</title>
 </svelte:head>
 
-{#if articles.length > 0}
-<div class="articles">
-  {#each articles as article}
-    <div class="article">
-      <a href={`/articles/${article.id}`}>
-        <div class="article-content">
-          {#if article.image_url}
-            <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
-          {:else}
-            <div class="no-image">No Image</div>
-          {/if}
-          <h2 class="article-title">{article.title}</h2>
-          <div class="article-meta">
-            <span>Published on: {article.date_time}</span>
-          </div>
-          <div class="article-preview">{@html article.content}</div>
-        </div>
-      </a>
-      <div class="button-container">
-        <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>
-          Delete
+<div class="search-container">
+  <div class="search-wrapper">
+    <div class="search-bar">
+      <div class="sort-container">
+        <select bind:value={sortBy} on:change={handleSort}>
+          <option value="date_time">Date</option>
+          <option value="title">Title</option>
+        </select>
+
+        <button on:click={toggleOrder} class="order-button">
+          {order === "DESC" ? "⬇" : "⬆"}
         </button>
       </div>
+
+      {#if filterBy === "date_time"}
+        <span class="date-label">Select date:</span>
+        <input type="date" bind:value={exactDate} on:change={handleSearch} />
+      {:else}
+        <input type="text" bind:value={searchQuery} placeholder="Search..." />
+      {/if}
+
+      <select bind:value={filterBy} on:change={handleFilterChange}>
+        <option value="title">Title</option>
+        <option value="date_time">Date</option>
+      </select>
+
+      <button on:click={handleSearch}>Search</button>
     </div>
-  {/each}
+  </div>
 </div>
+
+{#if articles.length > 0}
+  <div class="articles">
+    {#each articles as article}
+      {#if !article.image_url}
+        <div class="article">
+          <a href={`/articles/${article.id}`}>
+            <div class="article-content">
+              <h2>{article.title}</h2>
+              <div class="article-meta">
+                <div>Published on: {article.date_time}</div>
+              </div>
+              <div class="articleWithoutImg">{@html article.content}</div>
+            </div>
+          </a>
+          <div class="button-container">
+            <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>
+              Delete
+            </button>
+          </div>
+        </div>
+      {:else}
+        <div class="article">
+          <a href={`/articles/${article.id}`}>
+            <div class="article-content">
+              <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
+              <h2>{article.title}</h2>
+              <div class="article-meta">
+                <div>Published on: {article.date_time}</div>
+              </div>
+              <div class="article-preview">{@html article.content}</div>
+            </div>
+          </a>
+          <div class="button-container">
+            <button class="delete-button" on:click={() => confirmDeleteArticle(article.id)}>
+              Delete
+            </button>
+          </div>
+        </div>
+      {/if}
+    {/each}
+  </div>
 {:else if $logedIn}
-  <p>No articles found.</p>
+  <p class="no-articles">No articles found.</p>
 {:else}
-  <p>Please log in to view your articles.</p>
+  <p class="no-articles">Please log in to view your articles.</p>
 {/if}
 
 {#if showDeleteWindow}
-  <DeleteConfirmWindow message = {confirmMessage} on:confirm = {deleteArticle} on:cancel = {cancelDelete} />
+  <DeleteConfirmWindow
+    message={confirmMessage}
+    on:confirm={deleteArticle}
+    on:cancel={cancelDelete}
+  />
 {/if}
 
 {#if showErrorWindow}
   <AlertWindow message={errorWindowMessage} on:confirm={handleErrorConfirm} />
 {/if}
 
-
-
 <style>
+  .search-container {
+    padding: 10px 0;
+    z-index: 31;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+  }
+
+  .search-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 50px;
+  }
+
+  .sort-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-right: #acacac 1px solid;
+    padding-right: 10px;
+    height: 90%;
+  }
+
+  .search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 18px;
+  }
+
+  .search-bar select {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 5px;
+    font-size: 18px;
+    color: #666;
+  }
+
+  .search-bar button {
+    background: linear-gradient(90deg, pink, #ffe4e1);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 70px;
+    height: 35px;
+    font-size: 13px;
+  }
+
+  .order-button {
+    background: linear-gradient(90deg, pink, #ffe4e1);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 70px;
+    height: 30px;
+  }
+
+  .date-label {
+    color: #666;
+    font-size: 14px;
+    white-space: nowrap;
+    margin-right: 10px;
+  }
+
+  .no-articles {
+    text-align: center;
+    margin-top: 50px;
+    color: #666;
+    font-size: 1.2em;
+  }
+
+  .articleWithoutImg {
+    display: -webkit-box;
+    -webkit-line-clamp: 15;
+    line-clamp: 10;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding: 0 15px;
+    margin-bottom: 10px;
+  }
+
   .articles {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
-    margin-top: 95px;
   }
 
   .article {
@@ -217,7 +403,7 @@
 
   .article:hover {
     transform: translateY(-5px) scale(1.02) rotate(0.5deg);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     z-index: 30;
   }
 
@@ -264,7 +450,7 @@
   }
 
   .delete-button {
-    background: linear-gradient(90deg, pink, #FFE4E1);
+    background: linear-gradient(90deg, pink, #ffe4e1);
     border: none;
     padding: 8px 16px;
     border-radius: 20px;

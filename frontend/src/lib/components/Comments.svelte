@@ -269,7 +269,7 @@
 
 <style>
   .comments-container {
-    padding: 15px;
+    padding: 0 15px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -280,6 +280,8 @@
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    overflow-y: hidden;
+
   }
 
   .comment-box {

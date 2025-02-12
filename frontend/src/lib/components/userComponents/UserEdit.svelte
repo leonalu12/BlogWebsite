@@ -181,7 +181,7 @@
 
 {#if displayUserPopUpwindow}
   <button class="overlay" on:click={closeUserPopUpwindow}>
-    <button on:click|stopPropagation>
+    <button on:click|stopPropagation style="background-color: transparent; border: none;">
       <div class="edit-container">
         <div class="edit-header">
           <p class="EditTitle">Edit User Information</p>

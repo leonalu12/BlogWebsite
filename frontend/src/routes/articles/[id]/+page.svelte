@@ -189,21 +189,7 @@
     </div>
 
     <div class="article-right-column">
-      <div class="article-actions">
-        <button class="like-button" on:click={toggleLike}>
-          <Heart size={20} fill={isLiked ? "red" : "none"} color="red" />
-          {likeCount}
-        </button>
-        <button class="comment-button" on:click={toggleComments}>
-          <MessageCircle size={20} color={showComments ? "black" : "blue"} />
-          {$commentAmount}
-        </button>
-        {#if $user && $user.id === article.user_id}
-          <button class="edit-button" on:click={() => goto(`/articles/${article.id}/edit`)}>
-            edit
-          </button>
-        {/if}
-      </div>
+     
       <div class="article-content">
         <h1>{article.title}</h1>
         <div class="article-meta">
@@ -214,6 +200,23 @@
           {@html article.content}
         </div>
       </div>
+    </div>
+    <div class="article-actions">
+      <button class="like-button" on:click={toggleLike}>
+        <Heart size={20} fill={isLiked ? "red" : "none"} color="red" />
+        {likeCount}
+      </button>
+      <button class="comment-button" on:click={toggleComments}>
+        <MessageCircle size={20} color={showComments ? "black" : "blue"} />
+        {$commentAmount}
+      </button>
+      {#if $user && $user.id === article.user_id}
+        <button class="edit-button" on:click={() =>{goto(`/articles/${article.id}/edit`);
+          
+        } }>
+          edit
+        </button>
+      {/if}
     </div>
   </div>
 
@@ -239,7 +242,7 @@
     padding: 20px;
     padding-top: 0;
     padding-bottom: 0;
-    margin: 0 5%;
+    margin: 0 10%;
     z-index: 20;
   }
 
@@ -282,6 +285,7 @@
     overflow-y: auto;
   }
 
+  
   .article-right-column {
     height: calc(100vh - 110px);
     position: relative;
@@ -289,14 +293,14 @@
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-    padding: 0 20px;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    overflow-x: auto;
+    overflow-y: auto; /* 改为 overflow-y */
   }
 
   .article-content {
     height: 100%;
+    padding: 0 20px;
    
 
   }
@@ -315,24 +319,36 @@
   }
 
   .article-actions {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+    position: absolute; 
     display: flex;
+    flex-direction: column;
+    top: 115px; 
+    right: 13%;
+    display: flex;
+    width: 50px;
     gap: 10px;
-    z-index: 10;
+    z-index: 29; 
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9); 
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .like-button,
   .comment-button,
   .edit-button {
-    background: linear-gradient(90deg, pink, #ffe4e1);
+    background: linear-gradient(90deg, rgba(255,192,203,0.8), rgba(255,228,225,0.8));
     border: none;
     padding: 8px 16px;
     border-radius: 20px;
     color: white;
     cursor: pointer;
     transition: transform 0.2s ease;
+    font-size: 12px;
+  }
+
+  .edit-button{
+    font-size: 11px;
   }
 
   .like-button:hover,
@@ -351,6 +367,22 @@
       position: relative;
       height: 300px;
       top: 0;
+    }
+
+    .article-actions {
+      position: sticky;
+      top: 0;
+      right: 0;
+      background: white;
+      width: 100%;
+      justify-content: flex-end;
+      border-radius: 0;
+      padding: 10px 20px;
+      margin-bottom: 10px;
+    }
+
+    .article-right-column {
+      padding-top: 20px;
     }
   }
   .comments-overlay {
