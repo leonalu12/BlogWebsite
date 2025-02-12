@@ -23,68 +23,88 @@
 </div>
 
 <style>
-    /* 遮罩层 */
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000; /* 确保弹窗显示在最上层 */
-    }
-    
-    /* 弹窗框 */
-    .modal {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 300px;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* 弹窗中的消息文本 */
-    .message {
-        font-size: 16px;
-        margin-bottom: 20px;
-    }
-    
-    /* 按钮的样式 */
-    .actions {
-        display: flex;
-        justify-content: space-around;
-    }
-    
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-    }
-    
-    /* 确认按钮 */
-    .confirm {
-        background-color: #4CAF50; /* 绿色 */
-        color: white;
-    }
-    
-    .confirm:hover {
-        background-color: #45a049;
-    }
-    
-    /* 取消按钮 */
-    .cancel {
-    background-color: #f44336; /* 红色 */
+  .overlay {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    z-index: 9999;
+  }
+
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+    transition: all 0.3s ease;
+    z-index: 10000;
+  }
+
+  .modal:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .message {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1rem;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .confirm {
+    background: linear-gradient(90deg, pink, #FFE4E1);
     color: white;
-    }
-    
-    .cancel:hover {
-        background-color: #e53935;
-    }
+  }
+
+  .confirm:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+.confirm {
+  background: linear-gradient(90deg, pink, #FFE4E1);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.confirm:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cancel {
+  background: linear-gradient(90deg, pink, #FFE4E1);
+  color:white;
+  transition: all 0.2s ease;
+}
+
+.cancel:hover {
+  transform: scale(1.05); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 </style>

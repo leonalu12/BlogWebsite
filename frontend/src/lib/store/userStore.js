@@ -16,6 +16,10 @@ export const deleteUserSuccess = writable(false);
 
 export const displayLogin = writable(false);
 
+export const displayLogoutSuccess = writable(false);
+
+export const displayDeleteCommentAlert = writable(false);
+
 export const iconName = writable("");
 
 displayEdit.subscribe(value => {

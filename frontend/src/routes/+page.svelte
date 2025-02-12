@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import { iconName } from "../lib/store/userStore";
   import { displayLogin } from "../lib/store/userStore";
+  import UserLogin from "../lib/components/userComponents/UserLogin.svelte";
 
   let searchQuery = ""; // 搜索输入框的值
   let filterBy = "title"; // 过滤字段
@@ -13,31 +14,28 @@
   let order = "DESC"; // 排序方式
   let articles = []; // 文章列表
   let searchWrapper;
-  let minScale = 0.85;
+  let minScale = 0.75;
   let navbarHeight = 105;
   let isFixed = false;
 
   onMount(() => {
     const handleScroll = () => {
       if (!searchWrapper) return;
-      
+
       const scrollPosition = window.scrollY || document.documentElement.scrollTop;
-      
+
       if (scrollPosition > navbarHeight) {
         isFixed = true;
         searchWrapper.style.transform = `scale(${minScale})`;
       } else {
         isFixed = false;
-        const scale = Math.max(
-          minScale,
-          1 - (scrollPosition / navbarHeight) * (1 - minScale)
-        );
+        const scale = Math.max(minScale, 1 - (scrollPosition / navbarHeight) * (1 - minScale));
         searchWrapper.style.transform = `scale(${scale})`;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   });
 
   async function fetchArticles() {
@@ -72,7 +70,7 @@
         },
         credentials: "include"
       });
-      if (response.ok){
+      if (response.ok) {
         const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
           method: "GET",
           headers: {
@@ -91,9 +89,8 @@
       }
     } catch (error) {
       console.error("获取用户头像失败:", error);
-    } 
+    }
   });
-      
 
   function handleSearch() {
     if (filterBy === "date_time" && exactDate) {
@@ -136,35 +133,33 @@
   <title>Home</title>
 </svelte:head>
 
-
-
-<div class="search-container" class:fixed={isFixed} class:hidden={$displayLogin}>
+<div class="search-container" class:fixed={isFixed}>
   <div class="search-wrapper" bind:this={searchWrapper}>
     <div class="search-bar">
+      <div class="sort-container">
+        <select bind:value={sortBy} on:change={handleSort}>
+          <option value="date_time">Date</option>
+          <option value="title">Title</option>
+          <option value="username">Username</option>
+        </select>
+
+        <button on:click={toggleOrder} class="order-button">
+          {order === "DESC" ? "⬇" : "⬆"}
+        </button>
+      </div>
+
       {#if filterBy === "date_time"}
         <span class="date-label">Select date:</span>
         <input type="date" bind:value={exactDate} on:change={handleSearch} />
       {:else}
         <input type="text" bind:value={searchQuery} placeholder="Search..." />
       {/if}
-      
+
       <select bind:value={filterBy} on:change={handleFilterChange}>
         <option value="title">Title</option>
         <option value="username">Username</option>
         <option value="date_time">Date</option>
       </select>
-
-      
-
-      <select bind:value={sortBy} on:change={handleSort}>
-        <option value="date_time">Date</option>
-        <option value="title">Title</option>
-        <option value="username">Username</option>
-      </select>
-
-      <button on:click={toggleOrder}>
-        {order === "DESC" ? "⬇" : "⬆"}
-      </button>
 
       <button on:click={handleSearch}>Search</button>
     </div>
@@ -190,29 +185,36 @@
 </div>
 
 <style>
-   .search-container {
-    padding: 20px;
+  .search-container {
+    padding: 10px 0;
     transition: all 0.3s ease;
     z-index: 20;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%;
-    max-width: 800px;
+    max-width: 900px;
+    display: block;
   }
 
-  .hidden {
-    display: none;
+  .order-button {
+    background: linear-gradient(90deg, pink, #ffe4e1);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 70px;
+    height: 30px;
   }
-  
- 
+
   .search-container.fixed {
     position: fixed;
     top: 0;
   }
 
   .search-wrapper {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     transition: transform 0.3s ease;
     transform-origin: top center;
@@ -224,15 +226,26 @@
     gap: 10px;
     padding: 10px 20px;
     background: white;
+    opacity: 80%;
     border-radius: 30px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 50px;
+  }
+
+  .sort-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-right: #acacac 1px solid;
+    padding-right: 10px;
+    height: 90%;
   }
 
   .search-bar input {
     flex: 1;
     border: none;
     outline: none;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .search-bar select {
@@ -240,18 +253,21 @@
     outline: none;
     background: transparent;
     padding: 5px;
-    font-size: 14px;
+    font-size: 18px;
     color: #666;
   }
 
   .search-bar button {
-    background: linear-gradient(90deg, pink, #FFE4E1);
+    background: linear-gradient(90deg, pink, #ffe4e1);
     border: none;
     padding: 8px 16px;
     border-radius: 20px;
     color: white;
     cursor: pointer;
     transition: transform 0.2s ease;
+    width: 70px;
+    height: 35px;
+    font-size: 13px;
   }
 
   .search-bar button:hover {
@@ -267,38 +283,36 @@
   }
 
   .article {
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-  
-}
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
 
   .article:hover {
     transform: translateY(-5px) scale(1.02) rotate(0.5deg);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-    z-index: 30;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    z-index: 0;
   }
 
-
   .article img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-}
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
 
   .article-content {
     padding: 15px;
   }
 
   .article h2 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 0 15px;
-  margin-bottom: 10px;
-}
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 15px;
+    margin-bottom: 10px;
+  }
 
   .article-meta {
     margin-left: 15px;
@@ -308,14 +322,14 @@
   }
 
   .article-preview {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  padding: 0 15px;
-  margin-bottom: 10px;
-}
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding: 0 15px;
+    margin-bottom: 10px;
+  }
 
   a {
     text-decoration: none;
@@ -326,19 +340,19 @@
     .search-container.fixed {
       width: 90%;
     }
-    
+
     .search-bar {
       flex-wrap: wrap;
     }
   }
 
-    .date-label {
+  .date-label {
     color: #666;
     font-size: 14px;
     white-space: nowrap;
     margin-right: 10px;
   }
-  
+
   select {
     padding: 8px 12px;
     border-radius: 15px;
@@ -349,11 +363,11 @@
     cursor: pointer;
     transition: all 0.2s ease;
   }
-  
+
   select:hover {
     border-color: pink;
   }
-  
+
   select:focus {
     outline: none;
     border-color: lightpink;

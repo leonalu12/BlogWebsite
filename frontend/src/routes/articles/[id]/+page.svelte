@@ -66,6 +66,9 @@
   onMount(() => {
     fetchUser();
     fetchIsLiked();
+    if (!article.image_url){
+        showComments = true;
+    }
   });
   onMount(async () => {
     try {
@@ -86,6 +89,7 @@
         });
         if (!response.ok) {
           throw new Error("获取用户头像失败");
+          
         } else {
           const data = await response.json();
           iconName.set(data);
@@ -156,10 +160,17 @@
   <div class="article-container">
     <div class="article-left-column">
       <div class="article-image">
+        {#if !article.image_url}
         <img
-          src={article.image_url ? article.image_url : "/images/default-placeholder.jpg"}
+          src={article.image_url}
           alt={article.title}
         />
+        {/if}
+        {#if showComments}
+          <div class="comments-overlay">
+            <Comments {article} />
+          </div>
+        {/if}
         {#if showComments}
           <div class="comments-overlay">
             <Comments {article} />
@@ -197,6 +208,7 @@
     </div>
   </div>
 
+
 {:else}
   <p>Loading article...</p>
 {/if}
@@ -216,13 +228,22 @@
     margin: 95px auto 40px;
     max-width: 1200px;
     padding: 20px;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0 5%;
+    z-index: 20;
   }
 
   .article-left-column {
     position: relative;
     position: sticky;
     top: 95px;
-    height: calc(100vh - 115px);
+    height: calc(100vh - 110px);
+    z-index: 19;
+    width: 100%;
+     word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-x: auto;
   }
 
   .article-image {
@@ -253,15 +274,22 @@
   }
 
   .article-right-column {
+    height: calc(100vh - 110px);
     position: relative;
     background: white;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    width: 100%;
+    padding: 0 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-x: auto;
   }
 
   .article-content {
     height: 100%;
+   
+
   }
 
   .article-meta {
@@ -333,4 +361,6 @@
     position: relative;
     height: 100%;
   }
+
+  
 </style>

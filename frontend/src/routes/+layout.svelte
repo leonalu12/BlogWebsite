@@ -1,43 +1,114 @@
 <script>
-
   import "$lib/css/app.css";
   import UserControl from "$lib/components/userComponents/UserControl.svelte";
   import AddButton from "$lib/components/AddButton.svelte";
   import { page } from "$app/stores";
+  import UserLogin from "../lib/components/userComponents/UserLogin.svelte";
+  import UserEdit from "../lib/components/userComponents/UserEdit.svelte";
+  import UserSecurity from "../lib/components/userComponents/UserSecurity.svelte";
+  import AlertWindow from "../lib/components/utils/AlertWindow.svelte";
+  import { logedIn } from "../lib/store/userStore";
+  import { displayLogin } from "../lib/store/userStore";
+  import { displayLogoutSuccess } from "../lib/store/userStore";
+  import { displayEdit } from "../lib/store/userStore";
+  import { displaySecurity } from "../lib/store/userStore";
+  import { displayEditSuccessAlert } from "../lib/store/userStore";
+  import { displayChangePwdAlert } from "../lib/store/userStore";
+  import { deleteUserSuccess } from "../lib/store/userStore";
+  import { goto } from "$app/navigation";
 
   $: path = $page.url.pathname;
-
 </script>
 
-<div class="page-container">
-  <div class="header">
-    <nav>
-      <span class="nav-links">
-        <a href="/" class:active={path === "/"} class="nav-option">Explore</a>
-        <a href="/myArticles" class:active={path === "/myArticles"} class="nav-option">ME</a>
-      </span>
+<div class="page">
+  <div class="page-container">
+    <div class="header">
+      <nav>
+        <span class="nav-links">
+          <a href="/" class:active={path === "/"} class="nav-option">Explore</a>
+          <a href="/myArticles" class:active={path === "/myArticles"} class="nav-option">ME</a>
+        </span>
 
-      <span class="search-container-nav">
-        <slot name="search" />
-      </span>
+        <span class="search-container-nav">
+          <slot name="search" />
+        </span>
 
-      <span class="user-control nav-links">
-        <UserControl />
-      </span>
-    </nav>
+        <span class="user-control nav-links">
+          <UserControl />
+        </span>
+      </nav>
+    </div>
+
+    <div class="content">
+      <slot />
+    </div>
   </div>
-  
-  <div class="content">
-    <slot />
+
+  <div class="add-button-container">
+    <AddButton />
   </div>
-</div>
+  {#if !$logedIn}
+    {#if $displayLogin}
+      <UserLogin />
+    {/if}
+  {/if}
 
-<div class="add-button-container">
-  <AddButton />
-</div>
+  {#if $displayEdit}
+    <UserEdit />
+  {/if}
 
+  {#if $displaySecurity}
+    <UserSecurity />
+  {/if}
+
+  {#if $displayLogoutSuccess}
+    <AlertWindow
+      message="Log out successfully"
+      on:confirm={() => displayLogoutSuccess.set(false)}
+    />
+  {/if}
+
+  {#if $displayEditSuccessAlert}
+    <AlertWindow
+      message="User Information Updated"
+      on:confirm={() => displayEditSuccessAlert.set(false)}
+    />
+  {/if}
+
+  {#if $displayLogoutSuccess}
+    <AlertWindow
+      message="Log out successfully"
+      on:confirm={() => displayLogoutSuccess.set(false)}
+    />
+  {/if}
+
+  {#if $displayChangePwdAlert}
+    <AlertWindow message="Password changed" on:confirm={() => displayChangePwdAlert.set(false)} />
+  {/if}
+
+  {#if $deleteUserSuccess}
+    <AlertWindow
+      message="User deleted"
+      on:confirm={() => {
+        displayEdit.set(false);
+        displaySecurity.set(false);
+        logedIn.set(false);
+        deleteUserSuccess.set(false);
+        goto("/");
+      }}
+    />
+  {/if}
+</div>
 
 <style>
+  :global(body) {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  :global(body::-webkit-scrollbar) {
+    display: none; /* Chrome, Safari, Opera */
+  }
   .page-container {
     min-height: 100vh;
     display: flex;
@@ -48,10 +119,9 @@
   .header {
     background: white;
     padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
-  
   }
 
   nav {
@@ -93,7 +163,6 @@
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
-
   }
 
   .add-button-container {
@@ -102,24 +171,25 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 50;
-    
   }
 
   :global(.add-button) {
-    background: linear-gradient(90deg, pink, #FFE4E1);
+    background: linear-gradient(90deg, pink, #ffe4e1);
     border: none;
     border-radius: 25px;
     padding: 12px 30px;
     color: white;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
   :global(.add-button:hover) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   }
 
   @media (max-width: 768px) {
@@ -144,11 +214,9 @@
     align-items: center;
     transition: all 0.3s ease;
     z-index: 19;
-
   }
 
-  .user-control{
+  .user-control {
     z-index: 51;
   }
-  
 </style>
