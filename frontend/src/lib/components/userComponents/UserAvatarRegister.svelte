@@ -1,38 +1,42 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
   import { PUBLIC_IMAGES_URL } from "$env/static/public";
-  
+
   const dispatch = createEventDispatcher();
-  
+
   const predefinedAvatars = [
-    '1739143411474.JPG',
-    'avatar2.png',
-    'avatar3.png',
-    'avatar4.png',
-    'avatar5.png'
+    "1739143411474.JPG",
+    "avatar2.png",
+    "avatar3.png",
+    "avatar4.png",
+    "avatar5.png"
   ];
-  
+
   let selectedAvatar = predefinedAvatars[0];
   let customImage = null;
   let previewUrl = `${PUBLIC_IMAGES_URL}/${selectedAvatar}`;
-  
+
   function handleAvatarSelect(avatar) {
     selectedAvatar = avatar;
     previewUrl = `${PUBLIC_IMAGES_URL}/${avatar}`;
-    dispatch('select', { avatar, type: 'predefined' });
+    dispatch("select", { avatar, type: "predefined" });
   }
-  
+
+  function triggerFileInput() {
+    document.getElementById("custom-avatar").click();
+  }
+
   function handleCustomImageUpload(event) {
     const file = event.target.files[0];
     if (file) {
       customImage = file;
       previewUrl = URL.createObjectURL(file);
-      dispatch('select', { avatar: file, type: 'custom' });
+      dispatch("select", { avatar: file, type: "custom" });
     }
   }
-  
+
   function handleNext() {
-    dispatch('next');
+    dispatch("next");
   }
 </script>
 
@@ -40,25 +44,23 @@
   <div class="avatar-header">
     <p class="avatar-title">Choose Your Avatar</p>
   </div>
-  
+
   <div class="preview-container">
-    <img src={previewUrl} alt="Selected avatar" class="preview-avatar"/>
+    <img src={previewUrl} alt="Selected avatar" class="preview-avatar" />
   </div>
-  
+
   <div class="avatars-grid">
     {#each predefinedAvatars as avatar}
-      <button 
-        type="button"
-        class="avatar-option" 
+      <button
+        class="avatar-option"
         class:selected={selectedAvatar === avatar}
         on:click={() => handleAvatarSelect(avatar)}
-        on:keydown={(e) => e.key === 'Enter' && handleAvatarSelect(avatar)}
       >
-        <img src={`${PUBLIC_IMAGES_URL}/${avatar}`} alt="Avatar option"/>
+        <img src={`${PUBLIC_IMAGES_URL}/${avatar}`} alt="Avatar option" />
       </button>
     {/each}
-    
-    <div class="avatar-option upload-option">
+
+    <button class="avatar-option upload-option" on:click={triggerFileInput}>
       <label for="custom-avatar">
         <span class="upload-icon">+</span>
         <input
@@ -69,9 +71,9 @@
           style="display: none;"
         />
       </label>
-    </div>
+    </button>
   </div>
-  
+
   <button class="next-btn" on:click={handleNext}>Next</button>
 </div>
 
@@ -165,7 +167,7 @@
     border-radius: 4px;
     cursor: pointer;
     padding: 10px;
-    background: linear-gradient(90deg, pink, #FFE4E1);
+    background: linear-gradient(90deg, pink, #ffe4e1);
     height: 50px;
     font-size: 16px;
     margin-top: 20px;

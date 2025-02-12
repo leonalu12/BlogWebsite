@@ -86,7 +86,7 @@
         }
       }
 
-      // redirect to the home page
+      window.location.reload();
     } catch (error) {
       displayloginFailed = true;
       console.error("登录失败:", error);

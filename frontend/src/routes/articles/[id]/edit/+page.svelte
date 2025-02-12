@@ -165,7 +165,7 @@
   <label for="image">Upload Image (optional):</label>
   <input type="file" id="image" accept="image/*" on:change={(e) => (image = e.target.files[0])} />
   {#if existingImage}
-    <p>Original Image: <img src={existingImage} alt="Existing Image" width="100" /></p>
+    <p>Original Image: <img src={existingImage} alt="Existing Img" width="100" /></p>
     <button class="delete-image-button" on:click={confirmDeleteImage}>Delete Image</button>
   {/if}
   <!-- Submit Button -->

@@ -1,6 +1,4 @@
 <script>
-  import { writable } from "svelte/store";
-  // import CommentItem from "../components/CommentItem.svelte"-->
   import DeleteConfirmWindow from "../components/utils/DeleteConfirmWindow.svelte";
   import { displayLogin } from "../store/userStore";
   import { tick } from "svelte";
