@@ -40,7 +40,7 @@ public class UserTableModel extends AbstractTableModel {
         return columnNames[column];
     }
 
-    // 获取用户数据的列表
+    // Fetch the list of user data
     public List<User> getUsers() {
         return users;
     }
