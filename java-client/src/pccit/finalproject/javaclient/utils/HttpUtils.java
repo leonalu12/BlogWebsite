@@ -88,6 +88,7 @@ public class HttpUtils {
                         user.setFname(jsonObject.getString("fname"));
                         user.setLname(jsonObject.getString("lname"));
                         user.setDescription(jsonObject.getString("description"));
+                        user.setIcon(jsonObject.getString("icon"));
                         user.setPwd(jsonObject.getString("pwd"));
                         users.add(user);
                     }
