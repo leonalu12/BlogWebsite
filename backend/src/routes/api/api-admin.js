@@ -6,6 +6,7 @@ const router = express.Router();
 
 // authenticate admin
 router.post("/", async (req, res) => {
+
   try {
       const { username, pwd} = req.body;
       const admin = await authenticateAdmin(username,pwd);
@@ -14,13 +15,15 @@ router.post("/", async (req, res) => {
   } catch (error) {
       return res.status(401).json({ error: 'Failed to authenticate admin' })
   }
+
 });
 
 //users
 router.get("/", async (req, res) => {
   try {
       const users = await getUsers();
-      return res.json(users); // 返回用户数据
+      return res.json(users); 
+      //  Return user data
   } catch (error) {
       console.error('Error fetching users:', error);
       return res.status(500).json({ error: 'Failed to fetch users' });

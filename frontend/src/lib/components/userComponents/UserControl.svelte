@@ -10,6 +10,7 @@
   import { displayEdit, displaySecurity, displayEditSuccessAlert, displayChangePwdAlert, deleteUserSuccess, displayLogin, iconName } from "../../store/userStore.js";
   import { goto } from "$app/navigation";
 
+ 
   let showLogoutAlert = false;
   let isOpen = false;
   let dropdownRef; // 用于引用下拉框的 DOM 元素
@@ -48,6 +49,7 @@
       displayEdit.set(false);
       showLogoutAlert = true;
       toggleDropdown();
+      goto("/");
     } catch (error) {
       console.error("log out error:", error);
     }
@@ -62,14 +64,13 @@
     }
   }
 
-  // 组件挂载时添加事件监听器
   onMount(() => {
     document.addEventListener("click", handleClickOutside);
   });
 
-  // 组件销毁时移除事件监听器
   onDestroy(() => {
     document.removeEventListener("click", handleClickOutside);
+    
   });
 </script>
 

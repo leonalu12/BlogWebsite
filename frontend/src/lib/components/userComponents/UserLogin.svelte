@@ -80,7 +80,6 @@
             const data = await response.json();
             iconName.set(data);
             console.log("获取用户头像成功:", data);
-            goto("/");
           }
         } catch (error) {
           console.error("获取用户头像失败:", error);
@@ -189,7 +188,7 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5); /* half transparent */
-    z-index: 10; /* make sure it's on top of everything */
+    z-index: 1000; /* make sure it's on top of everything */
   }
   
   .login-container {

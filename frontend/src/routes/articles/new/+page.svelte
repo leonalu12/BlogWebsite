@@ -4,7 +4,12 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
-  import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
+  import DeleteConfirmWindow from "../../../lib/components/utils/DeleteConfirmWindow.svelte";
+  import { writable } from "svelte/store"; 
+  import UserLogin from "../../../lib/components/userComponents/UserLogin.svelte";
+  import {displayLogin} from "../../../lib/store/userStore";
+  import { logedIn } from "../../../lib/store/userStore";
+  import { iconName } from "../../../lib/store/userStore";
 
   let title = "";
   let content = "";
@@ -16,6 +21,7 @@
   let errorWindowMessage = "";
   let showDeleteImageWindow = false;
   let deleteImageMessage = "Are you sure you want to delete this image?";
+  let imageToDelete = null;
 
   let user = writable(null); // ✅ 存储用户信息
 
@@ -38,12 +44,10 @@
       if (res.ok) {
         const userData = await res.json();
         user.set(userData); // ✅ 存储用户信息
-        console.log("✅ Fetched user:", userData);
+        console.log(" Fetched user:", userData);
       } else if (res.status === 401) {
-        console.error("❌ User is not logged in. Redirecting...");
-        errorWindowMessage = "unauthorized: please log in first."
-        showErrorWindow = true;
-        goto("/login"); // ✅ 让用户重新登录
+        console.error(" User is not logged in. Redirecting...");
+        displayLogin.set(true);
       }
     } catch (error) {
       errorWindowMessage="Error fetching user."
@@ -51,7 +55,37 @@
     }
   }
 
-  onMount(fetchUser); // ✅ 页面加载时获取用户信息
+  onMount(fetchUser); 
+  onMount(async () => {
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/check`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      if (response.ok){
+        const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include"
+        });
+        if (!response.ok) {
+          throw new Error("获取用户头像失败");
+        } else {
+          const data = await response.json();
+          iconName.set(data);
+          console.log("get img successful:", data);
+          logedIn.set(true);
+        }
+      }
+    } catch (error) {
+      console.error("获取用户头像失败:", error);
+    } 
+  });
 
   // ✅ 提交文章
   async function handleSubmit() {
@@ -65,7 +99,7 @@
     user.subscribe((value) => (currentUser = value))(); // ✅ 获取 user
 
     if (!currentUser) {
-      goto("/login"); // ✅ 让用户重新登录
+      displayLogin.set(true);
       return;
     }
 
@@ -104,12 +138,19 @@
 
   function deleteImage() {
     if (image) content = content.replace(/<img[^>]+>/g, "");
-    image = null;
+    imageToDelete = null;
     showDeleteImageWindow = false;
     document.getElementById("image").value = "";
   }
+   
+   function cancelDeleteImage (){
+    showDeleteImageWindow = false;
+    imageToDelete = null;
+   }
 </script>
 
+
+{#if $logedIn}
 <div class="article-form">
   <h1>Write your article here</h1>
 
@@ -130,6 +171,9 @@
   <!-- Submit Button -->
   <button on:click={handleSubmit}>Publish</button>
 </div>
+{:else}
+<p>Please log in to write an article.</p>
+{/if}
 
 {#if showWindow}
   <AlertWindow message={windowMessage} on:confirm={handleConfirm} />
@@ -140,7 +184,11 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <AlertWindow message={deleteImageMessage} on:confirm={deleteImage} />
+  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={deleteImage} on:cancel={cancelDeleteImage} />
+{/if}
+
+{#if $displayLogin}
+  <UserLogin />
 {/if}
 
 <style>
