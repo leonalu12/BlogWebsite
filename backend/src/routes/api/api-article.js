@@ -9,7 +9,7 @@ import { requiresAuthentication } from "../../middleware/auth-middleware.js";
 
 const router = express.Router();
 
-// 配置 Multer 处理图片上传
+// Configure Multer to handle image uploads
 const storage = multer.diskStorage({
   destination: path.join(process.cwd(), "public/images"),
   filename: (req, file, cb) => {
@@ -18,11 +18,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// 获取文章（支持搜索、排序、按用户ID获取）
+// Get articles (support search, sorting, and filtering by user ID)
 router.get("/", async (req, res) => {
   try {
     const { search, filterBy, sortBy, order, userId, exactDate } = req.query;
-    console.log("🛠 收到的请求参数:", { search, filterBy, sortBy, order, userId, exactDate });
+    console.log("🛠  Received request parameters:", { search, filterBy, sortBy, order, userId, exactDate });
 
     const articles = await getAllArticles(search, filterBy, sortBy, order, userId, exactDate);
     res.json(articles);
@@ -32,35 +32,35 @@ router.get("/", async (req, res) => {
 });
 
 
-// 获取单篇文章（包含评论数量）
+// Get a single article (including comment count)
 router.get("/:id", async (req, res) => {
   try {
     const db = await getDatabase();
     const articleId = req.params.id;
     
 
-    // 获取文章信息
+    // Get article information
     const article = await getArticleById(req.params.id);
     if (!article) return res.status(404).json({ error: "Article not found" });
 
     console.log("🎨 Article Image URL:", article.image_url);
 
-    // 获取评论数量
+    //Get comment count
     const commentCountResult = await db.get(
       "SELECT COUNT(*) AS comment_count FROM comments WHERE article_id = ?",
       [articleId]
     );
-
-    article.comment_count = commentCountResult ? commentCountResult.comment_count : 0; // ✅ 确保前端获取评论数
+    // Ensure the frontend retrieves the comment count
+    article.comment_count = commentCountResult ? commentCountResult.comment_count : 0; 
     res.json(article);
   } catch (err) {
-    console.error("❌ 获取文章详情失败:", err.message);
+    console.error("❌  Failed to get article details:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 
-// 添加文章（需要登录）
+// Add an article (login required)
 router.post("/new", requiresAuthentication, upload.single("image"), async (req, res) => {
   try {
     console.log("🛠️ Creating article. Received user:", req.user);
@@ -70,7 +70,8 @@ router.post("/new", requiresAuthentication, upload.single("image"), async (req, 
     }
     
     const { title, content } = req.body;
-    const userId = req.user.id; // 🛠 **从 session 获取 userId**
+    //Get userId from session
+    const userId = req.user.id; 
     console.log("✅ User ID:", userId);
 
     if (!title || !content) {
@@ -88,11 +89,12 @@ router.post("/new", requiresAuthentication, upload.single("image"), async (req, 
 });
 
 
-// 更新文章（需要登录）
+// Update article (login required)
 router.put("/:id/edit", requiresAuthentication, upload.single("image"), async (req, res) => {
   try {
     const { title, content } = req.body;
-    const userId = req.user.id; // 🛠 **从认证中获取 userId**
+    // Get userId from authentication
+    const userId = req.user.id; 
     console.log("🔄 Update Request:", { title, content, userId });
 
     if (!title || !content) {
@@ -118,13 +120,14 @@ router.put("/:id/edit", requiresAuthentication, upload.single("image"), async (r
   }
 });
 
-// 删除文章（需要登录）
+
+// Delete article (login required)
 router.delete("/:id", requiresAuthentication, async (req, res) => {
   try {
-    const userId = req.user.id; // 🛠 **从 session 获取 userId**
+    const userId = req.user.id; 
     console.log("🗑️ Delete Request: Article ID:", req.params.id, "User ID:", userId);
 
-    // 获取文章信息
+    // Get article information
     const article = await getArticleById(req.params.id);
     if (!article) {
       return res.status(404).json({ error: "Article not found" });
@@ -146,10 +149,12 @@ router.delete("/:id", requiresAuthentication, async (req, res) => {
   }
 });
 
-// 点赞文章（需要登录）
+
+
+  // Like article (login required)
 router.post("/:id/like", requiresAuthentication, async (req, res) => {
   try {
-    const userId = req.user.id; // 🛠 **获取用户 ID**
+    const userId = req.user.id; 
     console.log("👍 Like Request:", { userId, articleId: req.params.id });
 
     const success = await likeArticle(userId, req.params.id);
@@ -161,10 +166,12 @@ router.post("/:id/like", requiresAuthentication, async (req, res) => {
   }
 });
 
-// 取消点赞（需要登录）
+
+
+// Unlike (login required)
 router.delete("/:id/like", requiresAuthentication, async (req, res) => {
   try {
-    const userId = req.user.id; // 🛠 **获取用户 ID**
+    const userId = req.user.id; 
     console.log("👎 Unlike Request:", { userId, articleId: req.params.id });
 
     await unlikeArticle(userId, req.params.id);
@@ -176,32 +183,34 @@ router.delete("/:id/like", requiresAuthentication, async (req, res) => {
   }
 });
 
-// 获取文章点赞状态（是否已点赞 ）
+
+
+// Get article like status (whether liked)
 router.get("/:id/like/check", requiresAuthentication, async (req, res) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: "Unauthorized: Please log in" });
     }
-
-    const userId = req.user.id; // ✅ 获取当前用户 ID
+    //Get current user ID
+    const userId = req.user.id; 
     const articleId = req.params.id;
     const db = await getDatabase();
 
-    console.log(`🔍 检查文章 ${articleId} 是否被用户 ${userId} 点赞`);
+    console.log(`🔍 Check article ${articleId} whether by user ${userId} like`);
 
    
-
-    // 检查用户是否已点赞
+    // Check if the user has already liked
     const userLiked = await db.get(
       "SELECT * FROM like_a WHERE user_id = ? AND article_id = ?",
       [userId, articleId]
     );
 
     res.json({
-      isLiked: !!userLiked // `!!userLiked` 确保返回 `true/false`
+      // `!!userLiked` ensures returning `true/false`
+      isLiked: !!userLiked 
     });
   } catch (err) {
-    console.error("❌ 点赞检查 API 出错:", err.message);
+    console.error("❌ Error in like check API:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -217,7 +226,7 @@ router.get("/:id/likesAmount", async (req, res) => {
     res.json({ like_count: likeCountResult ? likeCountResult.like_count : 0 });
   
   } catch (err) {
-    console.error("❌ 获取点赞数失败:", err.message);
+    console.error("❌  Failed to get like count:", err.message);
     res.status(500).json({ error: err.message });
   }
 

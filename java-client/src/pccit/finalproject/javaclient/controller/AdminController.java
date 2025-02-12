@@ -9,17 +9,19 @@ import pccit.finalproject.javaclient.view.LoginPanel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AdminController {
     private AdminDashboard dashboard;
     private LoginPanel loginPanel;
     private UserTableModel userTableModel;
+    private String adminName = "";
 
     public AdminController(AdminDashboard dashboard) {
         this.dashboard = dashboard;
-        this.loginPanel = dashboard.getLoginPanel(); // 确保从 dashboard 获取 loginPanel
+        this.loginPanel = dashboard.getLoginPanel();
+        // Ensure loginPanel is obtained from the dashboard
 
         loginPanel.setLoginAction(new ActionListener() {
             @Override
@@ -32,6 +34,26 @@ public class AdminController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 logout();
+            }
+        });
+
+        loginPanel.setDeleteAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int confirm = JOptionPane.showConfirmDialog(
+                            dashboard,
+                            "Are you sure you want to delete this admin?",
+                            "Confirm Deletion",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        deleteAdmin(adminName);
+                        loginPanel.setLoggedInState(false, adminName);
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
     }
@@ -48,13 +70,11 @@ public class AdminController {
 
             if (response.equals("null")) {
                 JOptionPane.showMessageDialog(dashboard, "Access denied.");
-                logout();
+                username = loginPanel.getUsername();
+                loginPanel.setLoggedInState(false, username);
             } else {
                 loginPanel.setLoggedInState(true, username);
-                JOptionPane.showMessageDialog(dashboard, "Login successful!");
-
-                // 通过 dashboard 获取 userTable，并设置其可见性
-                dashboard.getUserTable().setVisible(true); // 恢复表格的显示
+                adminName = username;
                 loadUsers();
             }
         } catch (Exception ex) {
@@ -63,24 +83,38 @@ public class AdminController {
         }
     }
 
-
     private void logout() {
-        // 清空用户信息（头像和用户名）并隐藏
-        dashboard.clearUserTable();
-
-        // 清除登录面板
+        JOptionPane.showMessageDialog(dashboard, "Logged out.");
         String username = loginPanel.getUsername();
         loginPanel.setLoggedInState(false, username);
-        loginPanel.clearFields();
-
-        JOptionPane.showMessageDialog(dashboard, "Logged out.");
     }
 
+    private void deleteAdmin(String adminName) throws Exception {
+        String requestBody = "{\"username\":\"" + adminName + "\"}";
+        try {
+            HttpUtils.sendDeleteRequestWithBody("/api/admins", requestBody);
+            JOptionPane.showMessageDialog(dashboard, "Delete admin successful!");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(dashboard, "Delete failed: " + ex.getMessage());
+        }
+    }
 
-    private void loadUsers() {
-        List<User> users = HttpUtils.getUsersFromBackend();
-        userTableModel = new UserTableModel(users);
-        dashboard.setTableModel(userTableModel);
+    public void loadUsers() {
+        SwingWorker<List<User>, Void> worker = HttpUtils.fetchUsersInBackground();
+        worker.execute();
+
+        worker.addPropertyChangeListener(evt -> {
+            if (SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                try {
+                    List<User> users = worker.get();
+                    userTableModel = new UserTableModel(users);
+                    dashboard.setTableModel(userTableModel);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(dashboard, "Error loading users: " + e.getMessage());
+                }
+            }
+        });
     }
 
     public void displayUserInfo(int rowIndex) {
@@ -90,5 +124,28 @@ public class AdminController {
         System.out.println("Icon loaded: " + (icon != null));
         dashboard.setUserInfo(user.getUsername(), icon);
     }
-}
 
+    public void deleteUser(int rowIndex) {
+        User user = userTableModel.getUsers().get(rowIndex);
+        int userId = user.getId();
+
+        try {
+            // Delete the user from the database
+            String response = HttpUtils.deleteUserFromBackend(userId);
+            if ("success".equals(response)) {
+                // Remove the user from the list
+                userTableModel.getUsers().remove(rowIndex);
+                // Notify the table that data has been updated
+                userTableModel.fireTableDataChanged();
+
+                // Clear the user info panel
+                dashboard.setUserInfo("", null);
+                JOptionPane.showMessageDialog(dashboard, "User deleted successfully.");
+            } else {
+                JOptionPane.showMessageDialog(dashboard, "Failed to delete user: " + response);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(dashboard, "Error: " + e.getMessage());
+        }
+    }
+}

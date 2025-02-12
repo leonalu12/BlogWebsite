@@ -9,32 +9,36 @@
   export let toggleReplyBox;
   export let startReply;
   export let article;
-  let showDeleteConfirm = false; // 控制删除确认框的显示
-  let replyInput; // 用于存储回复框的 DOM 参考
-  let user_id = null; // 设定默认值
+  let showDeleteConfirm = false; 
+  // Control the visibility of the delete confirmation box
+  let replyInput; 
+  // DOM reference for storing the reply box
+  let user_id = null; 
+  // Set default value
   $: if ($user) {
     user_id = $user.id;
   }
-  // 触发删除确认弹窗
+  // Trigger the delete confirmation popup
   function triggerDeleteConfirm() {
     showDeleteConfirm = true;
   }
 
-  // 确认删除评论
+  // Confirm comment deletion
   async function confirmDelete() {
     const res = await fetch(`http://localhost:3000/api/comments/${comment.id}`, { method: "DELETE" });
     if (res.ok) {
-      comment.deleted = true; // 标记已删除，触发 Svelte 更新
+      comment.deleted = true; 
+      // Mark as deleted and trigger Svelte update
     }
     showDeleteConfirm = false;
   }
 
-  // 取消删除
+  // Cancel delete
   function cancelDelete() {
     showDeleteConfirm = false;
   }
 
-  // 点赞 / 取消点赞
+  // like / unlike
   async function toggleLike() {
     if (!$user) {
       displayLogin.set(true);
@@ -53,23 +57,26 @@
     }
   }
 
-  // 修改 toggleReplyBox 逻辑，使其在显示输入框后自动聚焦
+  // Modify toggleReplyBox logic to automatically focus the input box after showing it
   async function handleToggleReplyBox(comment) {
     toggleReplyBox(comment);
-    await tick(); // 等待 DOM 更新
-    replyInput?.focus(); // 聚焦到输入框
+    await tick(); 
+    // Wait for DOM update
+    replyInput?.focus(); 
+    // Focus on the input box
   }
 
-  // 监听 Enter 键提交评论
+  // Listen for the Enter key to submit the comment
   function handleKeyDown(event, comment) {
     if (event.key === "Enter") {
-      event.preventDefault(); // 防止换行
-      startReply(comment); // 触发提交
+      event.preventDefault(); // Prevent line break
+      startReply(comment); // Trigger submission
     }
   }
 </script>
-  
-  {#if !comment.deleted} <!-- 仅在评论未被删除时渲染 -->
+
+  <!-- Only render when the comment is not deleted  -->
+  {#if !comment.deleted} 
   <div class="comment-item" style="margin-left: {comment.displayLayer * 20}px">
     <div class="comment-content">
       <div class="user-info">
@@ -126,7 +133,7 @@
       {/if}
     </div>
 
-    <!-- 递归渲染子评论 -->
+    <!-- Recursive rendering of child comments -->
     {#if comment.children?.length}
       <div class="comment-children">
         {#each comment.children as childComment}
@@ -145,7 +152,7 @@
       </div>
  
     {/if}
-  <!-- 删除确认弹窗 -->
+  <!-- Delete confirmation popup -->
   {#if showDeleteConfirm}
     <DeleteConfirmWindow
       message="Are you sure to delete this comment?"

@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    export let message = "Are you sure?"; // 默认提示语句
+    export let message = "Are you sure?";
+    // Default prompt message
     const dispatch = createEventDispatcher();
      
     const confirmDelete = () => {
@@ -14,7 +15,8 @@
 
 <div class="overlay">
     <div class="modal">
-        <p class="message">{message}</p> <!-- 显示传入的提示语句 -->
+        <p class="message">{message}</p>
+        <!-- Display the provided prompt message -->
         <div class="actions">
             <button class="btn confirm" on:click={confirmDelete}>Confirm</button>
             <button class="btn cancel" on:click={cancelDelete}>Cancel</button>
@@ -78,6 +80,7 @@
 
   .confirm {
     background: linear-gradient(90deg, pink, #FFE4E1);
+
     color: white;
   }
 

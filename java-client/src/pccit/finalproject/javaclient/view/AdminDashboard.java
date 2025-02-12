@@ -1,77 +1,111 @@
 package pccit.finalproject.javaclient.view;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import pccit.finalproject.javaclient.controller.AdminController;
 import pccit.finalproject.javaclient.model.UserTableModel;
 
-public class AdminDashboard extends JFrame {
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class AdminDashboard extends JFrame implements LoginStateObserver {
     private JTable userTable;
     private JLabel usernameLabel;
     private JLabel iconLabel;
     private LoginPanel loginPanel;
+    private JButton deleteUserButton;
     private AdminController controller;
+    private DefaultTableModel tableModel;
 
     public AdminDashboard() {
-        // 设置JFrame属性
+        // Set JFrame properties
         setTitle("Admin Dashboard");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // 创建并添加登录面板
+        // Create and add login panel
         loginPanel = new LoginPanel();
         add(loginPanel, BorderLayout.NORTH);
+        loginPanel.addObserver(this);
 
-        // 创建JTable
+        // Create JTable
         userTable = new JTable();
         add(new JScrollPane(userTable), BorderLayout.CENTER);
 
-        // 创建用户信息面板，并放置在表格下方
+        // Create user information panel and place it below the table
         JPanel userInfoPanel = new JPanel();
-        userInfoPanel.setLayout(new BoxLayout(userInfoPanel, BoxLayout.Y_AXIS)); // 使用 BoxLayout，让组件纵向排列
+        userInfoPanel.setLayout(new BoxLayout(userInfoPanel, BoxLayout.Y_AXIS));
+        // Use BoxLayout to arrange components vertically
 
-        // 设置用户信息面板的尺寸，增加整体高度
-        userInfoPanel.setPreferredSize(new Dimension(userInfoPanel.getWidth(), 150)); // 设置高度为150px，调整值以获得所需高度
+        // Set the size of the user info panel to increase overall height
+        userInfoPanel.setPreferredSize(new Dimension(userInfoPanel.getWidth(), 150));
+        // Set height to 150px, adjust value to get desired height
 
         usernameLabel = new JLabel();
         iconLabel = new JLabel();
+        deleteUserButton = new JButton("Delete User");
+        deleteUserButton.setVisible(false); // Hide initially
 
-        // 设置组件居中显示
+        // Center the components
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteUserButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // 将用户名和头像添加到面板中
-        userInfoPanel.add(Box.createVerticalStrut(30)); // 增加顶部间距
+        // Add username and icon to the panel
+        userInfoPanel.add(Box.createVerticalStrut(30)); // Add top margin
         userInfoPanel.add(usernameLabel);
-        userInfoPanel.add(Box.createVerticalStrut(10)); // 给头像和用户名之间添加间距
+        userInfoPanel.add(Box.createVerticalStrut(10)); // Add space between username and icon
         userInfoPanel.add(iconLabel);
-        userInfoPanel.add(Box.createVerticalStrut(30)); // 增加底部间距
+        userInfoPanel.add(Box.createVerticalStrut(10)); // Add space between icon and delete button
+        userInfoPanel.add(deleteUserButton);
+        userInfoPanel.add(Box.createVerticalStrut(30)); // Add bottom margin
 
-        // 将用户信息面板添加到JFrame的SOUTH位置
+        // Add the user info panel to the SOUTH position of the JFrame
         add(userInfoPanel, BorderLayout.SOUTH);
 
-        // 初始化控制器
+        // Initialize the controller
         controller = new AdminController(this);
 
-        // 设置JTable选择监听器
+        // Set JTable selection listener
         userTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int selectedRow = userTable.getSelectedRow();
                 if (selectedRow >= 0) {
-                    System.out.println("Selected row: " + selectedRow); // 调试输出
+                    System.out.println("Selected row: " + selectedRow); // Debug output
                     if (controller != null) {
                         controller.displayUserInfo(selectedRow);
+                        deleteUserButton.setVisible(true); // Show delete button
+                    }
+                } else {
+                    deleteUserButton.setVisible(false); // Hide delete button
+                }
+            }
+        });
+
+        // Set delete button listener
+        deleteUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow();
+                if (selectedRow >= 0 && controller != null) {
+                    int confirmation = JOptionPane.showConfirmDialog(AdminDashboard.this,
+                            "Are you sure you want to delete this user?",
+                            "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (confirmation == JOptionPane.YES_OPTION) {
+                        controller.deleteUser(selectedRow);
+                        deleteUserButton.setVisible(false); // Hide delete button after deleting user
                     }
                 }
             }
         });
 
-        // 显示JFrame
+        // Display JFrame
         setVisible(true);
     }
 
@@ -82,11 +116,9 @@ public class AdminDashboard extends JFrame {
     public void setUserInfo(String username, ImageIcon icon) {
         usernameLabel.setText(username);
         iconLabel.setIcon(icon);
-        System.out.println("Username: " + username); // 调试输出
-        System.out.println("Icon: " + icon); // 调试输出
-
+        System.out.println("Username: " + username);
+        System.out.println("Icon: " + icon);
     }
-
 
     public LoginPanel getLoginPanel() {
         return loginPanel;
@@ -95,18 +127,31 @@ public class AdminDashboard extends JFrame {
     public JTable getUserTable() {
         return userTable;
     }
-
-
+    //Update UI according to state
+    @Override
+    public void onLoginStateChanged(boolean isLoggedIn, String username) {
+        if (isLoggedIn) {
+            getUserTable().setVisible(true);
+            JOptionPane.showMessageDialog(this, "Login successful!");
+            controller.loadUsers();
+            loginPanel.setButtonState(false, true, !"admin".equals(username));
+        } else {
+            clearUserTable();
+            loginPanel.setButtonState(true, false, false);
+            loginPanel.clearFields();
+        }
+    }
     public void clearUserTable() {
-        // 清空表格数据
-        userTable.setModel(new DefaultTableModel()); // 清空表格
-        userTable.setVisible(false); // 隐藏表格
+        // Clear table data
+        userTable.setModel(new DefaultTableModel()); // Clear the table
+        userTable.setVisible(false); // Hide the table
 
-        // 隐藏用户信息面板
-        usernameLabel.setText(""); // 清空用户名
-        iconLabel.setIcon(null);    // 清空头像
-//        usernameLabel.setVisible(false); // 隐藏用户名标签
-//        iconLabel.setVisible(false);    // 隐藏头像标签
+        // Hide user info panel
+        usernameLabel.setText(""); // Clear username
+        iconLabel.setIcon(null);    // Clear icon
+
+        // Hide delete button
+        deleteUserButton.setVisible(false);
     }
 
 

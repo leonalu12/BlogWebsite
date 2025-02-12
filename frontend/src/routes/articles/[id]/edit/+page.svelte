@@ -5,24 +5,29 @@
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { page } from "$app/stores";
   import { get } from "svelte/store";
-  import { writable } from "svelte/store"; // ✅ 使用 store 存储用户信息
+  // Use store to store user information
+  import { writable } from "svelte/store"; 
   import AlertWindow from "../../../../lib/components/utils/alertWindow.svelte";
+  import DeleteConfirmWindow from "../../../../lib/components/utils/DeleteConfirmWindow.svelte";
 
   let title = "";
   let content = "";
   let image = null;
-  let existingImage = null; // ✅ 用于存储已存在的文章图片
+  // Used to store existing article images
+  let existingImage = null; 
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
 
 
   let articleId = ""; 
-  let user = writable(null); // ✅ 存储用户信息
+  // Store user information
+  let user = writable(null); 
   let showWindow=false;
   let showErrorWindow = false;
   let showDeleteImageWindow = false;
   let windowMessage = "Article updated successfully!"
   let errorWindowMessage = "";
   let deleteImageMessage = "Are you sure you want to delete this image?";
+  let imageToDelete = null;
 
   let conf = {
     toolbar:
@@ -32,7 +37,7 @@
     content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
   };
 
-  // ✅ 获取用户信息
+ //Get user information
   async function fetchUser() {
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
@@ -41,7 +46,8 @@
       });
       if (res.ok) {
         const userData = await res.json();
-        user.set(userData); // ✅ 存储用户信息
+        //Store user information
+        user.set(userData); 
       }
       else{
         errorWindowMessage = "Unauthorized: Please log in first."
@@ -53,18 +59,19 @@
     }
   }
 
-  // ✅ 获取文章数据
+  // Get article data
   async function fetchArticle() {
     try {
       articleId = get(page).params.id; 
-      console.log("编辑文章 ID:", articleId);
+      console.log("Edit article ID:", articleId);
 
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}`);
       if (response.ok) {
         const article = await response.json();
         title = article.title || "";
         content = article.content || "";
-        existingImage = article.image_url || null; // ✅ 存储文章中的图片 URL
+        // Store image URLs in the article
+        existingImage = article.image_url || null; 
       } else {
         errorWindowMessage = "Failed to fetch the article.";
         showErrorWindow = true;
@@ -76,11 +83,13 @@
   }
 
   onMount(async () => {
-    await fetchUser(); // ✅ 先获取用户
-    await fetchArticle(); // ✅ 再获取文章
+    //First, get the user
+    await fetchUser(); 
+    //Then, get the article
+    await fetchArticle(); 
   });
 
-  // ✅ 发送更新请求
+  // Send update request
   async function handleSubmit() {
     if (!title.trim() || !content.trim()) {
       errorWindowMessage = "Title and content are required.";
@@ -95,13 +104,15 @@
     if (image) {
       formData.append("image", image);
     } else if (!existingImage) {
-      formData.append("image", ""); // ✅ 允许删除现有图片
+      //Allow deleting existing images
+      formData.append("image", ""); 
     }
 
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${articleId}/edit`, {
       method: "PUT",
       body: formData,
-      credentials: "include" // ✅ 让请求带上 session
+      // Include session in the request
+      credentials: "include" 
     });
 
     if (res.ok) {
@@ -126,12 +137,16 @@
     showDeleteImageWindow = true;
   }
 
-
   function deleteImage() {
-    image = null;
+    imageToDelete = null;
     existingImage = null;
     showDeleteImageWindow = false;
     document.getElementById("image").value = "";
+  }
+
+  function cancelDeleteImage(){
+    showDeleteImageWindow = false;
+    imageToDelete = nunll;
   }
 </script>
 
@@ -166,7 +181,7 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <AlertWindow message={deleteImageMessage} on:confirm={deleteImage} />
+  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={deleteImage} on:cancel={cancelDeleteImage} />
 {/if}
 
 <style>

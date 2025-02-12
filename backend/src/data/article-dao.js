@@ -4,7 +4,7 @@ import { getDatabase } from "./database.js";
 import { updateDatabase } from "./util.js";
 const PUBLIC_IMAGES_URL = process.env.PUBLIC_IMAGES_URL || "http://localhost:3000/images";
 /**
- * Get all articles(search&sort)
+ * GET All Articles(search&sort)
  * @param {string} search 
  * @param {string} filterBy  (defult: title)
  * @param {string} sortBy  (defult: date_time)
@@ -33,23 +33,25 @@ export async function getAllArticles(
 
   let params = [];
 
-  // ✅ 处理精准搜索（去掉 Unicode 引号 & 空格）
+  // Handle precise search (remove Unicode quotes & spaces)
   search = search.replace(/[“”„‟❝❞＂]/g, '"').trim();
 
   if (search.startsWith('"') && search.endsWith('"')) {
-    search = search.slice(1, -1).trim(); // 去掉引号并去空格
+    // Remove quotes and trim spaces
+    search = search.slice(1, -1).trim();  
 
     if (filterBy === "title") {
-      // ✅ **精准匹配完整单词**
+      // Precisely match whole words
       query += ` AND LOWER(' ' || a.title || ' ') LIKE LOWER(?)`;
-      params.push(`% ${search} %`); // 🔥 让搜索匹配完整单词
+      // Ensure the search matches whole words
+      params.push(`% ${search} %`); 
     } else if (filterBy === "username") {
-      // ✅ 让 SQLite 替换 `_` 为 ` ` 并确保匹配完整单词
+      // Let SQLite replace _ with and ensure whole word matching
       query += ` AND LOWER(' ' || REPLACE(u.username, '_', ' ') || ' ') LIKE LOWER(?)`;
-      params.push(`% ${search} %`); // 🔥 让搜索匹配完整单词
+      params.push(`% ${search} %`); 
     }
   } 
-  // ✅ 处理模糊搜索（仍然替换 `_` 为 ` `）
+ // Handle fuzzy search (still replace _ with )
   else if (filterBy === "username") {
     query += ` AND LOWER(REPLACE(u.username, '_', ' ')) LIKE LOWER(?)`;  
     params.push(`%${search}%`);
@@ -61,12 +63,12 @@ export async function getAllArticles(
 
 
   if (filterBy === "date_time" && exactDate && exactDate !== "null") {
-    console.log("📌 正在筛选日期:", exactDate); 
+    console.log("📌 Filtering dates:", exactDate); 
     query += " AND strftime('%Y-%m-%d', a.date_time) = ?";  
     params.push(exactDate);
   }
 
-  // **按用户ID筛选**
+  // Filter by user ID
   if (userId) {
     query += " AND a.user_id = ?";
     params.push(userId);
@@ -77,15 +79,15 @@ export async function getAllArticles(
   console.log("🔍 Generated SQL Query:", query);
   console.log("📝 Query Params:", params); 
 
-  return await db.all(query, params); // ✅ **这里正确返回**
-} // **确保这里正确结束函数**
+  return await db.all(query, params); 
+} 
 
 
 
 /**
- * 获取单篇文章
- * @param {number} id 文章ID
- * @returns {Object} 文章数据
+ * GET A Single Article
+ * @param {number} id articleID
+ * @returns {Object} articleData
  */
 export async function getArticleById(id) {
   const db = await getDatabase();
@@ -108,9 +110,9 @@ export async function getArticleById(id) {
 
 
 /**
- * 添加文章
- * @param {Object} articleData 文章数据
- * @returns {Object} 新文章数据
+ *  ADD New Article
+ * @param {Object} articleData 
+ * @returns {Object} New articleData 
  */
 export async function addArticle({ title, content, userId, imageUrl }) {
   const db = await getDatabase();
@@ -118,13 +120,13 @@ export async function addArticle({ title, content, userId, imageUrl }) {
   const now = new Date();
   const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
 
-  // 插入文章
+  // Insert an article
   const query = `INSERT INTO articles (title, content, date_time, user_id) VALUES (?, ?, ?, ?)`;
   const result = await db.run(query, [title, content, formattedDate, userId]);
 
 
 
-  // 插入图片（如果有）
+  // Insert image (if available)
   if (imageUrl) {
     await db.run(`INSERT INTO imgs (path, article_id) VALUES (?, ?)`, [imageUrl, result.lastID]);
   }
@@ -133,10 +135,10 @@ export async function addArticle({ title, content, userId, imageUrl }) {
 }
 
 /**
- * 更新文章
- * @param {number} id 文章ID
- * @param {Object} updateData 更新数据
- * @returns {Object|null} 更新后的文章
+ * EDIT Article
+ * @param {number} id articleID
+ * @param {Object} updateData 
+ * @returns {Object|null}  Updated article
  */
 export async function updateArticle(id, updateData) {
   const db = await getDatabase();
@@ -145,7 +147,7 @@ export async function updateArticle(id, updateData) {
 
   if (updateData.imageUrl !== undefined) {
     if (updateData.imageUrl) {
-        // ✅ 先检查是否已有图片
+        // First check if an image already exists
         const existingImg = await db.get(`SELECT path FROM imgs WHERE article_id = ?`, [id]);
         if (existingImg) {
             await db.run(`UPDATE imgs SET path = ? WHERE article_id = ?`, [updateData.imageUrl, id]);
@@ -163,9 +165,9 @@ export async function updateArticle(id, updateData) {
 }
 
 /**
- * 删除文章
- * @param {number} id 文章ID
- * @returns {boolean} 是否删除成功
+ * DELETE Article
+ * @param {number} id ArticleID
+ * @returns {boolean} Check if deletion was successful
  */
 export async function deleteArticle(id) {
   const db = await getDatabase();
@@ -174,15 +176,15 @@ export async function deleteArticle(id) {
 }
 
 /**
- * 点赞文章
- * @param {number} userId 用户ID
- * @param {number} articleId 文章ID
- * @returns {boolean} 是否点赞成功
+ * LIKE Article
+ * @param {number} userId 
+ * @param {number} articleId 
+ * @returns {boolean}  Check if the like was successful
  */
 export async function likeArticle(userId, articleId) {
   const db = await getDatabase();
 
-  // 检查是否已经点赞
+  // Check if the like was successful
   const existingLike = await db.get("SELECT * FROM like_a WHERE user_id = ? AND article_id = ?", [userId, articleId]);
 
   if (!existingLike) {
@@ -194,9 +196,9 @@ export async function likeArticle(userId, articleId) {
 }
 
 /**
- * 取消点赞
- * @param {number} userId 用户ID
- * @param {number} articleId 文章ID
+ * UNLIKE Article
+ * @param {number} userId 
+ * @param {number} articleId 
  */
 export async function unlikeArticle(userId, articleId) {
   const db = await getDatabase();
@@ -204,9 +206,9 @@ export async function unlikeArticle(userId, articleId) {
 }
 
 /**
- * 获取文章的点赞数
- * @param {number} articleId 文章ID
- * @returns {number} 点赞数
+ * Get the like count of the article
+ * @param {number} articleId 
+ * @returns {number} Like count
  */
 export async function getArticleLikes(articleId) {
   const db = await getDatabase();

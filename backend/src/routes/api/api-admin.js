@@ -1,23 +1,65 @@
 import express from "express";
 import { authenticateAdmin} from "../../data/admin-dao.js";
-import { getUsers } from "../../data/user-dao.js";
+import { getUsers, deleteUser } from "../../data/user-dao.js";
+import { deleteAdmin } from "../../data/admin-dao.js";
 const router = express.Router();
 
+// authenticate admin
 router.post("/", async (req, res) => {
-    const { username, pwd} = req.body;
-  const admin = await authenticateAdmin(username,pwd);
-  return res.json(admin); //null or admin
+
+  try {
+      const { username, pwd} = req.body;
+      const admin = await authenticateAdmin(username,pwd);
+      if(!admin){return res.status(404).json(admin)};
+      return res.status(200).json(admin); //null or admin
+  } catch (error) {
+      return res.status(401).json({ error: 'Failed to authenticate admin' })
+  }
+
 });
 
 //users
 router.get("/", async (req, res) => {
   try {
       const users = await getUsers();
-      return res.json(users); // 返回用户数据
+      return res.json(users); 
+
+     //  Return user data
+
   } catch (error) {
       console.error('Error fetching users:', error);
       return res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
+
+//delete admin
+router.delete("/",async(req,res)=>{
+try {
+    const {username} = req.body;
+    await deleteAdmin(username);
+    return res.sendStatus(204);
+} catch (error) {
+  
+}
+
+
+})
+
+//delete user
+router.delete("/:id", async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  try {
+    const result = await deleteUser(userId);
+    if (result) {
+      return res.status(200).send('success');
+    } else {
+      return res.status(404).send('User not found');
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
 
 export default router;

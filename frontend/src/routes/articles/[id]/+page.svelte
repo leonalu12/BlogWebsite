@@ -4,36 +4,41 @@
   import { goto } from "$app/navigation";
   import Comments from "../../../lib/components/Comments.svelte";
   import { onMount } from "svelte";
-  import { writable } from "svelte/store"; // ✅ 存储用户信息
+  //Store user information
+  import { writable } from "svelte/store"; 
   import AlertWindow from "../../../lib/components/utils/AlertWindow.svelte";
   import { displayLogin } from "../../../lib/store/userStore";
   import { logedIn } from "../../../lib/store/userStore";
   import { iconName } from "../../../lib/store/userStore";
 
   export let data;
-  const article = data?.article || {}; // ✅ 避免 `null`
+  // ✅ Avoid `null`
+  const article = data?.article || {}; 
 
   let likeCount = article?.like_count ?? 0;
   let isLiked = false;
+  //Control whether the comment section is expanded
+  let showComments = false; 
 
-  let showComments = false; // ✅ 控制评论区是否展开
-
-  let user = writable(null); // ✅ 存储用户信息
+  //Save user information
+  let user = writable(null); 
 
   let showErrorWindow = false;
   let errorWindowMessage = "";
 
-  // ✅ 获取用户信息
+  //  Get user information
   async function fetchUser() {
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
         method: "GET",
-        credentials: "include" // ✅ 让请求带上 session
+        // Include session in the request
+        credentials: "include" 
       });
 
       if (res.ok) {
         const userData = await res.json();
-        user.set(userData); // ✅ 存储用户信息
+        //✅ Store user information
+        user.set(userData); 
         console.log("✅ Fetched user:", userData);
       } else if (res.status === 401) {
         console.error("❌ User is not logged in. Redirecting...");
@@ -48,7 +53,7 @@
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/${article.id}/like/check`, {
         method: "GET",
-        credentials: "include" // ✅ 让请求带上 session
+        credentials: "include" 
       });
 
       if (res.ok) {
@@ -88,8 +93,9 @@
           credentials: "include"
         });
         if (!response.ok) {
-          throw new Error("获取用户头像失败");
+
           
+          throw new Error("Failed to get user avatar");
         } else {
           const data = await response.json();
           iconName.set(data);
@@ -98,7 +104,7 @@
         }
       }
     } catch (error) {
-      console.error("获取用户头像失败:", error);
+      console.error("Failed to retrieve user avatar:", error);
     }
   });
 
@@ -127,10 +133,11 @@
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles/${article.id}/like`, {
         method,
         headers: { "Content-Type": "application/json" },
-        credentials: "include" // ✅ 让 session 传递到后端
+        // Pass session to the backend
+        credentials: "include" 
       });
 
-      if (!response.ok) throw new Error("API 请求失败");
+      if (!response.ok) throw new Error(" API request failed");
 
       const data = await response.json();
       isLiked = newLikeStatus;
@@ -142,14 +149,15 @@
   }
 
   function toggleComments() {
-    showComments = !showComments; // ✅ 切换评论区的展开/收起状态
+    // Toggle comment section expand/collapse state
+    showComments = !showComments; 
   }
 
   function handleErrorConfirm() {
     showErrorWindow = false;
   }
 
-  console.log("文章数据:", article);
+  console.log("Article data:", article);
 </script>
 
 <svelte:head>
