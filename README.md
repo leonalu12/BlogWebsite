@@ -16,10 +16,13 @@ d. Any other instructions / comments you wish to make to your markers
 In Java Swing, we have set up a separate database for administrators. We have one super admin and two regular admins. The super admin account cannot be deleted, while the other admin accounts can be deleted.
 
 Super admin:
+
 -username: admin - password: admin
 
 Other admins:
+
 -username: admin1 - password: admin1
+
 -username: admin2 - password: admin2
 
 
