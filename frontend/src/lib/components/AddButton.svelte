@@ -12,11 +12,12 @@
 
 {#if $currentPath !== "/articles/new"}
   <button class="add-article-btn" on:click={navigateToNewArticle}>
-    Write New Article
+    <span style="color:brown;">Write New Article</span>
   </button>
 {/if}
 
 <style>
+ 
   .add-article-btn {
     width: 200px;
     padding: 12px 30px;

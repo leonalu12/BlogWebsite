@@ -166,7 +166,7 @@
 
   .content {
     flex: 1;
-    padding: 20px;
+    margin: 40px;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -174,10 +174,11 @@
 
   .add-button-container {
     position: fixed;
-    bottom: 80px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 50;
+    opacity: 95%;
   }
 
   :global(.add-button) {
@@ -225,5 +226,11 @@
 
   .user-control {
     z-index: 51;
+  }
+
+  @media (max-width: 1080px) {
+    nav{
+      z-index: 1000;
+    }
   }
 </style>
