@@ -770,19 +770,6 @@ class NeuralNetwork {
 ('<article><h2>Minimalist Wardrobe Essentials</h2>
 <p>Streamline your closet with these five must-have staples...</p></article>', '2023-09-05 16:15:00', 'Minimalist Fashion', 9);
 
--- Insert sample comments
-INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES
-('Amazing photos! Would love to know what camera you use.', 1, '2023-01-15 11:00:00', 2, 1, NULL),
-('Great article! The recipes remind me of my own family traditions.', 1, '2023-01-20 13:00:00', 3, 2, NULL),
-('Fascinating perspective on AI development.', 1, '2023-02-05 16:00:00', 4, 3, NULL),
-('These workouts are perfect for my schedule!', 1, '2023-02-10 10:00:00', 5, 4, NULL),
-('Love the fashion insights! Very helpful.', 1, '2023-03-01 15:00:00', 6, 5, NULL),
-('I use a Canon EOS R5 for most shots.', 2, '2023-01-15 11:30:00', 1, 1, 1),
-('Would love to see more recipes like these!', 2, '2023-01-20 13:30:00', 4, 2, 2),
-('The AI predictions are spot on.', 2, '2023-02-05 16:30:00', 5, 3, 3),
-('Thanks for sharing these workout tips!', 2, '2023-02-10 10:30:00', 6, 4, 4),
-('The spring collection looks amazing!', 2, '2023-03-01 15:30:00', 7, 5, 5);
-
 -- Insert more detailed comments
 INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES
 -- Photography article comments (article_id: 1)
@@ -940,6 +927,7 @@ INSERT INTO like_c (user_id, comment_id) VALUES
 (5, 81),
 (1, 82),
 (3, 83);
+
 
 -- Insert admin accounts
 INSERT INTO admins (username, pwd) VALUES
