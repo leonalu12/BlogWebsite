@@ -28,7 +28,6 @@
         <span class="nav-links">
           <a href="/" class:active={path === "/"} class="nav-option">Explore</a>
           <a href="/articles/new" class:active={path === "/articles/new"} class="nav-option">New</a>
-          <a href="/myArticles" class:active={path === "/myArticles"} class="nav-option">ME</a>
         </span>
 
         <span class="search-container-nav">
@@ -36,6 +35,8 @@
         </span>
 
         <span class="user-control nav-links">
+          <a href="/myArticles" class:active={path === "/myArticles"} class="nav-option">ME</a>
+
           <UserControl />
         </span>
       </nav>
