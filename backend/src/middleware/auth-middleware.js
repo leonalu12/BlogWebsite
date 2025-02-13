@@ -1,17 +1,16 @@
 import { getUsersByUsername } from "../data/user-dao.js";
 import { getUsernameFromJWT } from "../data/jwt-util.js";
 
-
 export async function requiresAuthentication(req, res, next) {
 
-  if(req.cookies.authToken){  //检查autoToken是否存在（存于cookies）
+  if(req.cookies.authToken){  // Check if authToken exists in cookies
 
-    try {    //JSON Web Token (JWT)，其中包含 username、user_id 等信息
-      const username = getUsernameFromJWT(req.cookies.authToken);   //解析 JWT，获取 username
+    try {    // JSON Web Token (JWT), which contains username, user_id, etc.
+      const username = getUsernameFromJWT(req.cookies.authToken);   // Parse JWT to get username
       console.log(username);
-      const user = await getUsersByUsername(username);   //查询数据库，验证 username 是否有效
+      const user = await getUsersByUsername(username);   // Query the database to verify if the username is valid
       if (user) {
-        req.user = user;        //如果成功，赋值 req.user，继续执行后续代码
+        req.user = user;        // If successful, assign req.user and continue executing subsequent code
         return next();
       } else {
         return res.sendStatus(401);
@@ -20,6 +19,6 @@ export async function requiresAuthentication(req, res, next) {
       return res.sendStatus(401);
     }
   } else {
-    return res.sendStatus(401);        //如果失败，返回 401（未授权）
+    return res.sendStatus(401);        // If failed, return 401 (Unauthorized)
   }
 }

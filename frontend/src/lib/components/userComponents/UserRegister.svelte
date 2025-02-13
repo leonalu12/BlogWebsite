@@ -89,7 +89,7 @@
       }
 
       const data = await response.json();
-      console.log("注册成功:", data);
+      console.log("Registration successful:", data);
       logedIn.set(true);
 
       const loginResponse = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
@@ -115,19 +115,19 @@
             credentials: "include"
           });
           if (!response.ok) {
-            throw new Error("获取用户头像失败");
+            throw new Error("Failed to get user icon");
           } else {
             const data = await response.json();
             iconName.set(data);
-            console.log("获取用户头像成功:", data);
+            console.log("User icon retrieved successfully:", data);
             goto("/");
           }
         } catch (error) {
-          console.error("获取用户头像失败:", error);
+          console.error("Failed to get user icon:", error);
         }
       }
     } catch (error) {
-      console.error("注册错误:", error);
+      console.error("Registration error:", error);
     } finally {
       loading = false;
     }
@@ -153,7 +153,7 @@
       const data = await response.json();
       console.log("username checking:", data);
     } catch (error) {
-      console.error("username alread existed:", error);
+      console.error("username already existed:", error);
     }
   }
 </script>

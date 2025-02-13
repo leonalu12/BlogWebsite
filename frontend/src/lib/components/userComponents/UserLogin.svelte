@@ -4,7 +4,7 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { logedIn } from "../../store/userStore.js";
-  import AlertWindow from "../utils/AlertWindow.svelte"; //import the alertWindow component
+  import AlertWindow from "../utils/AlertWindow.svelte"; // Import the AlertWindow component
   import { displayEdit } from "../../store/userStore.js";
   import { iconName } from "../../store/userStore.js";
   import { displayLogin } from "../../store/userStore.js";
@@ -27,8 +27,6 @@
     background.style.background = `radial-gradient(circle at ${x}px ${y}px, #FFE4E1 10%, pink 30%, lightpink 50%)`;
   }
 
- 
-
   function closeUserPopUpwindow() {
     displayUserPopUpwindow = false;
     displayLogin.set(false);
@@ -44,11 +42,11 @@
   let username = "";
   let password = "";
 
-  // process the login form
+  // Process the login form
   async function handleLogin(event) {
     event.preventDefault();
 
-    // send the login request
+    // Send the login request
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
         method: "POST",
@@ -63,7 +61,7 @@
         throw new Error("login failed");
       } else {
         const data = await response.json();
-        console.log("登录成功:", data);
+        console.log("Login successful:", data);
         toggleLogedIn();
         displayloginFailed = false;
         try {
@@ -75,31 +73,31 @@
             credentials: "include"
           });
           if (!response.ok) {
-            throw new Error("获取用户头像失败");
+            throw new Error("Failed to fetch user icon");
           } else {
             const data = await response.json();
             iconName.set(data);
-            console.log("获取用户头像成功:", data);
+            console.log("User icon fetched successfully:", data);
           }
         } catch (error) {
-          console.error("获取用户头像失败:", error);
+          console.error("Failed to fetch user icon:", error);
         }
       }
 
       window.location.reload();
     } catch (error) {
       displayloginFailed = true;
-      console.error("登录失败:", error);
+      console.error("Login failed:", error);
     }
   }
 </script>
 
 {#if displayUserPopUpwindow}
-  <button class="overlay" on:click={closeUserPopUpwindow}>
+  <button class="overlay" on:click={closeUserPopUpwindow}></button>
     <button on:click|stopPropagation style="background-color: transparent; border: none;">
       {#if displayloginFailed}
         <AlertWindow message="login failed" on:confirm={() => (displayloginFailed = false)} />
-        <!-- pass the message prop to the alertWindow component -->
+        <!-- Pass the message prop to the AlertWindow component -->
       {/if}
 
       {#if !$logedIn}
@@ -300,7 +298,6 @@
     color: #aaa;
     font-size: 15px;
     font-weight: bold;
-    
   }
 
   .signUpMsg {
@@ -316,19 +313,18 @@
   }
 
   .loginBtn {
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  padding: 10px;
-  background: linear-gradient(90deg, pink, #FFE4E1);
-  transition: transform 0.2s ease;
-  height: 50px;
-  font-size: 16px;
-  opacity: 1;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 10px;
+    background: linear-gradient(90deg, pink, #FFE4E1);
+    transition: transform 0.2s ease;
+    height: 50px;
+    font-size: 16px;
+    opacity: 1;
   }
 
   .loginBtn:hover {
     transform: translateY(-3px);
   }
-  
 </style>

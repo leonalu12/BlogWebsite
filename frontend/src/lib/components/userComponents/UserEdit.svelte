@@ -41,7 +41,7 @@
     }
   }
 
-  // 在组件挂载时获取数据
+  // Fetch data when the component mounts
   onMount(async () => {
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/users/`, {
@@ -76,7 +76,7 @@
     }
   });
 
-  // 提交表单的处理函数
+  // Handle form submission
   async function handleSubmit(event) {
     event.preventDefault();
     console.log("User Information:", user);
@@ -86,7 +86,7 @@
       return;
     }
     try {
-      console.log("发送用户数据:", user);
+      console.log("Sending user data:", user);
       const formData = new FormData();
       formData.append("username", user.username);
       formData.append("fname", user.fname);
@@ -101,14 +101,14 @@
         credentials: "include"
       });
       if (!response.ok) {
-        throw new Error("网络响应问题");
+        throw new Error("Network response error");
       } else {
         displayEdit.set(false);
         displayEditSuccessAlert.set(true);
         console.log("User Information Updated");
       }
     } catch (error) {
-      console.error("获取数据失败:", error);
+      console.error("Data fetch failed:", error);
     } finally {
       loading = false;
     }
@@ -122,13 +122,13 @@
         credentials: "include"
       });
       if (!response.ok) {
-        throw new Error("network response error");
+        throw new Error("Network response error");
       }
       const data = await response.json();
-      console.log("relogin success:", data);
+      console.log("Relogin success:", data);
       logedIn.set(true);
     } catch (error) {
-      console.error("relogin fail:", error);
+      console.error("Relogin fail:", error);
     }
     console.log("User Information:", user);
 
@@ -141,14 +141,14 @@
         credentials: "include"
       });
       if (!response.ok) {
-        throw new Error("获取用户头像失败");
+        throw new Error("Failed to fetch user icon");
       } else {
         const data = await response.json();
         iconName.set(data);
-        console.log("获取用户头像成功:", data);
+        console.log("User icon fetched successfully:", data);
       }
     } catch (error) {
-      console.error("获取用户头像失败:", error);
+      console.error("Failed to fetch user icon:", error);
     }
   }
 
@@ -171,9 +171,9 @@
         }
         isUniqueUsername = true;
         const data = await response.json();
-        console.log("username checking:", data);
+        console.log("Username checking:", data);
       } catch (error) {
-        console.error("username alread existed:", error);
+        console.error("Username already existed:", error);
       }
     }
   }

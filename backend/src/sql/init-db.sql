@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS admins (
 -- Insert sample users
 INSERT INTO users (username, fname, lname, description, dob, icon, pwd) VALUES
 ('Vita', 'Vita', 'Vita', 'a cute and lovely IT teacher, blending technology with charm and creativity', '1990-06-15', 'avatar1.jpg', '$2b$10$z5nBMoUzPmMQ7F2XGI7YZeQsRl31ZqaJwnYqjZCbudyYx35Ykj41K'),
-('Tyne', 'Tyne', 'Tyne', 'a dashing IT teacher, merging tech expertise with style and charisma!', '1990-11-23', 'avatar2.jpg', '$2b$10$4cbxd067BCPCb/zHUji2KOFhoW4tNVIk8wHIc4qytSIea5IwOBMXi'),
+('Tyne', 'Tyne', 'Tyne', 'a dashing IT teacher, merging tech expertise with style and charisma!', '1990-11-23', 'avatar3.jpg', '$2b$10$4cbxd067BCPCb/zHUji2KOFhoW4tNVIk8wHIc4qytSIea5IwOBMXi'),
 ('alice_jones', 'Alice', 'Jones', 'Tech blogger and software developer', '1988-03-09', 'avatar3.jpg', 'password789'),
 ('bob_wilson', 'Bob', 'Wilson', 'Fitness trainer and health consultant', '1982-07-30', 'avatar4.jpg', 'password101'),
 ('emma_davis', 'Emma', 'Davis', 'Fashion blogger and style enthusiast', '1993-09-17', 'avatar5.jpg', 'password202'),
