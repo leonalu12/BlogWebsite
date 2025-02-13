@@ -69,20 +69,20 @@ CREATE TABLE IF NOT EXISTS admins (
 
 -- Insert sample users
 INSERT INTO users (username, fname, lname, description, dob, icon, pwd) VALUES
-('john_doe', 'John', 'Doe', 'Photography enthusiast and travel blogger', '1985-06-15', 'avatar1.png', 'password123'),
-('jane_smith', 'Jane', 'Smith', 'Food lover and amateur chef', '1990-11-23', 'avatar2.png', 'password456'),
-('alice_jones', 'Alice', 'Jones', 'Tech blogger and software developer', '1988-03-09', 'avatar3.png', 'password789'),
-('bob_wilson', 'Bob', 'Wilson', 'Fitness trainer and health consultant', '1982-07-30', 'avatar4.png', 'password101'),
-('emma_davis', 'Emma', 'Davis', 'Fashion blogger and style enthusiast', '1993-09-17', 'avatar5.png', 'password202'),
-('michael_brown', 'Michael', 'Brown', 'Travel writer and adventurer', '1987-12-05', '1739143411474.JPG', 'password303'),
-('sarah_miller', 'Sarah', 'Miller', 'Book reviewer and literature lover', '1991-04-28', 'avatar2.png', 'password404'),
-('david_taylor', 'David', 'Taylor', 'Music producer and artist', '1989-08-14', 'avatar3.png', 'password505'),
-('lisa_anderson', 'Lisa', 'Anderson', 'Environmental activist and blogger', '1986-01-22', 'avatar4.png', 'password606'),
-('james_martin', 'James', 'Martin', 'Sports analyst and former athlete', '1984-05-11', 'avatar5.png', 'password707');
+('Vita', 'Vita', 'Vita', 'a cute and lovely IT teacher, blending technology with charm and creativity', '1990-06-15', 'avatar1.jpg', '$2b$10$z5nBMoUzPmMQ7F2XGI7YZeQsRl31ZqaJwnYqjZCbudyYx35Ykj41K'),
+('Tyne', 'Tyne', 'Tyne', 'a dashing IT teacher, merging tech expertise with style and charisma!', '1990-11-23', 'avatar2.jpg', '$2b$10$4cbxd067BCPCb/zHUji2KOFhoW4tNVIk8wHIc4qytSIea5IwOBMXi'),
+('alice_jones', 'Alice', 'Jones', 'Tech blogger and software developer', '1988-03-09', 'avatar3.jpg', 'password789'),
+('bob_wilson', 'Bob', 'Wilson', 'Fitness trainer and health consultant', '1982-07-30', 'avatar4.jpg', 'password101'),
+('emma_davis', 'Emma', 'Davis', 'Fashion blogger and style enthusiast', '1993-09-17', 'avatar5.jpg', 'password202'),
+('michael_brown', 'Michael', 'Brown', 'Travel writer and adventurer', '1987-12-05', 'avatar5.jpg', 'password303'),
+('sarah_miller', 'Sarah', 'Miller', 'Book reviewer and literature lover', '1991-04-28', 'avatar2.jpg', 'password404'),
+('david_taylor', 'David', 'Taylor', 'Music producer and artist', '1989-08-14', 'avatar3.jpg', 'password505'),
+('lisa_anderson', 'Lisa', 'Anderson', 'Environmental activist and blogger', '1986-01-22', 'avatar4.jpg', 'password606'),
+('james_martin', 'James', 'Martin', 'Sports analyst and former athlete', '1984-05-11', 'avatar5.jpg', 'password707');
 
 -- Insert sample articles with rich HTML content
 INSERT INTO articles (content, date_time, title, user_id) VALUES
-('<article><h2>Hidden Gems of Paris: A Photographer''s Journey</h2>
+('<article>
 <p>As a photographer wandering through the streets of Paris, I''ve discovered that the true essence of this magnificent city lies far beyond the iconic Eiffel Tower and the bustling Champs-Élysées. In this photo essay, I''ll take you through the lesser-known corners of Paris that capture its authentic spirit.</p>
 <h3>The Hidden Courtyards of Le Marais</h3>
 <p>Deep within the maze-like streets of Le Marais, centuries-old courtyards tell stories of Paris''s aristocratic past. These secret spaces, often hidden behind unassuming wooden doors, reveal stunning architectural details, from ornate fountains to perfectly manicured gardens. One particular courtyard at 7 Rue de Sévigné showcases an exceptional example of 17th-century French architecture, with its symmetrical design and intricate stone carvings.</p>
@@ -94,9 +94,9 @@ INSERT INTO articles (content, date_time, title, user_id) VALUES
 <li>Primary Lens: 24-70mm f/2.8</li>
 <li>Time of Day: Golden Hour (typically 4-6 PM in summer)</li>
 <li>Post-processing: Minimal, focusing on preserving natural light and shadows</li>
-</ul></article>', '2023-01-15 10:00:00', 'Hidden Paris', 1),
+</ul></article>', '2024-01-15 10:00:00', 'Hidden Paris', 1),
 
-('<article><h2>Traditional Family Recipes: A Culinary Heritage</h2>
+('<article>
 <p>Food has always been the thread that weaves families together, and nowhere is this more evident than in the treasured recipes passed down through generations. Today, I''m sharing some of my grandmother''s most cherished recipes, each carrying its own story and significance.</p>
 <h3>The Perfect Homemade Pasta</h3>
 <p>My grandmother''s pasta recipe, perfected over 50 years, creates strands of silky smooth tagliatelle that puts store-bought versions to shame. The secret lies in the precise ratio of "00" flour to farm-fresh eggs, and the patient kneading process that develops just the right amount of gluten.</p>
@@ -117,9 +117,9 @@ INSERT INTO articles (content, date_time, title, user_id) VALUES
 </ol>
 </div>
 <h3>The Family Marinara Sauce</h3>
-<p>This sauce recipe dates back to 1920s Sicily, where my great-grandmother would spend hours selecting the perfect San Marzano tomatoes. The key is in the slow cooking process, allowing the flavors to develop and meld together over several hours.</p></article>', '2023-01-20 12:30:00', 'Family Recipes', 2),
+<p>This sauce recipe dates back to 1920s Sicily, where my great-grandmother would spend hours selecting the perfect San Marzano tomatoes. The key is in the slow cooking process, allowing the flavors to develop and meld together over several hours.</p></article>', '2024-01-20 12:30:00', 'Family Recipes', 2),
 
-('<article><h2>The Future of AI: A Developer''s Perspective</h2>
+('<article>
 <p>As we stand at the crossroads of technological evolution, artificial intelligence continues to reshape our world in unprecedented ways. Drawing from my decade of experience in AI development, I''ll explore the most significant trends and their implications for our future.</p>
 <h3>The Rise of Multimodal AI</h3>
 <p>We''re witnessing a paradigm shift from single-domain AI models to multimodal systems that can process and understand various types of input simultaneously. These systems can interpret text, images, speech, and even behavioral patterns in real-time, opening new possibilities for human-AI interaction.</p>
@@ -144,9 +144,9 @@ class NeuralNetwork {
     }
 }
 </code></pre>
-</div></article>', '2023-02-05 15:45:00', 'AI Future', 3),
+</div></article>', '2024-02-05 15:45:00', 'AI Future', 2),
 
-('<article><h2>Essential Workout Routines for Busy Professionals</h2>
+('<article>
 <p>In today''s fast-paced world, finding time for fitness can be challenging. As a fitness trainer with over a decade of experience, I''ve developed these efficient workout routines specifically for busy professionals who want to maintain their health without spending hours in the gym.</p>
 <h3>Morning Energy Boost (15 minutes)</h3>
 <p>Start your day with this high-intensity circuit:</p>
@@ -170,9 +170,9 @@ class NeuralNetwork {
 </div>
 <h3>Science Behind the Routines</h3>
 <p>These workouts are designed based on recent research in exercise physiology, showing that short, intense bursts of activity can be as effective as longer moderate sessions. The key is maintaining proper form and consistency.</p></article>', 
-'2023-02-10 09:15:00', 'Quick Workouts', 4),
+'2024-02-10 09:15:00', 'Quick Workouts', 1),
 
-('<article><h2>Spring Fashion Trends 2024: A Comprehensive Guide</h2>
+('<article>
 <p>As we approach the new season, it''s time to explore the most exciting trends that will define fashion in 2024. From sustainable materials to bold color choices, this guide will help you navigate the evolving landscape of style.</p>
 <h3>Sustainable Fashion Takes Center Stage</h3>
 <p>This season marks a significant shift towards eco-conscious fashion:</p>
@@ -201,9 +201,9 @@ class NeuralNetwork {
 <li>Minimalist accessories</li>
 </ol>
 <p>Styling tips and combination suggestions included in the next section...</p></article>', 
-'2023-03-01 14:20:00', 'Fashion Trends', 5),
+'2024-03-01 14:20:00', 'Fashion Trends', 1),
 
-('<article><h2>Backpacking Through Southeast Asia: A Complete Guide</h2>
+('<article>
 <p>After spending six months exploring the hidden corners of Southeast Asia, I''ve compiled this comprehensive guide to help fellow travelers navigate this fascinating region. From remote temples to bustling night markets, here''s everything you need to know.</p>
 <h3>Essential Planning Tips</h3>
 <div class="travel-planning">
@@ -224,9 +224,9 @@ class NeuralNetwork {
 </table>
 <h3>Cultural Insights</h3>
 <p>Understanding local customs is crucial for meaningful travel experiences...</p></article>', 
-'2023-03-15 11:30:00', 'Asia Travel Guide', 6),
+'2024-03-15 11:30:00', 'Asia Travel Guide', 1),
 
-('<article><h2>Must-Read Books of 2023: A Literature Lover''s Guide</h2>
+('<article>
 <p>As a passionate book reviewer and literature enthusiast, I''ve had the privilege of exploring countless literary works throughout 2023. Here''s my carefully curated list of the most impactful books that have shaped the literary landscape this year.</p>
 
 <h3>Fiction Highlights</h3>
@@ -271,9 +271,9 @@ class NeuralNetwork {
       <td>Environmental Science, Sustainability</td>
     </tr>
   </table>
-</div></article>', '2023-04-01 16:45:00', 'Book Reviews 2023', 7),
+</div></article>', '2024-04-01 16:45:00', 'Book Reviews 2023', 2),
 
-('<article><h2>The Evolution of Digital Music Production</h2>
+('<article>
 <p>As a music producer with over a decade of experience, I''ve witnessed the remarkable transformation of music production from hardware-dominated studios to powerful digital workstations. This comprehensive guide explores the current state of digital music production and its future trajectory.</p>
 
 <h3>Modern Production Essentials</h3>
@@ -308,9 +308,9 @@ class NeuralNetwork {
 <div class="workflow-section">
   <h4>Modern Workflow Integration</h4>
   <p>Today''s production workflow combines traditional musicianship with cutting-edge technology, creating a hybrid approach that maximizes both creativity and efficiency.</p>
-</div></article>', '2023-04-15 13:25:00', 'Digital Music', 8),
+</div></article>', '2024-04-15 13:25:00', 'Digital Music', 1),
 
-('<article><h2>Climate Action: Small Changes, Big Impact</h2>
+('<article>
 <p>As an environmental activist and researcher, I''ve spent years studying how individual actions can collectively create significant environmental change. This comprehensive guide explores practical steps we can all take to combat climate change.</p>
 
 <h3>Understanding Your Carbon Footprint</h3>
@@ -356,9 +356,9 @@ class NeuralNetwork {
 </div>
 
 <h3>Community Impact</h3>
-<p>Individual actions create ripple effects throughout communities, inspiring others and building momentum for larger-scale change.</p></article>', '2023-05-01 10:10:00', 'Climate Action', 9),
+<p>Individual actions create ripple effects throughout communities, inspiring others and building momentum for larger-scale change.</p></article>', '2024-05-01 10:10:00', 'Climate Action', 9),
 
-('<article><h2>The Evolution of Modern Sports: A Comprehensive Analysis</h2>
+('<article>
 <p>Drawing from my experience as both a former athlete and sports analyst, I''ve witnessed firsthand the dramatic transformation of sports over the past few decades. This analysis explores how technology, science, and societal changes have revolutionized athletic competition.</p>
 
 <h3>The Technology Revolution in Sports</h3>
@@ -427,9 +427,9 @@ class NeuralNetwork {
     <li>Sustainable sports facility design</li>
     <li>Integration of esports with traditional sports</li>
   </ul>
-</div></article>', '2023-05-15 15:15:00', 'Sports Evolution', 10),
+</div></article>', '2024-05-15 15:15:00', 'Sports Evolution', 2),
 
-('<article><h2>My Journey Through Italian Cuisine: A Gastronomic Adventure</h2>
+('<article>
 <p>Having spent three months traveling through Italy''s diverse regions, I''ve discovered that Italian cuisine is far more varied and complex than most people realize. Each region offers its own unique flavors, techniques, and traditions that contribute to the rich tapestry of Italian gastronomy.</p>
 
 <h3>Regional Specialties</h3>
@@ -474,7 +474,7 @@ class NeuralNetwork {
   </ul>
 </div></article>', '2023-06-01 12:00:00', 'Italian Food Journey', 2),
 
-('<article><h2>Tech Trends That Will Shape 2024</h2>
+('<article>
 <p>As a software developer and tech analyst with over 15 years of experience, I''ve been closely monitoring the evolving technology landscape. Here''s my in-depth analysis of the trends that will define technology in 2024 and beyond.</p>
 
 <h3>Quantum Computing Breakthroughs</h3>
@@ -538,9 +538,9 @@ class NeuralNetwork {
     <li>Biodegradable electronics</li>
     <li>Energy-harvesting devices</li>
   </ul>
-</div></article>', '2023-06-15 14:30:00', 'Tech Trends 2024', 3),
+</div></article>', '2023-06-15 14:30:00', 'Tech Trends 2024', 1),
 
-('<article><h2>Sustainable Fashion: A Guide to Ethical Shopping</h2>
+('<article>
 <p>The fashion industry is undergoing a revolutionary transformation towards sustainability. As a fashion consultant and environmental advocate, I''ve researched and experienced firsthand how conscious fashion choices can make a significant impact on our planet.</p>
 
 <h3>Understanding Sustainable Materials</h3>
@@ -609,9 +609,9 @@ class NeuralNetwork {
       <p>Verifies overall ethical business practices</p>
     </li>
   </ul>
-</div></article>', '2023-07-01 11:45:00', 'Sustainable Fashion', 5),
+</div></article>', '2023-07-01 11:45:00', 'Sustainable Fashion', 1),
 
-('<article><h2>Hidden Trails: Discovering Nature''s Secrets</h2>
+('<article>
 <p>After years of exploring the world''s most remote paths, I''ve discovered that the true essence of hiking lies not in reaching the summit, but in understanding the delicate ecosystems we traverse. Join me as we explore some of Earth''s most remarkable hidden trails.</p>
 
 <h3>Ancient Forest Paths</h3>
@@ -668,9 +668,9 @@ class NeuralNetwork {
       </ul>
     </li>
   </ol>
-</div></article>', '2023-07-15 09:30:00', 'Nature Trails', 6),
+</div></article>', '2023-07-15 09:30:00', 'Nature Trails', 1),
 
-('<article><h2>The Art of Street Photography</h2>
+('<article>
 <p>Street photography is more than just capturing candid moments—it''s about telling stories through visual narratives that reflect the human condition. Drawing from my decades of experience, I''ll share advanced techniques and philosophical approaches to this compelling art form.</p>
 
 <h3>Technical Mastery</h3>
@@ -741,47 +741,34 @@ class NeuralNetwork {
   </ol>
 </div></article>', '2023-08-01 16:20:00', 'Street Photography', 1),
 
-('<article><h2>Advanced Street Photography Techniques</h2>
+('<article>
 <p>Building on the basics, let''s explore advanced techniques that can elevate your street photography.</p>
 <h3>Mastering Light and Shadow</h3>
 <p>Understanding how light interacts with urban environments is crucial.</p>
 </article>', '2023-08-10 10:00:00', 'Advanced Street Photography', 1),
 
-('<article><h2>The Ultimate Guide to Vegan Italian Cooking</h2>
+('<article>
 <p>Italian cuisine can be adapted to vegan diets without sacrificing flavor.</p>
 <h3>Veganizing Classic Dishes</h3>
 <p>Learn how to make traditional dishes vegan.</p>
 </article>', '2023-08-15 12:00:00', 'Vegan Italian Cooking', 2),
 
-('<article><h2>Quantum Machine Learning: A New Frontier</h2>
+('<article>
 <p>Combining quantum computing with machine learning offers unprecedented possibilities.</p>
 <h3>Quantum Algorithms for ML</h3>
 <p>Explore quantum algorithms that enhance machine learning.</p>
 </article>', '2023-08-20 14:00:00', 'Quantum Machine Learning', 3),
 
-('<article><h2>Rediscovering the Streets of London</h2>
+('<article>
 <p>Join me on a deep dive into London''s hidden corners...</p></article>', '2023-09-01 10:00:00', 'London Streets', 2),
-('<article><h2>Healthy Eating on a Budget</h2>
+('<article>
 <p>Tips and tricks to stretch your dollar while maintaining a balanced diet...</p></article>', '2023-09-02 11:00:00', 'Budget Health', 5),
-('<article><h2>Evolution of VR Gaming</h2>
+('<article>
 <p>A comprehensive look at how VR gaming technology has progressed...</p></article>', '2023-09-03 14:00:00', 'VR Gaming', 3),
-('<article><h2>Exploring Desert Landscapes</h2>
+('<article>
 <p>Discover the mesmerizing beauty of arid regions around the world...</p></article>', '2023-09-04 09:30:00', 'Desert Exploration', 6),
-('<article><h2>Minimalist Wardrobe Essentials</h2>
+('<article>
 <p>Streamline your closet with these five must-have staples...</p></article>', '2023-09-05 16:15:00', 'Minimalist Fashion', 9);
-
--- Insert sample comments
-INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES
-('Amazing photos! Would love to know what camera you use.', 1, '2023-01-15 11:00:00', 2, 1, NULL),
-('Great article! The recipes remind me of my own family traditions.', 1, '2023-01-20 13:00:00', 3, 2, NULL),
-('Fascinating perspective on AI development.', 1, '2023-02-05 16:00:00', 4, 3, NULL),
-('These workouts are perfect for my schedule!', 1, '2023-02-10 10:00:00', 5, 4, NULL),
-('Love the fashion insights! Very helpful.', 1, '2023-03-01 15:00:00', 6, 5, NULL),
-('I use a Canon EOS R5 for most shots.', 2, '2023-01-15 11:30:00', 1, 1, 1),
-('Would love to see more recipes like these!', 2, '2023-01-20 13:30:00', 4, 2, 2),
-('The AI predictions are spot on.', 2, '2023-02-05 16:30:00', 5, 3, 3),
-('Thanks for sharing these workout tips!', 2, '2023-02-10 10:30:00', 6, 4, 4),
-('The spring collection looks amazing!', 2, '2023-03-01 15:30:00', 7, 5, 5);
 
 -- Insert more detailed comments
 INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES
@@ -927,23 +914,208 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 
 -- Insert new like records for articles
 INSERT INTO like_a (user_id, article_id) VALUES
-(3, 1),
-(6, 2),
-(7, 4),
-(8, 5),
-(10, 6);
+(1, 1),
+(2, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1),
+(8, 1),
+(9, 1),
+(10, 1),
+(1, 2),
+(2, 2),
+(3, 2),
+(4, 2),
+(5, 2),
+(7, 2),
+(8, 2),
+(9, 2),
+(10, 2),
+(1, 3),
+(2, 3),
+(3, 3),
+(4, 3),
+(5, 3),
+(6, 3),
+(7, 3),
+(8, 3),
+(9, 3),
+(10, 3),
+(1, 4),
+(2, 4),
+(3, 4),
+(5, 4),
+(6, 4),
+(8, 4),
+(9, 4),
+(10, 4),
+(1, 5),
+(2, 5),
+(3, 5),
+(4, 5),
+(5, 5),
+(6, 5),
+(7, 5),
+(9, 5),
+(10, 5),
+(1, 6),
+(2, 6),
+(3, 6),
+(4, 6),
+(5, 6),
+(6, 6),
+(7, 6),
+(8, 6),
+(9, 6),
+(10, 6),
+(1, 7),
+(2, 7),
+(3, 7),
+(4, 7),
+(5, 7),
+(6, 7),
+(7, 7),
+(8, 7),
+(9, 7),
+(10, 7),
+(1, 8),
+(2, 8),
+(3, 8),
+(4, 8),
+(5, 8),
+(6, 8),
+(7, 8),
+(9, 8),
+(10, 8),
+(1, 9),
+(2, 9),
+(3, 9),
+(4, 9),
+(5, 9),
+(6, 9),
+(7, 9),
+(8, 9),
+(9, 9),
+(10, 9),
+(1, 10),
+(2, 10),
+(3, 10),
+(4, 10),
+(5, 10),
+(6, 10),
+(7, 10),
+(8, 10),
+(9, 10),
+(10, 10);
 
 -- Insert new like records for comments
 INSERT INTO like_c (user_id, comment_id) VALUES
-(2, 79),
-(9, 80),
-(5, 81),
-(1, 82),
-(3, 83);
+
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1),
+(8, 1),
+(9, 1),
+(10, 1),
+(1, 2),
+(2, 2),
+(3, 2),
+(4, 2),
+(5, 2),
+(6, 2),
+(7, 2),
+(8, 2),
+(9, 2),
+(10, 2),
+(1, 3),
+(2, 3),
+(3, 3),
+(4, 3),
+(5, 3),
+(6, 3),
+(7, 3),
+(8, 3),
+(9, 3),
+(10, 3),
+(1, 4),
+(2, 4),
+(3, 4),
+(4, 4),
+(5, 4),
+(6, 4),
+(7, 4),
+(8, 4),
+(9, 4),
+(10, 4),
+(1, 5),
+(2, 5),
+(3, 5),
+(4, 5),
+(5, 5),
+(6, 5),
+(7, 5),
+(8, 5),
+(9, 5),
+(10, 5),
+(1, 6),
+(2, 6),
+(3, 6),
+(4, 6),
+(5, 6),
+(6, 6),
+(7, 6),
+(8, 6),
+(9, 6),
+(10, 6),
+(1, 7),
+(2, 7),
+(3, 7),
+(4, 7),
+(5, 7),
+(6, 7),
+(7, 7),
+(8, 7),
+(9, 7),
+(10, 7),
+(1, 8),
+(2, 8),
+(3, 8),
+(4, 8),
+(5, 8),
+(6, 8),
+(7, 8),
+(8, 8),
+(9, 8),
+(10, 8),
+(1, 9),
+(2, 9),
+(3, 9),
+(4, 9),
+(5, 9),
+(6, 9),
+(7, 9),
+(8, 9),
+(9, 9),
+(10, 9),
+(1, 10),
+(2, 10),
+(3, 10),
+(4, 10),
+(5, 10),
+(6, 10),
+(7, 10),
+(8, 10),
+(9, 10),
+(10, 10);
 
 -- Insert admin accounts
 INSERT INTO admins (username, pwd) VALUES
-('admin', 'admin123'),
-('moderator', 'mod123'),
-('supervisor', 'super123');
+('admin', 'admin'),
+('admin1', 'admin1'),
+('admin2', 'admin2');
 

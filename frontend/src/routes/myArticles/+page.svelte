@@ -30,6 +30,31 @@
   let order = "DESC";
   let exactDate = "";
 
+  let searchWrapper;
+  let minScale = 0.8;
+  let navbarHeight = 80;
+  let isFixed = false;
+
+  onMount(() => {
+    const handleScroll = () => {
+      if (!searchWrapper) return;
+
+      const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+
+      if (scrollPosition > navbarHeight) {
+        isFixed = true;
+        searchWrapper.style.transform = `scale(${minScale})`;
+      } else {
+        isFixed = false;
+        const scale = Math.max(minScale, 1 - (scrollPosition / navbarHeight) * (1 - minScale));
+        searchWrapper.style.transform = `scale(${scale})`;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  });
+
   /** Get user information */
   async function fetchUser() {
     try {
@@ -194,8 +219,8 @@
   <title>My Articles</title>
 </svelte:head>
 
-<div class="search-container">
-  <div class="search-wrapper">
+<div class="search-container" class:fixed={isFixed}>
+  <div class="search-wrapper" bind:this={searchWrapper}>
     <div class="search-bar">
       <div class="sort-container">
         <select bind:value={sortBy} on:change={handleSort}>
@@ -212,7 +237,12 @@
         <span class="date-label">Select date:</span>
         <input type="date" bind:value={exactDate} on:change={handleSearch} />
       {:else}
-        <input type="text" bind:value={searchQuery} placeholder="Search..." />
+        <input 
+          type="text" 
+          bind:value={searchQuery} 
+          placeholder="Search..." 
+          style="background: transparent; border: none; outline: none; font-size: 18px;"
+        />
       {/if}
 
       <select bind:value={filterBy} on:change={handleFilterChange}>
@@ -287,16 +317,24 @@
 <style>
   .search-container {
     padding: 10px 0;
-    z-index: 0;
-    position: relative;
-    max-width: 900px;
-    margin: 0 auto;
-    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    z-index: 31;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    display: block;
+  }
+
+  .search-container.fixed {
+    position: fixed;
+    top: 0;
   }
 
   .search-wrapper {
-    max-width: 900px;
     margin: 0 auto;
+    transition: transform 0.3s ease;
+    transform-origin: top center;
   }
 
   .search-bar {
@@ -304,10 +342,12 @@
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
-    background: white;
+    background: rgba(255, 245, 245);
     border-radius: 30px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     height: 50px;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
   }
 
   .sort-container {
@@ -346,6 +386,10 @@
     width: 70px;
     height: 35px;
     font-size: 13px;
+  }
+
+  .search-bar button:hover {
+    transform: scale(1.05);
   }
 
   .order-button {
@@ -389,6 +433,7 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
+    margin-top: 100px;
   }
 
   .article {
@@ -469,9 +514,37 @@
     color: inherit;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1080px) {
     .articles {
-      padding: 10px;
+      margin-top: 150px;
+    }
+    .search-bar {
+       padding: 10px 10px;
+       flex-direction: column;
+       gap: 10px;
+       height: auto;
+       padding: 15px;
+       align-items: center;
+     }
+     .sort-container {
+       width: 100%;
+       justify-content: center;
+       border-right: none;
+       padding-right: 0;
+     }
+     .right-search-container {
+       width: 100%;
+       justify-content: center;
+       flex-direction: column;
+       gap: 10px;
+     }
+    .search-container{
+      z-index: 29;
+      width: 80%;
+    }
+    .search-container.fixed {
+      position: absolute;
+      top: 0;
     }
   }
 </style>
