@@ -433,6 +433,7 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
+    margin-top: 100px;
   }
 
   .article {
