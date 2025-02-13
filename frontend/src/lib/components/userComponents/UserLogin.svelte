@@ -27,6 +27,8 @@
     background.style.background = `radial-gradient(circle at ${x}px ${y}px, #FFE4E1 10%, pink 30%, lightpink 50%)`;
   }
 
+ 
+
   function closeUserPopUpwindow() {
     displayUserPopUpwindow = false;
     displayLogin.set(false);
@@ -42,11 +44,11 @@
   let username = "";
   let password = "";
 
-  // Process the login form
+  // process the login form
   async function handleLogin(event) {
     event.preventDefault();
 
-    // Send the login request
+    // send the login request
     try {
       const response = await fetch(`${PUBLIC_API_BASE_URL}/auth`, {
         method: "POST",
@@ -61,7 +63,6 @@
         throw new Error("login failed");
       } else {
         const data = await response.json();
-        console.log("Login successful:", data);
         toggleLogedIn();
         displayloginFailed = false;
         try {
@@ -73,31 +74,27 @@
             credentials: "include"
           });
           if (!response.ok) {
-            throw new Error("Failed to fetch user icon");
           } else {
             const data = await response.json();
             iconName.set(data);
-            console.log("User icon fetched successfully:", data);
           }
         } catch (error) {
-          console.error("Failed to fetch user icon:", error);
         }
       }
 
       window.location.reload();
     } catch (error) {
       displayloginFailed = true;
-      console.error("Login failed:", error);
     }
   }
 </script>
 
 {#if displayUserPopUpwindow}
-  <button class="overlay" on:click={closeUserPopUpwindow}></button>
+  <button class="overlay" on:click={closeUserPopUpwindow}>
     <button on:click|stopPropagation style="background-color: transparent; border: none;">
       {#if displayloginFailed}
         <AlertWindow message="login failed" on:confirm={() => (displayloginFailed = false)} />
-        <!-- Pass the message prop to the AlertWindow component -->
+        <!-- pass the message prop to the alertWindow component -->
       {/if}
 
       {#if !$logedIn}
@@ -298,6 +295,7 @@
     color: #aaa;
     font-size: 15px;
     font-weight: bold;
+    
   }
 
   .signUpMsg {
@@ -313,18 +311,19 @@
   }
 
   .loginBtn {
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 10px;
-    background: linear-gradient(90deg, pink, #FFE4E1);
-    transition: transform 0.2s ease;
-    height: 50px;
-    font-size: 16px;
-    opacity: 1;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 10px;
+  background: linear-gradient(90deg, pink, #FFE4E1);
+  transition: transform 0.2s ease;
+  height: 50px;
+  font-size: 16px;
+  opacity: 1;
   }
 
   .loginBtn:hover {
     transform: translateY(-3px);
   }
+  
 </style>
