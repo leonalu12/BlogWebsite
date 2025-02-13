@@ -155,9 +155,14 @@
         <div>
           {#if filterBy === "date_time"}
             <span class="date-label">Select date:</span>
-            <input type="date" bind:value={exactDate} on:change={handleSearch} />
-          {:else}
-            <input type="text" bind:value={searchQuery} placeholder="Search..." />
+            <input  type="date" bind:value={exactDate} on:change={handleSearch}  />
+            {:else}
+            <input 
+              type="text" 
+              bind:value={searchQuery} 
+              placeholder="Search..." 
+              style="background: rgb(255, 245, 245);"
+            />
           {/if}
         </div>
         <div>
@@ -253,12 +258,11 @@
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
-    background: white;
+    background: rgba(255, 245, 245);
     border-radius: 30px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     height: 50px;
     justify-content: space-evenly;
-
     flex-wrap: wrap; /* Allow wrapping */
   }
 
@@ -411,6 +415,7 @@
     color: #666;
     font-size: 14px;
     white-space: nowrap;
+
   }
 
   select {
