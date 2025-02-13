@@ -4,7 +4,7 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import { logedIn } from "../../store/userStore.js";
-  import AlertWindow from "../utils/AlertWindow.svelte"; //import the alertWindow component
+  import AlertWindow from "../utils/AlertWindow.svelte"; // Import the AlertWindow component
   import { displayEdit } from "../../store/userStore.js";
   import { iconName } from "../../store/userStore.js";
   import { displayLogin } from "../../store/userStore.js";
@@ -63,7 +63,6 @@
         throw new Error("login failed");
       } else {
         const data = await response.json();
-        console.log("登录成功:", data);
         toggleLogedIn();
         displayloginFailed = false;
         try {
@@ -75,21 +74,17 @@
             credentials: "include"
           });
           if (!response.ok) {
-            throw new Error("获取用户头像失败");
           } else {
             const data = await response.json();
             iconName.set(data);
-            console.log("获取用户头像成功:", data);
           }
         } catch (error) {
-          console.error("获取用户头像失败:", error);
         }
       }
 
       window.location.reload();
     } catch (error) {
       displayloginFailed = true;
-      console.error("登录失败:", error);
     }
   }
 </script>

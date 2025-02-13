@@ -11,10 +11,9 @@
   import { goto } from "$app/navigation";
   import { displayLogoutSuccess } from "../../store/userStore.js";
 
- 
   let isOpen = false;
-  let dropdownRef; // 用于引用下拉框的 DOM 元素
-  let triggerRef; // 用于引用触发按钮的 DOM 元素
+  let dropdownRef; // Reference to the dropdown DOM element
+  let triggerRef; // Reference to the trigger button DOM element
 
   function toggleDisplaySecurity() {
     displaySecurity.update((value) => !value);
@@ -55,7 +54,7 @@
     }
   }
 
-  // 点击外部关闭下拉框
+  // Close dropdown when clicking outside
   function handleClickOutside(event) {
     if (dropdownRef && !dropdownRef.contains(event.target)) {
       if (triggerRef && !triggerRef.contains(event.target)) {
@@ -70,7 +69,6 @@
 
   onDestroy(() => {
     document.removeEventListener("click", handleClickOutside);
-    
   });
 </script>
 
@@ -79,9 +77,6 @@
     <span class="menu"><Menu /></span>
     <span class="icon"><User /></span>
   </button>
-
-  
-  
 {:else}
   <div class="dropdown">
     <button class="loggedIcon" on:click={toggleDropdown} bind:this={triggerRef}>
@@ -99,13 +94,7 @@
       </button>
     </div>
   </div>
-
 {/if}
-  
-
-  
-
-
 
 <style>
   .userButton {
@@ -136,7 +125,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
   }
 
   .icon {
