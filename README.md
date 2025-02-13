@@ -1,3 +1,44 @@
+#please read me
+
+##a. Team name
+    Keeping Up With the Karshions
+
+##b. Are there any special setup instructions, beyond initialising the database and running your project?
+    We have no special setup instructions.:D
+
+##c. At least one username / password combination for an existing user in your system with some already-published articles & comments
+    > [!TIP]
+    >-username: Vita -password: loveuvita
+    >-username: Tyne -password: loveutyne
+
+##d. Any other instructions / comments you wish to make to your markers
+    In Java Swing, we have set up a separate database for administrators. We have one super admin and two regular admins. The super admin account cannot be deleted, while the other admin accounts can be deleted.
+    > [!TIP]
+    >Super admin:
+    >   -username: admin - password: admin
+    >Other admins:
+    >   -username: admin1 - password: admin1
+    >   -username: admin2 - password: admin2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Final project - A personal blogging system - Team $GROUPNAME
 
 This repository contains a starting point for your team's final project. We look forward to seeing your progress and your final results this semester!
