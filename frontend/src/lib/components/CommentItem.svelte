@@ -30,8 +30,7 @@
     if (res.ok) {
       comment.deleted = true; 
       // Mark as deleted and trigger Svelte update
-
-      
+      window.location.reload();
     }
     showDeleteConfirm = false;
   }
@@ -80,7 +79,7 @@
 
   <!-- Only render when the comment is not deleted  -->
   {#if !comment.deleted} 
-  <div class="comment-item" style="margin-left: {comment.displayLayer * 20}px">
+  <div class="comment-item" style="margin-left: {comment.displayLayer == 1 ? '0px' : '5px'}">
     <div class="comment-content">
       <div class="user-info">
         <img class="user-avatar" src={`http://localhost:3000/images/${comment.icon}`} alt={comment.username} />
@@ -89,7 +88,7 @@
       </div>
       {#if comment.parent_username}
         <div class="reply-to">
-          Reply <span class="reply-username">@{comment.parent_username}</span>
+          <span class="buttonInfo">Reply</span> <span class="reply-username">@{comment.parent_username}</span>
         </div>
       {/if}
       <p>{comment.content}</p>
@@ -107,14 +106,15 @@
         
         <button on:click={() => handleToggleReplyBox(comment)} class="icon-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 8.046H11V6.119c0-.921-.9-1.446-1.524-.894l-5.108 4.49a1.2 1.2 0 0 0 0 1.739l5.108 4.49c.624.556 1.524.027 1.524-.893v-1.928h2a3.023 3.023 0 0 1 3 3.046V19a5.593 5.593 0 0 0-1.5-10.954"/>
-          </svg>Reply
+          </svg>
+          <span class="buttonInfo">Reply
         </button>
         <!-- Only comment owner/article owner can see the "Delete" button -->
         {#if user_id &&( user_id == comment.user_id || user_id == article.user_id) }
           <button on:click={triggerDeleteConfirm} class="icon-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17 6h5v2h-2v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8H2V6h5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1zm1 2H6v12h12zm-9 3h2v6H9zm4 0h2v6h-2zM9 4v2h6V4z"/>
             </svg>
-            Delete</button>
+            <span class="buttonInfo">Delete</span></button>
         {/if}
       </div>
       
@@ -259,7 +259,21 @@
     .icon-btn svg {
       transition: transform 0.2s ease;
     }
+    
+
+    @media (max-width: 978px) {
+      .comment-content {
+        padding: 12px;
+      }
   
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+      }
+      .buttonInfo {
+        display: none;
+      }
+    }
     @media (max-width: 768px) {
       .comment-content {
         padding: 12px;
@@ -268,6 +282,41 @@
       .user-avatar {
         width: 32px;
         height: 32px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .comment-content {
+        padding: 10px;
+      }
+  
+      .user-avatar {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    @media (max-width: 250px) {
+      .comment-content {
+        padding: 8px;
+      }
+      
+      .user-avatar {
+        width: 24px;
+        height: 24px;
+      }
+
+      .icon-btn span {
+        display: none;
+      }
+
+      .icon-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .buttonInfo {
+        display: none;
       }
     }
     .reply-box {

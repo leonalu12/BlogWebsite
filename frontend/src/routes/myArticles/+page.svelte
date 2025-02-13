@@ -287,7 +287,7 @@
 <style>
   .search-container {
     padding: 10px 0;
-    z-index: 31;
+    z-index: 0;
     position: relative;
     max-width: 900px;
     margin: 0 auto;
@@ -404,7 +404,7 @@
   .article:hover {
     transform: translateY(-5px) scale(1.02) rotate(0.5deg);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    z-index: 30;
+    z-index: 0;
   }
 
   .article img {
@@ -440,6 +440,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     padding: 0 15px;
+    z-index: 0;
   }
 
   .button-container {

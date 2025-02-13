@@ -179,7 +179,7 @@
     right: 0;
     background-color: #ffffff;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    z-index: 1000;
     border-radius: 8px;
     overflow: hidden;
     min-width: 160px;

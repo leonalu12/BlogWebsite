@@ -433,6 +433,8 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   }
 
+
+
   .image-preview {
     width: 100%;
     display: flex;
@@ -444,6 +446,10 @@
     max-height: 300px;
     border-radius: 8px;
     object-fit: contain;
+  }
+
+  #title {
+    width: 96%;
   }
 
   @media (max-width: 768px) {
@@ -464,4 +470,6 @@
       max-height: 200px;
     }
   }
+
+
 </style>

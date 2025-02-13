@@ -5,16 +5,16 @@
   import { PUBLIC_API_BASE_URL } from "$env/static/public";
   import AlertWindow from "../../../lib/components/utils/alertWindow.svelte";
   import DeleteConfirmWindow from "../../../lib/components/utils/DeleteConfirmWindow.svelte";
-  import { writable } from "svelte/store"; 
+  import { writable } from "svelte/store";
   import UserLogin from "../../../lib/components/userComponents/UserLogin.svelte";
-  import {displayLogin} from "../../../lib/store/userStore";
+  import { displayLogin } from "../../../lib/store/userStore";
   import { logedIn } from "../../../lib/store/userStore";
   import { iconName } from "../../../lib/store/userStore";
 
   let title = "";
   let content = "";
   let image = null;
-  let previewUrl = ''; // 新增: 用于存储预览URL
+  let previewUrl = ""; // 新增: 用于存储预览URL
   let apiKey = "isispwbzpba6wf2rc8djljndp26nq2f6ueiclzfjlh2tcjgx";
   let showWindow = false;
   let windowMessage = "";
@@ -24,9 +24,8 @@
   let deleteImageMessage = "Are you sure you want to delete this image?";
 
   let imageToDelete = null;
-// Store user information
+  // Store user information
   let user = writable(null); // ✅ 存储用户信息
-
 
   let conf = {
     toolbar:
@@ -41,20 +40,20 @@
     try {
       const res = await fetch(`${PUBLIC_API_BASE_URL}/users`, {
         method: "GET",
-        credentials: "include" 
+        credentials: "include"
       });
 
       if (res.ok) {
         const userData = await res.json();
         // Store user information
-        user.set(userData); 
+        user.set(userData);
         console.log(" Fetched user:", userData);
       } else if (res.status === 401) {
         console.error(" User is not logged in. Redirecting...");
         displayLogin.set(true);
       }
     } catch (error) {
-      errorWindowMessage="Error fetching user."
+      errorWindowMessage = "Error fetching user.";
       showErrorWindow = true;
     }
   }
@@ -78,7 +77,7 @@
         },
         credentials: "include"
       });
-      if (response.ok){
+      if (response.ok) {
         const response = await fetch(`${PUBLIC_API_BASE_URL}/users/icon`, {
           method: "GET",
           headers: {
@@ -97,7 +96,7 @@
       }
     } catch (error) {
       console.error("Failed to fetch user avatar:", error);
-    } 
+    }
   });
 
   //Submit article
@@ -110,7 +109,7 @@
 
     let currentUser;
     //Get user
-    user.subscribe((value) => (currentUser = value))(); 
+    user.subscribe((value) => (currentUser = value))();
 
     if (!currentUser) {
       displayLogin.set(true);
@@ -125,7 +124,7 @@
     const res = await fetch(`${PUBLIC_API_BASE_URL}/articles/new`, {
       method: "POST",
       body: formData,
-      credentials: "include" 
+      credentials: "include"
     });
 
     if (res.ok) {
@@ -163,8 +162,8 @@
       URL.revokeObjectURL(previewUrl);
     }
     image = null;
-    previewUrl = '';
-    document.getElementById('image').value = '';
+    previewUrl = "";
+    document.getElementById("image").value = "";
     showDeleteImageWindow = false;
   }
 
@@ -177,14 +176,14 @@
     showDeleteImageWindow = false;
   }
 
-   function cancelDeleteImage (){
+  function cancelDeleteImage() {
     showDeleteImageWindow = false;
     imageToDelete = null;
-   }
+  }
 
-   function formatFileName(name) {
+  function formatFileName(name) {
     if (name.length > 20) {
-      return name.substring(0, 20) + '...';
+      return name.substring(0, 20) + "...";
     }
     return name;
   }
@@ -195,56 +194,63 @@
   }
 </script>
 
-
 {#if $logedIn}
-<div class="article-form">
-  <h1>Write your article here</h1>
+  <div class="article-form">
+    <h1>Write your article here</h1>
 
-  <!-- Article Title -->
-  <label for="title">Title:</label>
-  <input type="text" id="title" bind:value={title} placeholder="Enter article title" required />
+    <!-- Article Title -->
+    <label for="title">Title:</label>
+    <input type="text" id="title" bind:value={title} placeholder="Enter article title" required />
 
-  <!-- WYSIWYG Editor -->
-  <label for="content">Content:</label>
-  <TinyMCE {apiKey} bind:value={content} {conf} />
+    <!-- WYSIWYG Editor -->
+    <label for="content">Content:</label>
+    <TinyMCE {apiKey} bind:value={content} {conf} />
 
-  <div class="file-input-container">
-    <label for="image" class="file-input-label">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="17 8 12 3 7 8"/>
-        <line x1="12" y1="3" x2="12" y2="15"/>
-      </svg>
-      <span>Choose an image to upload</span>
-    </label>
-    <input
-      type="file"
-      id="image"
-      accept="image/*"
-      on:change={handleFileSelect}
-      class="hidden-input"
-    />
-    
-    <!-- Preview Section -->
-    {#if previewUrl}
-      <div class="preview-container">
-        <div class="preview-header">
-          <h3>Image Preview:</h3>
-          <button class="delete-image-button" on:click={confirmDeleteImage}>
-            Delete
-          </button>
+    <div class="file-input-container">
+      <label for="image" class="file-input-label">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <span>Choose an image to upload</span>
+      </label>
+      <input
+        type="file"
+        id="image"
+        accept="image/*"
+        on:change={handleFileSelect}
+        class="hidden-input"
+      />
+
+      <!-- Preview Section -->
+      {#if previewUrl}
+        <div class="preview-container">
+          <div class="preview-header">
+            <h3>Image Preview:</h3>
+            <button class="delete-image-button" on:click={confirmDeleteImage}> Delete </button>
+          </div>
+          <div class="image-preview">
+            <img src={previewUrl} alt="Preview" />
+          </div>
         </div>
-        <div class="image-preview">
-          <img src={previewUrl} alt="Preview" />
-        </div>
-      </div>
-    {/if}
+      {/if}
+    </div>
+    <!-- Submit Button -->
+    <button on:click={handleSubmit}>Publish</button>
   </div>
-  <!-- Submit Button -->
-  <button on:click={handleSubmit}>Publish</button>
-</div>
 {:else}
-<p>Please log in to write an article.</p>
+  <p>Please log in to write an article.</p>
 {/if}
 
 {#if showWindow}
@@ -256,7 +262,11 @@
 {/if}
 
 {#if showDeleteImageWindow}
-  <DeleteConfirmWindow message = {deleteImageMessage} on:confirm={handleDeleteImage} on:cancel={cancelDeleteImage} />
+  <DeleteConfirmWindow
+    message={deleteImageMessage}
+    on:confirm={handleDeleteImage}
+    on:cancel={cancelDeleteImage}
+  />
 {/if}
 
 {#if $displayLogin}
@@ -322,7 +332,7 @@
   }
 
   button {
-    background: linear-gradient(90deg, rgba(255,192,203,0.8), rgba(255,228,225,0.8));
+    background: linear-gradient(90deg, rgba(255, 192, 203, 0.8), rgba(255, 228, 225, 0.8));
     color: #333;
     padding: 12px 24px;
     border: none;
@@ -391,109 +401,110 @@
     }
   }
 
-  
-  
-    .file-input-container {
-      position: relative;
-      margin-top: 1rem;
-    }
-  
-    .file-input-label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 20px;
-      background: linear-gradient(90deg, rgba(255,192,203,0.1), rgba(255,228,225,0.1));
-      border: 2px dashed rgba(255,192,203,0.5);
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-  
-    .file-input-label:hover {
-      background: linear-gradient(90deg, rgba(255,192,203,0.2), rgba(255,228,225,0.2));
-      border-color: pink;
-    }
-  
-    .file-input-label span {
-      color: #666;
-      font-size: 1rem;
-    }
-  
-    input[type="file"] {
-      position: absolute;
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      z-index: -1;
-    }
-  
-    .file-preview {
-      margin-top: 1rem;
-      padding: 10px;
-      background: rgba(255,192,203,0.1);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-  
-    .file-name {
-      color: #666;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  
+  .file-input-container {
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  .file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: linear-gradient(90deg, rgba(255, 192, 203, 0.1), rgba(255, 228, 225, 0.1));
+    border: 2px dashed rgba(255, 192, 203, 0.5);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .file-input-label:hover {
+    background: linear-gradient(90deg, rgba(255, 192, 203, 0.2), rgba(255, 228, 225, 0.2));
+    border-color: pink;
+  }
+
+  .file-input-label span {
+    color: #666;
+    font-size: 1rem;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  .file-preview {
+    margin-top: 1rem;
+    padding: 10px;
+    background: rgba(255, 192, 203, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .file-name {
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .preview-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255, 192, 203, 0.1);
+    border-radius: 10px;
+  }
+
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+
+  #title {
+    width: 96%;
+  }
+
+  .preview-header h3 {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+  }
+
+  .image-preview {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .image-preview img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+
+  @media (max-width: 768px) {
     .preview-container {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: rgba(255,192,203,0.1);
-      border-radius: 10px;
+      padding: 0.8rem;
     }
-  
+
     .preview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.6rem;
     }
-  
-    .preview-header h3 {
-      font-size: 0.9rem;
-      color: #666;
-      margin: 0;
-    }
-  
-    .image-preview {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-  
+
     .image-preview img {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 8px;
-      object-fit: contain;
+      max-height: 200px;
     }
-  
-    @media (max-width: 768px) {
-      .preview-container {
-        padding: 0.8rem;
-      }
-  
-      .preview-header {
-        margin-bottom: 0.6rem;
-      }
-  
-      .image-preview img {
-        max-height: 200px;
-      }
-    }
-    
+  }
 </style>

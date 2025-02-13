@@ -13,9 +13,9 @@
 
   let exactDate = "";
   // Sort order
-  let order = "DESC"; 
+  let order = "DESC";
   // Article list
-  let articles = []; 
+  let articles = [];
   let searchWrapper;
   let minScale = 0.75;
   let navbarHeight = 105;
@@ -56,7 +56,7 @@
       const response = await fetch(`${PUBLIC_API_BASE_URL}/articles?${queryParams}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       articles = await response.json();
-      console.log(" Retrieved articles:", articles); 
+      console.log(" Retrieved articles:", articles);
     } catch (error) {
       console.error(" Failed to retrieve article:", error);
     }
@@ -91,9 +91,8 @@
         }
       }
     } catch (error) {
-
       console.error(" Failed to retrieve user avatar:", error);
-    } 
+    }
   });
 
   function handleSearch() {
@@ -105,18 +104,18 @@
       console.log("🔎 Not date filtering, normal query");
     }
 
-   //  **Remove Unicode quotes to prevent invalid characters**
+    //  **Remove Unicode quotes to prevent invalid characters**
     searchQuery = searchQuery.replace(/[“”„‟❝❞＂]/g, '"').trim();
 
     fetchArticles();
   }
 
- // ** Support dynamic switching of search types (title, username, date_time)**
+  // ** Support dynamic switching of search types (title, username, date_time)**
   function handleFilterChange(event) {
     filterBy = event.target.value;
     if (filterBy !== "date_time") {
       // If not searching by date, clear the date selection
-      exactDate = ""; 
+      exactDate = "";
     }
     fetchArticles();
   }
@@ -152,56 +151,59 @@
           {order === "DESC" ? "⬇" : "⬆"}
         </button>
       </div>
+      <div class="right-search-container">
+        <div>
+          {#if filterBy === "date_time"}
+            <span class="date-label">Select date:</span>
+            <input type="date" bind:value={exactDate} on:change={handleSearch} />
+          {:else}
+            <input type="text" bind:value={searchQuery} placeholder="Search..." />
+          {/if}
+        </div>
+        <div>
+          <select bind:value={filterBy} on:change={handleFilterChange}>
+            <option value="title">Title</option>
+            <option value="username">Username</option>
+            <option value="date_time">Date</option>
+          </select>
 
-      {#if filterBy === "date_time"}
-        <span class="date-label">Select date:</span>
-        <input type="date" bind:value={exactDate} on:change={handleSearch} />
-      {:else}
-        <input type="text" bind:value={searchQuery} placeholder="Search..." />
-      {/if}
-
-      <select bind:value={filterBy} on:change={handleFilterChange}>
-        <option value="title">Title</option>
-        <option value="username">Username</option>
-        <option value="date_time">Date</option>
-      </select>
-
-      <button on:click={handleSearch}>Search</button>
+          <button on:click={handleSearch}>Search</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="articles">
   {#each articles as article}
-  {#if !article.image_url}
-  <div class="article">
-    <a href={`/articles/${article.id}`}>
-      <div class="article-content">
-        <h2>{article.title}</h2>
-        <div class="article-meta">
-          <div>By: {article.username}</div>
-          <div>Published on: {article.date_time}</div>
-        </div>
-        <div class="articleWithoutImg">{@html article.content}</div>
+    {#if !article.image_url}
+      <div class="article">
+        <a href={`/articles/${article.id}`}>
+          <div class="article-content">
+            <h2>{article.title}</h2>
+            <div class="article-meta">
+              <div>By: {article.username}</div>
+              <div>Published on: {article.date_time}</div>
+            </div>
+            <div class="articleWithoutImg">{@html article.content}</div>
+          </div>
+        </a>
       </div>
-    </a>
-  </div>
-  {:else}
-  <div class="article">
-    <a href={`/articles/${article.id}`}>
-      <div class="article-content">
-        <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
-        <h2>{article.title}</h2>
-        <div class="article-meta">
-          <div>By: {article.username}</div>
-          <div>Published on: {article.date_time}</div>
-        </div>
-        <div class="article-preview">{@html article.content}</div>
+    {:else}
+      <div class="article">
+        <a href={`/articles/${article.id}`}>
+          <div class="article-content">
+            <img src="{PUBLIC_IMAGES_URL}/{article.image_url}" alt={article.title} />
+            <h2>{article.title}</h2>
+            <div class="article-meta">
+              <div>By: {article.username}</div>
+              <div>Published on: {article.date_time}</div>
+            </div>
+            <div class="article-preview">{@html article.content}</div>
+          </div>
+        </a>
       </div>
-    </a>
-  </div>
-  {/if}
-    
+    {/if}
   {/each}
 </div>
 
@@ -213,10 +215,16 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 900px;
+    width: 60%;
     display: block;
   }
+  .right-search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
+    justify-content: space-between;
+  }
   .order-button {
     background: linear-gradient(90deg, pink, #ffe4e1);
     border: none;
@@ -235,7 +243,6 @@
   }
 
   .search-wrapper {
-    max-width: 900px;
     margin: 0 auto;
     transition: transform 0.3s ease;
     transform-origin: top center;
@@ -250,6 +257,9 @@
     border-radius: 30px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     height: 50px;
+    justify-content: space-evenly;
+
+    flex-wrap: wrap; /* Allow wrapping */
   }
 
   .sort-container {
@@ -351,7 +361,7 @@
     margin-bottom: 10px;
   }
 
-  .articleWithoutImg{
+  .articleWithoutImg {
     display: -webkit-box;
     -webkit-line-clamp: 15;
     line-clamp: 10;
@@ -359,6 +369,7 @@
     overflow: hidden;
     padding: 0 15px;
     margin-bottom: 10px;
+    margin-right: 0;
   }
 
   a {
@@ -366,21 +377,56 @@
     color: inherit;
   }
 
-  @media (max-width: 768px) {
-    .search-container.fixed {
-      width: 90%;
+  @media (max-width: 1080px) {
+    .search-container{
+      z-index: 29;
+      width: 80%;
+
+    }
+    .search-bar {
+      padding: 10px 10px;
+      flex-direction: column; /* Change to column direction */
+      gap: 10px;
+      height: auto;
+      padding: 15px;
+      align-items: center;
     }
 
-    .search-bar {
-      flex-wrap: wrap;
+    .sort-container {
+      width: 100%; /* Full width on small screens */
+      justify-content: center; /* Center items */
+      border-right: none; /* Remove border */
+      padding-right: 0; /* Remove padding */
     }
+
+    .right-search-container {
+      width: 100%; /* Full width on small screens */
+      justify-content: center; /* Center items */
+      flex-direction: column; /* Change to column direction */
+      gap: 10px;
+    }
+  }
+
+  @media (max-width: 850px) {
+    .search-container {
+      z-index: 29;
+      width: 90%;
+    }
+    .search-container.fixed {
+    position: absolute;
+    top: 0;
+  }
+
+  .articles{
+    margin-top: 120px;
+  }
+
   }
 
   .date-label {
     color: #666;
     font-size: 14px;
     white-space: nowrap;
-    margin-right: 10px;
   }
 
   select {

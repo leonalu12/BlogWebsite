@@ -339,6 +339,19 @@
     border-radius: 3px;
   }
 
+  @media (max-width: 870px) {
+    .comments-container {
+      padding: 10px;
+    }
+
+    .comment-box {
+      padding: 10px;
+    }
+    .new-comment{
+      flex-direction: column;
+    }
+  }
+  
   @media (max-width: 768px) {
     .comments-container {
       padding: 10px;
@@ -348,4 +361,6 @@
       padding: 10px;
     }
   }
+
+
 </style>
