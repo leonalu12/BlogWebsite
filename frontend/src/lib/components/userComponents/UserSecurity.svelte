@@ -279,6 +279,7 @@
     margin: 0;
     width: 97%;
     justify-self: center;
+    margin-bottom: 20px;
   }
 
   .userInput {

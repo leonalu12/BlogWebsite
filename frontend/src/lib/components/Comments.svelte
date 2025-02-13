@@ -323,6 +323,8 @@
     flex: 1;
     overflow-y: auto;
     padding-right: 10px;
+    opacity: 1;
+    background-color: white;
   }
 
   .comments-list::-webkit-scrollbar {
