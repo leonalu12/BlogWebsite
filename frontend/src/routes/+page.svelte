@@ -17,8 +17,8 @@
   // Article list
   let articles = [];
   let searchWrapper;
-  let minScale = 0.75;
-  let navbarHeight = 105;
+  let minScale = 0.8;
+  let navbarHeight = 80;
   let isFixed = false;
 
   onMount(() => {
@@ -383,28 +383,12 @@
       width: 80%;
 
     }
-    .search-bar {
-      padding: 10px 10px;
-      flex-direction: column; /* Change to column direction */
-      gap: 10px;
-      height: auto;
-      padding: 15px;
-      align-items: center;
-    }
+    
 
-    .sort-container {
-      width: 100%; /* Full width on small screens */
-      justify-content: center; /* Center items */
-      border-right: none; /* Remove border */
-      padding-right: 0; /* Remove padding */
-    }
-
-    .right-search-container {
-      width: 100%; /* Full width on small screens */
-      justify-content: center; /* Center items */
-      flex-direction: column; /* Change to column direction */
-      gap: 10px;
-    }
+    .search-container.fixed {
+    position: absolute;
+    top: 0;
+  }
   }
 
   @media (max-width: 850px) {
