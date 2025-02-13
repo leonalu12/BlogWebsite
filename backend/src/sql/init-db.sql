@@ -144,7 +144,7 @@ class NeuralNetwork {
     }
 }
 </code></pre>
-</div></article>', '2024-02-05 15:45:00', 'AI Future', 2),
+</div></article>', '2024-02-05 15:45:00', 'AI Future', 3),
 
 ('<article>
 <p>In today''s fast-paced world, finding time for fitness can be challenging. As a fitness trainer with over a decade of experience, I''ve developed these efficient workout routines specifically for busy professionals who want to maintain their health without spending hours in the gym.</p>
@@ -170,7 +170,7 @@ class NeuralNetwork {
 </div>
 <h3>Science Behind the Routines</h3>
 <p>These workouts are designed based on recent research in exercise physiology, showing that short, intense bursts of activity can be as effective as longer moderate sessions. The key is maintaining proper form and consistency.</p></article>', 
-'2024-02-10 09:15:00', 'Quick Workouts', 1),
+'2024-02-10 09:15:00', 'Quick Workouts', 4),
 
 ('<article>
 <p>As we approach the new season, it''s time to explore the most exciting trends that will define fashion in 2024. From sustainable materials to bold color choices, this guide will help you navigate the evolving landscape of style.</p>
@@ -201,7 +201,7 @@ class NeuralNetwork {
 <li>Minimalist accessories</li>
 </ol>
 <p>Styling tips and combination suggestions included in the next section...</p></article>', 
-'2024-03-01 14:20:00', 'Fashion Trends', 1),
+'2024-03-01 14:20:00', 'Fashion Trends', 5),
 
 ('<article>
 <p>After spending six months exploring the hidden corners of Southeast Asia, I''ve compiled this comprehensive guide to help fellow travelers navigate this fascinating region. From remote temples to bustling night markets, here''s everything you need to know.</p>
@@ -224,7 +224,7 @@ class NeuralNetwork {
 </table>
 <h3>Cultural Insights</h3>
 <p>Understanding local customs is crucial for meaningful travel experiences...</p></article>', 
-'2024-03-15 11:30:00', 'Asia Travel Guide', 1),
+'2024-03-15 11:30:00', 'Asia Travel Guide', 6),
 
 ('<article>
 <p>As a passionate book reviewer and literature enthusiast, I''ve had the privilege of exploring countless literary works throughout 2023. Here''s my carefully curated list of the most impactful books that have shaped the literary landscape this year.</p>
@@ -271,7 +271,7 @@ class NeuralNetwork {
       <td>Environmental Science, Sustainability</td>
     </tr>
   </table>
-</div></article>', '2024-04-01 16:45:00', 'Book Reviews 2023', 2),
+</div></article>', '2024-04-01 16:45:00', 'Book Reviews 2023', 7),
 
 ('<article>
 <p>As a music producer with over a decade of experience, I''ve witnessed the remarkable transformation of music production from hardware-dominated studios to powerful digital workstations. This comprehensive guide explores the current state of digital music production and its future trajectory.</p>
@@ -308,7 +308,7 @@ class NeuralNetwork {
 <div class="workflow-section">
   <h4>Modern Workflow Integration</h4>
   <p>Today''s production workflow combines traditional musicianship with cutting-edge technology, creating a hybrid approach that maximizes both creativity and efficiency.</p>
-</div></article>', '2024-04-15 13:25:00', 'Digital Music', 1),
+</div></article>', '2024-04-15 13:25:00', 'Digital Music', 8),
 
 ('<article>
 <p>As an environmental activist and researcher, I''ve spent years studying how individual actions can collectively create significant environmental change. This comprehensive guide explores practical steps we can all take to combat climate change.</p>
@@ -798,11 +798,9 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 ('These workouts have completely transformed my morning routine!', 1, '2023-02-10 09:30:00', 3, 4, NULL),
 ('How do you maintain proper form during high-intensity exercises?', 1, '2023-02-10 09:35:00', 5, 4, NULL),
 ('Form is key - I recommend starting slowly and focusing on technique', 2, '2023-02-10 09:40:00', 4, 4, 17),
-('Could you share more desk exercises for lower back pain?', 1, '2023-02-10 09:45:00', 7, 4, NULL),
 ('The science behind HIIT is fascinating!', 1, '2023-02-10 09:50:00', 8, 4, NULL),
 
 -- Fashion article comments (article_id: 5)
-('The sustainable fashion tips are incredibly practical', 1, '2023-03-01 14:30:00', 4, 5, NULL),
 ('How do you balance sustainability with affordability?', 1, '2023-03-01 14:35:00', 6, 5, NULL),
 ('It''s about investing in quality pieces that last longer', 2, '2023-03-01 14:40:00', 5, 5, 21),
 ('The color trends for 2024 are spot on!', 1, '2023-03-01 14:45:00', 8, 5, NULL),
@@ -810,16 +808,13 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 
 -- Travel article comments (article_id: 6)
 ('Your guide made my Southeast Asia trip so much easier', 1, '2023-03-15 11:40:00', 5, 6, NULL),
-('Any tips for solo female travelers?', 1, '2023-03-15 11:45:00', 7, 6, NULL),
-('The budget breakdown is incredibly helpful', 1, '2023-03-15 11:50:00', 8, 6, NULL),
 ('How did you handle the language barrier?', 1, '2023-03-15 11:55:00', 9, 6, NULL),
 ('Learning basic phrases in local languages helps a lot', 2, '2023-03-15 12:00:00', 6, 6, 26),
 
 -- Literature article comments (article_id: 7)
 ('Finally, someone who appreciates experimental narratives!', 1, '2023-04-01 17:00:00', 6, 7, NULL),
 ('The Echo of Memories moved me to tears', 1, '2023-04-01 17:05:00', 8, 7, NULL),
-('What are your thoughts on the rise of AI-generated literature?', 1, '2023-04-01 17:10:00', 9, 7, NULL),
-('Would love more recommendations in the sci-fi genre', 1, '2023-04-01 17:15:00', 10, 7, NULL),
+
 ('This list will be my reading guide for the year', 2, '2023-04-01 17:20:00', 7, 7, 28),
 
 -- Music production comments (article_id: 8)
@@ -827,17 +822,22 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 ('How do you feel about analog vs digital production?', 1, '2023-04-15 13:35:00', 9, 8, NULL),
 ('The AI integration section is mind-blowing', 1, '2023-04-15 13:40:00', 10, 8, NULL),
 ('Can you elaborate on latency optimization?', 1, '2023-04-15 13:45:00', 1, 8, NULL),
-('These virtual instruments sound incredible', 2, '2023-04-15 13:50:00', 8, 8, 33);
+('Would love more recommendations in the sci-fi genre', 2, '2023-04-01 17:15:00', 10, 8, 33),
+('Can you elaborate on latency optimization?', 1, '2023-04-15 13:45:00', 1, 8, NULL),
+('Can you elaborate on latency optimization?', 1, '2023-04-15 13:45:00', 1, 8, NULL),
+('Can you elaborate on latency optimization?', 1, '2023-04-15 13:45:00', 1, 8, NULL),
+('These virtual instruments sound incredible', 1, '2023-04-15 13:50:00', 8, 8, NULL);
+
 
 -- Add more interactive comments for remaining articles
 INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES
 -- Climate Action article comments (article_id: 9)
-('What are the most effective ways to reduce personal carbon footprint?', 1, '2023-05-01 11:00:00', 2, 9, NULL),
+('Can you elaborate on latency optimization?', 1, '2023-04-15 13:45:06', 1, 9, NULL),
+('Can you elaborate on latency optimization?', 1, '2023-04-15 13:45:09', 3, 9, NULL),
 ('Reducing meat consumption and using public transport are key', 2, '2023-05-01 11:05:00', 9, 9, 40),
-('Have you considered investing in renewable energy?', 1, '2023-05-01 11:10:00', 4, 9, NULL),
-('Solar panels are a great long-term investment', 2, '2023-05-01 11:15:00', 9, 9, 42),
-('What about the impact of fast fashion on the environment?', 1, '2023-05-01 11:20:00', 5, 9, NULL),
-('Supporting sustainable brands and buying second-hand helps', 2, '2023-05-01 11:25:00', 9, 9, 44),
+('Solar panels are a great long-term investment', 1, '2023-05-01 11:15:00', 9, 9, NULL),
+('The AI integration section is mind-blowing', 1, '2023-04-15 13:40:00', 10, 9, NULL),
+('Supporting sustainable brands and buying second-hand helps', 1, '2023-05-01 11:25:00', 9, 9, NULL),
 
 -- Sports Evolution article comments (article_id: 10)
 ('How has technology changed the training regimen for athletes?', 1, '2023-05-15 16:00:00', 3, 10, NULL),
@@ -850,8 +850,7 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 -- Italian Food Journey article comments (article_id: 11)
 ('Your journey through Italian cuisine is inspiring!', 1, '2023-06-01 13:00:00', 1, 11, NULL),
 ('What''s your favorite regional dish?', 1, '2023-06-01 13:05:00', 3, 11, NULL),
-('I''m a big fan of the pasta dishes in Tuscany', 2, '2023-06-01 13:10:00', 2, 11, 52),
-('Have you tried making your own pasta from scratch?', 1, '2023-06-01 13:15:00', 4, 11, NULL),
+('I''m a big fan of the pasta dishes in Tuscany', 2, '2023-06-01 13:10:00', 2, 11, NULL),
 ('It''s a rewarding experience, but requires patience', 2, '2023-06-01 13:20:00', 2, 11, 54),
 ('The coffee guide is incredibly helpful', 1, '2023-06-01 13:25:00', 5, 11, NULL),
 
@@ -861,24 +860,21 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 ('Maintaining qubit stability is a major hurdle', 2, '2023-06-15 15:10:00', 3, 12, 58),
 ('How will AI impact job markets in the future?', 1, '2023-06-15 15:15:00', 5, 12, NULL),
 ('Upskilling and adaptation will be crucial', 2, '2023-06-15 15:20:00', 3, 12, 60),
-('Sustainable tech is the way forward', 1, '2023-06-15 15:25:00', 6, 12, NULL),
 
 -- Comments for Advanced Street Photography (article_id: 16)
 ('Great tips! How do you handle challenging lighting conditions?', 1, '2023-08-10 11:00:00', 2, 16, NULL),
-('Using reflectors and shooting during golden hour helps', 2, '2023-08-10 11:10:00', 1, 16, 61),
 ('What about shooting at night?', 1, '2023-08-10 11:20:00', 3, 16, NULL),
 ('High ISO and wide aperture lenses are essential', 2, '2023-08-10 11:30:00', 1, 16, 63),
 ('Do you ever use external flashes?', 1, '2023-08-10 11:40:00', 4, 16, NULL),
 ('Rarely, but small speedlights can be useful', 2, '2023-08-10 11:50:00', 1, 16, 65),
-('Thanks for the insights!', 3, '2023-08-10 12:00:00', 2, 16, 66),
+('Thanks for the insights!', 1, '2023-08-10 12:00:00', 2, 16, NUll),
 
 -- Comments for Vegan Italian Cooking (article_id: 17)
 ('This is amazing! I''ve been looking for vegan Italian recipes', 1, '2023-08-15 13:00:00', 3, 17, NULL),
 ('What do you use as a cheese substitute?', 1, '2023-08-15 13:10:00', 2, 17, NULL),
-('Nut-based cheeses work really well', 2, '2023-08-15 13:20:00', 2, 17, 68),
-('Any tips for making vegan pasta?', 1, '2023-08-15 13:30:00', 4, 17, NULL),
-('Use semolina flour and avoid eggs', 2, '2023-08-15 13:40:00', 2, 17, 70),
-('Thanks! I''ll try that', 3, '2023-08-15 13:50:00', 3, 17, 71),
+('Nut-based cheeses work really well', 2, '2023-08-15 13:20:00', 2, 17, 69),
+('Use semolina flour and avoid eggs', 2, '2023-08-15 13:40:00', 2, 17, NULL),
+('Thanks! I''ll try that', 1, '2023-08-15 13:50:00', 3, 17, Null),
 
 -- Comments for Quantum Machine Learning (article_id: 18)
 ('This is fascinating! How close are we to practical applications?', 1, '2023-08-20 15:00:00', 4, 18, NULL),
@@ -887,7 +883,7 @@ INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid
 ('Qubit stability and error correction', 2, '2023-08-20 15:30:00', 3, 18, 75),
 ('Can you recommend any resources for learning more?', 1, '2023-08-20 15:40:00', 6, 18, NULL),
 ('Check out Xanadu and Rigetti''s websites', 2, '2023-08-20 15:50:00', 3, 18, 77),
-('Thanks!', 3, '2023-08-20 16:00:00', 4, 18, 78);
+('Thanks!', 1, '2023-08-20 16:00:00', 4, 18, NULL);
 
 -- Insert sample image records
 INSERT INTO imgs (path, article_id) VALUES
@@ -905,11 +901,6 @@ INSERT INTO imgs (path, article_id) VALUES
 -- Insert new comments for the articles above
 INSERT INTO comments (content, layer, date_time, user_id, article_id, parent_cid) VALUES
 ('Love this insight on London''s lesser-known streets!', 1, '2023-09-01 11:00:00', 1, 19, NULL),
-('Any recommendations for budget grocery stores?', 1, '2023-09-02 11:30:00', 8, 20, NULL),
-('VR arcades are popping up everywhere, can''t wait to see more!', 1, '2023-09-03 14:30:00', 10, 21, NULL),
-('Which desert would you recommend visiting first?', 1, '2023-09-04 10:00:00', 4, 22, NULL),
-('What are your favorite neutral color pieces?', 1, '2023-09-05 16:30:00', 7, 23, NULL),
-('Try Camden Town for street photography!', 2, '2023-09-01 11:10:00', 5, 19, 79),
 ('Bulk purchase beans and grains for cost savings.', 2, '2023-09-02 11:40:00', 2, 20, 80);
 
 -- Insert new like records for articles

@@ -79,7 +79,7 @@
 
   <!-- Only render when the comment is not deleted  -->
   {#if !comment.deleted} 
-  <div class="comment-item" style="margin-left: {comment.displayLayer == 1 ? '0px' : '5px'}">
+  <div class="comment-item" style="margin-left: {comment.displayLayer == 1 ? '0px' : '10px'}">
     <div class="comment-content">
       <div class="user-info">
         <img class="user-avatar" src={`http://localhost:3000/images/${comment.icon}`} alt={comment.username} />
