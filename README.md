@@ -1,6 +1,14 @@
 ## Technical Overview
-
-This project is a **full-stack personal blogging platform** built with a **SvelteKit frontend** and an **Express.js backend**.  
+<!-- Project Badges -->
+![Full Stack](https://img.shields.io/badge/Project-Full%20Stack-blue)
+![SvelteKit](https://img.shields.io/badge/Frontend-SvelteKit-orange)
+![Express.js](https://img.shields.io/badge/Backend-Express.js-lightgrey)
+![SQLite](https://img.shields.io/badge/Database-SQLite-blueviolet)
+![Java Swing](https://img.shields.io/badge/Desktop-Java%20Swing-ff69b4)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen)
+![Status](https://img.shields.io/badge/Status-Active-success)
+- This project is a **full-stack personal blogging platform** built with a **SvelteKit frontend** and an **Express.js backend**.  
 It adopts a clear separation of concerns:
 
 ### **Frontend** (`/frontend`)
