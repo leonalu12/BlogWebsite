@@ -1,42 +1,50 @@
-Technical Overview
-This project is a full-stack personal blogging platform built with a SvelteKit frontend and an Express.js backend.
+## Technical Overview
+
+This project is a **full-stack personal blogging platform** built with a **SvelteKit frontend** and an **Express.js backend**.  
 It adopts a clear separation of concerns:
 
-Frontend (/frontend): Built with SvelteKit, providing an interactive user interface, rich text editing via TinyMCE, date selection via Flatpickr, and responsive design.
+### **Frontend** (`/frontend`)
+- Built with **SvelteKit**
+- Interactive user interface
+- Rich text editing via **TinyMCE**
+- Date selection via **Flatpickr**
+- Responsive design
 
-Backend (/backend): Developed with Express.js, using SQLite for persistent storage. It supports authentication with JWT, password hashing via bcrypt, image uploads via Multer, and schema validation with Yup.
+### **Backend** (`/backend`)
+- Developed with **Express.js**
+- **SQLite** for persistent storage
+- Authentication with **JWT**
+- Password hashing via **bcrypt**
+- Image uploads via **Multer**
+- Schema validation with **Yup**
 
-Java Client (/java-client): A desktop Swing application for administrative management of accounts and content.
+### **Java Client** (`/java-client`)
+- Desktop **Swing** application for administrative management of accounts and content
 
-Features:
+---
 
-User registration & login with secure authentication
+## Features
 
-Role-based access control (normal user / admin / super admin)
+- User registration & login with secure authentication  
+- Role-based access control (**normal user / admin / super admin**)  
+- Article publishing & editing with WYSIWYG editor  
+- Commenting system  
+- Image upload & storage  
+- Admin panel with management capabilities  
 
-Article publishing & editing with WYSIWYG editor
+---
 
-Commenting system
+## Preloaded Accounts for Testing
 
-Image upload & storage
+### **Users**
+- `Vita / loveuvita`
+- `Tyne / loveutyne`
 
-Admin panel with management capabilities
+### **Admins**
+- `admin / admin` (**super admin**, undeletable)
+- `admin1 / admin1`
+- `admin2 / admin2`
 
-Preloaded accounts for testing:
-
-Users:
-
-Vita / loveuvita
-
-Tyne / loveutyne
-
-Admins:
-
-admin / admin (super admin, undeletable)
-
-admin1 / admin1
-
-admin2 / admin2
 
 
 
