@@ -53,25 +53,87 @@ It adopts a clear separation of concerns:
 - `admin1 / admin1`
 - `admin2 / admin2`
 
+## Getting Started
+
+Follow the steps below to set up the project locally for development.
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/leonalu12/BlogWebsite.git
+cd BlogWebsite
+```
+
+### 2. Backend Setup (/backend)
+```bash
+cd backend
+npm install
+```
+Create a .env file in the backend directory and configure the environment variables:
+```env
+PUBLIC_API_BASE_URL=http://localhost:3000/api
+PUBLIC_IMAGES_URL=http://localhost:3000/images
+```
+Run the backend in development mode:
+
+```bash
+
+npm run dev
+```
+By default, the backend runs at http://localhost:3000.
+
+### 3. Frontend Setup (/frontend)
+```bash
+
+cd ../frontend
+npm install
+```
+Start the frontend development server:
+
+```bash
+
+npm run dev
+```
+The frontend will run on http://localhost:5173 and will communicate with the backend using PUBLIC_API_BASE_URL.
+
+### 4. Java Client Setup (/java-client)
+Open the /java-client directory in IntelliJ IDEA or any Java 17+ compatible IDE.
+
+Configure database or API connection settings if required.
+
+Run the main class (e.g., Main or App) to start the Swing admin console.
+
+### 5. Code Formatting
+Backend
+
+```bash
+
+cd backend
+npm run format
+```
+Frontend
+
+```bash
+
+cd frontend
+npm run format
+```
 
 
-
-
-a. Team name
+## a. Team name
 
 Keeping Up With the Karshions
 
-b. Are there any special setup instructions, beyond initialising the database and running your project?
+## b. Are there any special setup instructions, beyond initialising the database and running your project?
 
 We have no special setup instructions.:D
 
-c. At least one username / password combination for an existing user in your system with some already-published articles & comments
+## c. At least one username / password combination for an existing user in your system with some already-published articles & comments
 
 -username: Vita -password: loveuvita
 
 -username: Tyne -password: loveutyne
 
-d. Any other instructions / comments you wish to make to your markers
+## d. Any other instructions / comments you wish to make to your markers
 In Java Swing, we have set up a separate database for administrators. We have one super admin and two regular admins. The super admin account cannot be deleted, while the other admin accounts can be deleted.
 
 Super admin:
