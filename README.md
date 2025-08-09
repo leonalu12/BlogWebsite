@@ -1,3 +1,46 @@
+Technical Overview
+This project is a full-stack personal blogging platform built with a SvelteKit frontend and an Express.js backend.
+It adopts a clear separation of concerns:
+
+Frontend (/frontend): Built with SvelteKit, providing an interactive user interface, rich text editing via TinyMCE, date selection via Flatpickr, and responsive design.
+
+Backend (/backend): Developed with Express.js, using SQLite for persistent storage. It supports authentication with JWT, password hashing via bcrypt, image uploads via Multer, and schema validation with Yup.
+
+Java Client (/java-client): A desktop Swing application for administrative management of accounts and content.
+
+Features:
+
+User registration & login with secure authentication
+
+Role-based access control (normal user / admin / super admin)
+
+Article publishing & editing with WYSIWYG editor
+
+Commenting system
+
+Image upload & storage
+
+Admin panel with management capabilities
+
+Preloaded accounts for testing:
+
+Users:
+
+Vita / loveuvita
+
+Tyne / loveutyne
+
+Admins:
+
+admin / admin (super admin, undeletable)
+
+admin1 / admin1
+
+admin2 / admin2
+
+
+
+
 a. Team name
 
 Keeping Up With the Karshions
