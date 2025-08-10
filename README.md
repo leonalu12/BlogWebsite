@@ -11,6 +11,13 @@
 - This project is a **full-stack personal blogging platform** built with a **SvelteKit frontend** and an **Express.js backend**.  
 It adopts a clear separation of concerns:
 
+### Screenshots
+<p align="center">
+  <p>Homepage</p><img src="docs/1.jpg" width="30%" />
+  <p>Comments</p><img src="docs/2.jpg" width="30%" />
+  <p>Search&Order</p><img src="docs/3.jpg" width="30%" />
+</p>
+
 ### **Frontend** (`/frontend`)
 - Built with **SvelteKit**
 - Interactive user interface
